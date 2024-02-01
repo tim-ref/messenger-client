@@ -1,0 +1,149 @@
+{
+  "resourceType": "Bundle",
+  "id": "148a9ab4-d2ab-479f-a268-87c63fe75c6d",
+  "meta": {
+    "lastUpdated": "2023-03-10T11:38:23.974+01:00"
+  },
+  "type": "searchset",
+  "total": 2,
+  "link": [
+    {
+      "relation": "self",
+      "url": "http://localhost:8080/fhir/PractitionerRole?_format=json&_include=PractitionerRole%3Apractitioner&_include=PractitionerRole%3Aendpoint&endpoint%3AEndpoint.connection-type=tim&endpoint%3AEndpoint.status=active&practitioner.family=Guzman&practitioner.given=Titus"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/423",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "423",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:13.491+01:00",
+          "source": "#qtDGsgtdxvpIrfSe",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC4wMjgwOTc4Nzc1Njg0OTU0NjY"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC40NjMzNDkzODg4NjYxNTA4NQ"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC40NjMzNDkzODg4NjYxNTA4NQ",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC40NjMzNDkzODg4NjYxNTA4NQ",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:12.950+01:00",
+          "source": "#KxOWlUAkekNXEInk"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Guzman:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Guzman:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC4wMjgwOTc4Nzc1Njg0OTU0NjY",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC4wMjgwOTc4Nzc1Njg0OTU0NjY",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:13.414+01:00",
+          "source": "#DUpUOBXobFlSH3EQ",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC4wMjgwOTc4Nzc1Njg0OTU0NjY"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC4wMjgwOTc4Nzc1Njg0OTU0NjY"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Guzman",
+            "family": "Guzman",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+  messenger-client:
+    build: .
+    ports:
+      - "0.0.0.0:8989:80"

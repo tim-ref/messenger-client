@@ -1,0 +1,34 @@
+<!--
+  ~ Modified by akquinet GmbH on 16.10.2023
+  ~ Originally forked from https://github.com/krille-chan/fluffychat
+  ~
+  ~ This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1024dp"
+    android:height="1024dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+  <group>
+    <clip-path
+        android:pathData="M1024,0L1024,1024L0,1024L0,0L1024,0Z"/>
+    <path
+        android:pathData="M0,0l1024,0l0,1024l-1024,0l0,-1024z"
+        android:fillColor="#01114E"
+        android:strokeColor="#00000000"/>
+  </group>
+  <path
+      android:pathData="M211.8,633L211.8,366.2L145,366.2L145,333h200v33.2L278.2,366.2L278.2,633Z"
+      android:fillColor="#ffffff"/>
+  <path
+      android:pathData="M378.2,366.2L378.2,333h66.8v33.2zM378.2,633v-233.2h66.8L445,633Z"
+      android:fillColor="#ffffff"/>
+  <path
+      android:pathData="m511.4,633v-300h15.6l142.4,142 142,-142h33.6L845,633h-66.8v-183.2l-116.8,116.8 -116.4,-116.8L545,633Z"
+      android:fillColor="#ffffff"/>
+</vector>

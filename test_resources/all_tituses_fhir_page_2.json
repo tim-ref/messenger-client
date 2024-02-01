@@ -1,0 +1,1608 @@
+{
+  "resourceType": "Bundle",
+  "id": "08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90",
+  "meta": {
+    "lastUpdated": "2023-03-10T12:35:46.196+01:00"
+  },
+  "type": "searchset",
+  "link": [
+    {
+      "relation": "self",
+      "url": "http://localhost:8080/fhir?_getpages=08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90&_getpagesoffset=20&_count=20&_format=json&_pretty=true&_include=PractitionerRole%3Aendpoint&_include=PractitionerRole%3Apractitioner&_bundletype=searchset"
+    },
+    {
+      "relation": "next",
+      "url": "http://localhost:8080/fhir?_getpages=08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90&_getpagesoffset=40&_count=20&_format=json&_pretty=true&_include=PractitionerRole%3Aendpoint&_include=PractitionerRole%3Apractitioner&_bundletype=searchset"
+    },
+    {
+      "relation": "previous",
+      "url": "http://localhost:8080/fhir?_getpages=08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90&_getpagesoffset=0&_count=20&_format=json&_pretty=true&_include=PractitionerRole%3Aendpoint&_include=PractitionerRole%3Apractitioner&_bundletype=searchset"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/453",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "453",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:17.370+01:00",
+          "source": "#IkcmVrDZupqawtz5",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC41MjI5ODczMDA0NzE5ODE2"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC4zNjE4ODg4NTg2NzMzNzcz"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/456",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "456",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:17.575+01:00",
+          "source": "#U6dQMxMYt7ei8JdJ",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC4yNzYxNjg1MTY3MjgzNTYz"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC42ODE5NTYxMDg1NzU4Mzk0"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/459",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "459",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:18.294+01:00",
+          "source": "#iookjB1V8qxaVCm3",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC45ODE4NjA1Mjc2ODMxNTQ"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC42ODA1NjE4MTM1ODMwMzA5"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/462",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "462",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:18.520+01:00",
+          "source": "#53aaMgEbuaGT3lTX",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC42OTEyODEwNDMzNzYxMzc4"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC45ODIzOTczOTg5NjI3Mjgy"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/465",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "465",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:18.742+01:00",
+          "source": "#8wyrKRGNVykN1otP",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC4yMTkxNTY2OTIwMDM4MjcyNg"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC4xMTEzMzgyOTgzMTg3NTI1Mw"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/468",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "468",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:19.396+01:00",
+          "source": "#VHlNHo5E2gQnfWKN",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC4wMTkxNDg4MTE4NzA2NjA0Mg"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC44NjE4NTkwNzk1NTM3NA"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/471",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "471",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:19.616+01:00",
+          "source": "#m7icPIIcz1ioCvvn",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC41MTkyNzM2OTMxMjMwNDkz"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC45NTY0MzU0NjI3NDUwMjI"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/474",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "474",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:19.835+01:00",
+          "source": "#tJvQ9xilU3g8rss7",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC45NDA0NzI1MzM0MDMwNjY4"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC4xMjAzMjgxMjA0MTA3MDY1MQ"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/477",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "477",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:20.663+01:00",
+          "source": "#IsellfpNaEaXCjxH",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC41ODI4Mjc2OTg3MjgxOTI"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC4yMzc1NzA4NjA4MjcxNTIwNg"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/480",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "480",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:20.910+01:00",
+          "source": "#PQV92fr2flCizxp8",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC41ODkzMzg4MDU4Mzg2NzU"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC4yMzE0NjE2NDUwNzkzNTY5Ng"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/483",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "483",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:21.119+01:00",
+          "source": "#M5JsRUk3qByRMEsi",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC41NDM4MDYxMTM4NzY3Njk0"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC4zMDAxMDk3Mjk3NzUyODE3"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/PractitionerRole/486",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "486",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:21.930+01:00",
+          "source": "#Y0e1fCq1e50QSgzK",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerRoleDirectory"
+          ]
+        },
+        "practitioner": {
+          "reference": "Practitioner/practitionerMC40MzgzNDY4NDE0Mjc2NDMyNA"
+        },
+        "endpoint": [
+          {
+            "reference": "Endpoint/endpointMC4xNjA2MzczNzA3NjcyNDMyNw"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC4zMDAxMDk3Mjk3NzUyODE3",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC4zMDAxMDk3Mjk3NzUyODE3",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:20.984+01:00",
+          "source": "#mWOwhaqZHAxsiJkd"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Woods:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Woods:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC41NDM4MDYxMTM4NzY3Njk0",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC41NDM4MDYxMTM4NzY3Njk0",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:21.059+01:00",
+          "source": "#DZkU33cMc6h7pnev",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC41NDM4MDYxMTM4NzY3Njk0"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC41NDM4MDYxMTM4NzY3Njk0"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Woods",
+            "family": "Woods",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC4zNjE4ODg4NTg2NzMzNzcz",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC4zNjE4ODg4NTg2NzMzNzcz",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:17.231+01:00",
+          "source": "#tvepbAY9cDUqQPmf"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Benjamin:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Benjamin:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC4xNjA2MzczNzA3NjcyNDMyNw",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC4xNjA2MzczNzA3NjcyNDMyNw",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:21.194+01:00",
+          "source": "#eiq54eDLLZaBrVPo"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Fitzpatrick:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Fitzpatrick:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC41MjI5ODczMDA0NzE5ODE2",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC41MjI5ODczMDA0NzE5ODE2",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:17.298+01:00",
+          "source": "#B6yuAVCTC0P1mjQe",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC41MjI5ODczMDA0NzE5ODE2"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC41MjI5ODczMDA0NzE5ODE2"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Benjamin",
+            "family": "Benjamin",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC40MzgzNDY4NDE0Mjc2NDMyNA",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC40MzgzNDY4NDE0Mjc2NDMyNA",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:21.848+01:00",
+          "source": "#27eJrsxjI2WKNp1Y",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC40MzgzNDY4NDE0Mjc2NDMyNA"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC40MzgzNDY4NDE0Mjc2NDMyNA"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Fitzpatrick",
+            "family": "Fitzpatrick",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC42ODE5NTYxMDg1NzU4Mzk0",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC42ODE5NTYxMDg1NzU4Mzk0",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:17.426+01:00",
+          "source": "#TeaZlxicMQ9rb15X"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Barrett:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Barrett:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC4yNzYxNjg1MTY3MjgzNTYz",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC4yNzYxNjg1MTY3MjgzNTYz",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:17.499+01:00",
+          "source": "#tvlw40kZYbPWesdF",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC4yNzYxNjg1MTY3MjgzNTYz"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC4yNzYxNjg1MTY3MjgzNTYz"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Barrett",
+            "family": "Barrett",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC42ODA1NjE4MTM1ODMwMzA5",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC42ODA1NjE4MTM1ODMwMzA5",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:17.647+01:00",
+          "source": "#ZTjQOCTSO0JZYATN"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Conway:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Conway:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC45ODE4NjA1Mjc2ODMxNTQ",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC45ODE4NjA1Mjc2ODMxNTQ",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:18.216+01:00",
+          "source": "#S6nGY1IwGT48Jl8S",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC45ODE4NjA1Mjc2ODMxNTQ"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC45ODE4NjA1Mjc2ODMxNTQ"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Conway",
+            "family": "Conway",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC45ODIzOTczOTg5NjI3Mjgy",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC45ODIzOTczOTg5NjI3Mjgy",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:18.370+01:00",
+          "source": "#2hGke9GwCQvYXbml"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Mendoza:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Mendoza:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC42OTEyODEwNDMzNzYxMzc4",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC42OTEyODEwNDMzNzYxMzc4",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:18.442+01:00",
+          "source": "#89YLljopFMGV84JS",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC42OTEyODEwNDMzNzYxMzc4"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC42OTEyODEwNDMzNzYxMzc4"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Mendoza",
+            "family": "Mendoza",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC4xMTEzMzgyOTgzMTg3NTI1Mw",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC4xMTEzMzgyOTgzMTg3NTI1Mw",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:18.596+01:00",
+          "source": "#zieVvnENH3Sgb8ff"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Chang:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Chang:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC4yMTkxNTY2OTIwMDM4MjcyNg",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC4yMTkxNTY2OTIwMDM4MjcyNg",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:18.669+01:00",
+          "source": "#RdMhss8aYalyPzXh",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC4yMTkxNTY2OTIwMDM4MjcyNg"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC4yMTkxNTY2OTIwMDM4MjcyNg"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Chang",
+            "family": "Chang",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC44NjE4NTkwNzk1NTM3NA",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC44NjE4NTkwNzk1NTM3NA",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:18.812+01:00",
+          "source": "#U2WnjQ1EbaYAuulN"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Coleman:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Coleman:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC4wMTkxNDg4MTE4NzA2NjA0Mg",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC4wMTkxNDg4MTE4NzA2NjA0Mg",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:19.324+01:00",
+          "source": "#sjgtmMOjKhtVdO6n",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC4wMTkxNDg4MTE4NzA2NjA0Mg"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC4wMTkxNDg4MTE4NzA2NjA0Mg"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Coleman",
+            "family": "Coleman",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC45NTY0MzU0NjI3NDUwMjI",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC45NTY0MzU0NjI3NDUwMjI",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:19.466+01:00",
+          "source": "#W4Z6LeYnBr5hXUVh"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Mercer:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Mercer:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC41MTkyNzM2OTMxMjMwNDkz",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC41MTkyNzM2OTMxMjMwNDkz",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:19.539+01:00",
+          "source": "#GbtOd1QDH1gUorZg",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC41MTkyNzM2OTMxMjMwNDkz"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC41MTkyNzM2OTMxMjMwNDkz"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Mercer",
+            "family": "Mercer",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC4xMjAzMjgxMjA0MTA3MDY1MQ",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC4xMjAzMjgxMjA0MTA3MDY1MQ",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:19.686+01:00",
+          "source": "#l6Rij13C1hIvxCOO"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Guzman:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Guzman:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC45NDA0NzI1MzM0MDMwNjY4",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC45NDA0NzI1MzM0MDMwNjY4",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:19.760+01:00",
+          "source": "#DTykIrEAlCHKXbZi",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC45NDA0NzI1MzM0MDMwNjY4"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC45NDA0NzI1MzM0MDMwNjY4"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Guzman",
+            "family": "Guzman",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC4yMzc1NzA4NjA4MjcxNTIwNg",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC4yMzc1NzA4NjA4MjcxNTIwNg",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:19.908+01:00",
+          "source": "#hYql2yVRGldseQkI"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Mercer:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Mercer:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC41ODI4Mjc2OTg3MjgxOTI",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC41ODI4Mjc2OTg3MjgxOTI",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:20.585+01:00",
+          "source": "#7OEPgToQ7a1vvBGQ",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC41ODI4Mjc2OTg3MjgxOTI"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC41ODI4Mjc2OTg3MjgxOTI"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Mercer",
+            "family": "Mercer",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Endpoint/endpointMC4yMzE0NjE2NDUwNzkzNTY5Ng",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "endpointMC4yMzE0NjE2NDUwNzkzNTY5Ng",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:20.737+01:00",
+          "source": "#QKY5i4JkZBHuR7Ng"
+        },
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "@Titus.Fitzpatrick:akq.de",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat"
+              }
+            ]
+          }
+        ],
+        "address": "@Titus.Fitzpatrick:akq.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/Practitioner/practitionerMC41ODkzMzg4MDU4Mzg2NzU",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "practitionerMC41ODkzMzg4MDU4Mzg2NzU",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-10T11:26:20.813+01:00",
+          "source": "#l9Kk24PvOsn5hplR",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "1-1.58practitionerMC41ODkzMzg4MDU4Mzg2NzU"
+          },
+          {
+            "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+            "value": "123456789practitionerMC41ODkzMzg4MDU4Mzg2NzU"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Titus Fitzpatrick",
+            "family": "Fitzpatrick",
+            "given": [
+              "Titus"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/PractitionerProfessionOID",
+                  "code": "1.2.276.0.76.4.31"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "010",
+                  "display": "FA Allgemeinmedizin"
+                }
+              ]
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.276.0.76.5.514",
+                  "code": "523",
+                  "display": "FA Innere Medizin und (SP) Gastroenterologie"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    }
+  ]
+}

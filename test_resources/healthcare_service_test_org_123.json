@@ -1,0 +1,199 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundleId",
+  "meta": {
+    "lastUpdated": "2023-04-04T19:43:59.009+02:00"
+  },
+  "type": "searchset",
+  "total": 4,
+  "entry": [
+    {
+      "fullUrl": "https://fhir-directory-test.vzd.ti-dienste.de/search/HealthcareService/h34lthc4r353rv1c3",
+      "resource": {
+        "resourceType": "HealthcareService",
+        "id": "h34lthc4r353rv1c3",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-23T13:34:55.669+01:00",
+          "source": "#Unittestdata",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/HealthcareServiceDirectory",
+            "http://hl7.org/fhir/StructureDefinition/HealthcareService"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Test Organization 123 Testcity Teststate DE Test Weg 42</div>"
+        },
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "HealthcareServiceh34lthc4r353rv1c3"
+          }
+        ],
+        "providedBy": {
+          "reference": "Organization/0rg4n1z4t10n1d"
+        },
+        "location": [
+          {
+            "reference": "Location/L0c4t10n"
+          }
+        ],
+        "endpoint": [
+          {
+            "reference": "Endpoint/3ndp01nt1d"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://fhir-directory-test.vzd.ti-dienste.de/search/Location/L0c4t10n",
+      "resource": {
+        "resourceType": "Location",
+        "id": "L0c4t10n",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-23T13:34:55.669+01:00",
+          "source": "#Unittestdata",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/LocationDirectory",
+            "http://hl7.org/fhir/StructureDefinition/Location"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Unittestdata</div>"
+        },
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "LocationL0c4t10n"
+          }
+        ],
+        "name": "Location of Test Organization 123",
+        "address": {
+          "use": "work",
+          "type": "postal",
+          "text": "Test Weg 42, 19104711 Testcity",
+          "line": [
+            "Test Weg 42"
+          ],
+          "city": "Testcity",
+          "state": "Teststate",
+          "postalCode": "19104711",
+          "country": "DE"
+        }
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "https://fhir-directory-test.vzd.ti-dienste.de/search/Organization/0rg4n1z4t10n1d",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "0rg4n1z4t10n1d",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-23T13:34:55.669+01:00",
+          "source": "#unittestdata",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/OrganizationDirectory",
+            "http://hl7.org/fhir/StructureDefinition/Organization"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Unittestdata</div>"
+        },
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "Organization0rg4n1z4t10n1d"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN"
+                }
+              ]
+            },
+            "system": "https://gematik.de/fhir/sid/telematik-id",
+            "value": "test-org-123"
+          }
+        ],
+        "active": true,
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID",
+                "code": "1.2.276.0.76.4.273",
+                "display": "ePA KTR-Zugriffsautorisierung"
+              }
+            ]
+          }
+        ],
+        "name": "Test Organization 123",
+        "alias": [
+          "Test Organization 123"
+        ]
+      },
+      "search": {
+        "mode": "include"
+      }
+    },
+    {
+      "fullUrl": "https://fhir-directory-test.vzd.ti-dienste.de/search/Endpoint/3ndp01nt1d",
+      "resource": {
+        "resourceType": "Endpoint",
+        "id": "3ndp01nt1d",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2023-03-23T13:34:55.669+01:00",
+          "source": "#omk5g5V91El5e9f8",
+          "profile": [
+            "https://gematik.de/fhir/directory/StructureDefinition/EndpointDirectory",
+            "http://hl7.org/fhir/StructureDefinition/Endpoint"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Generated by Arvato QA at 2023-03-23T13:34:41+01:00\ndata model version:2\nprofile version   :0.9.2</div>"
+        },
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "endpoint3ndp01nt1d"
+          }
+        ],
+        "status": "active",
+        "connectionType": {
+          "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryConnectionType",
+          "code": "tim"
+        },
+        "name": "MatrixId von Test Organization 123 (@testOrg123:tim.test.gematik.de)",
+        "payloadType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/directory/CodeSystem/EndpointDirectoryPayloadType",
+                "code": "tim-chat",
+                "display": "TI-Messenger chat"
+              }
+            ]
+          }
+        ],
+        "address": "@testOrg123:tim.test.gematik.de"
+      },
+      "search": {
+        "mode": "include"
+      }
+    }
+  ]
+}

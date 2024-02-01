@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Classes\tim]
+"URL Protocol"=""
+
+[HKEY_CURRENT_USER\Software\Classes\tim\shell]
+
+[HKEY_CURRENT_USER\Software\Classes\tim\shell\open]
+
+[HKEY_CURRENT_USER\Software\Classes\tim\shell\open\command]
+@="\"C:\\tim\\tim.bat\" \"%1\""
+

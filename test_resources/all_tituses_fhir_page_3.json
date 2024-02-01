@@ -1,0 +1,15 @@
+{
+  "resourceType": "Bundle",
+  "id": "08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90",
+  "meta": {
+    "lastUpdated": "2023-03-10T12:35:46.196+01:00"
+  },
+  "type": "searchset",
+  "total": 32,
+  "link": [
+    {
+      "relation": "self",
+      "url": "http://localhost:8080/fhir?_getpages=08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90&_getpagesoffset=40&_count=20&_format=json&_pretty=true&_include=PractitionerRole%3Aendpoint&_include=PractitionerRole%3Apractitioner&_bundletype=searchset"
+    }
+  ]
+}
