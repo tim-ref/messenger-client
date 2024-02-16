@@ -1,6 +1,6 @@
 /*
- * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Modified by akquinet GmbH on 16.10.2023
+ * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *

@@ -4,6 +4,25 @@ This project contains the `TIM reference implementation` of a `Messenger Client`
 * Flutter 
 * Dart
 
+This Messenger Client of the TIM reference implementation (“Messenger Client”) is licensed under version 3 of the GNU Affero General Public License and other licenses. The implementation is based on FluffyChat (https://github.com/krille-chan/fluffychat) and on the Matrix DART SDK (https://github.com/famedly/matrix-dart-sdk) by Famedly GmbH.
+
+You may convey this Messenger Client under the terms of the version 3 of the GNU Affero General Public License, available from the URL https://github.com/tim-ref/messenger-client/blob/main/LICENSE.
+This Messenger Client is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+Further third-party libraries and the underlying license information are available from the URL https://github.com/tim-ref/messenger-client-dependencies.
+
+Original fork: https://github.com/krille-chan/fluffychat
+
+License: https://github.com/tim-ref/messenger-client/blob/main/LICENSE
+
+Source code: https://github.com/tim-ref/messenger-client
+
+Third-party libraries: https://github.com/tim-ref/messenger-client-dependencies
+
+Noto Emoji: https://github.com/googlefonts/noto-emoji/
+
+Imprint: https://akquinet.com/impressum.html
+
 ## Quickstart: Webclient with Docker 
 
 - make sure docker is installed and docker deamon is running
@@ -142,9 +161,6 @@ Refer to [this guide](README-translation-guide.md).
 
 ### HBA Authentication
 Further information about the usage of the HBA authentication is listed [here](README-hba-auth.md).
-
-### Privacy
-Further information about privacy is listed [here](PRIVACY.md).
 
 ## Architecture Overview
 

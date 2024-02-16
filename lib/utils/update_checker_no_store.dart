@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 16.02.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -72,14 +72,7 @@ class UpdateCheckerNoStore {
   }
 
   Uri downloadUri(UpdateMetadata metadata) {
-    // platform specific
-    if (PlatformInfos.isWindows) {
-      return Uri.parse('https://$gitLabHost/famedly/fluffychat/-'
-          '/jobs/artifacts/$metadata/raw/'
-          'build/windows/runner/Release/fluffychat.msix?job=build_windows');
-    } else {
-      throw UnimplementedError('No download URI available for this platform.');
-    }
+    throw UnimplementedError('No download URI available for this platform.');
   }
 
   /// launches an app update
@@ -90,17 +83,6 @@ class UpdateCheckerNoStore {
     // platform specific
     try {
       if (kIsWeb) return;
-      if (PlatformInfos.isWindows) {
-        final dir = await getTemporaryDirectory();
-        final response = await get(downloadUri(metadata));
-        if (response.statusCode == 200) {
-          final file = File('${dir.path}/fluffychat.msix');
-          await file.writeAsBytes(response.bodyBytes);
-          Process.start(file.path, [], runInShell: true);
-        } else {
-          throw response;
-        }
-      }
     } catch (e) {
       Logs().w('Error launching th update:', e);
     }

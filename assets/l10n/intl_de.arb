@@ -1,7 +1,7 @@
 {
   "@@locale": "de",
   "@@last_modified": "2021-08-14 12:41:10.119255",
-  "about": "Über",
+  "about": "About, Legal Notice and Source Code",
   "@about": {
     "type": "text",
     "placeholders": {}

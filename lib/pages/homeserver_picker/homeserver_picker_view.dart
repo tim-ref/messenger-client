@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 16.02.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -15,6 +15,8 @@ import 'package:fluffychat/widgets/layouts/login_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../utils/platform_infos.dart';
 
 class HomeserverPickerView extends StatelessWidget {
   final HomeserverPickerController controller;
@@ -69,6 +71,10 @@ class HomeserverPickerView extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  TextButton(
+                    onPressed: () => PlatformInfos.showLicenseDialog(context),
+                    child: Text(L10n.of(context)!.about),
+                  ),
                   TextButton(
                     onPressed: () => launch(AppConfig.privacyUrl),
                     child: Text(L10n.of(context)!.privacy),

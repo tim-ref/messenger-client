@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 16.02.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -205,7 +205,7 @@ class SettingsView extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.info_outline_rounded),
               title: Text(L10n.of(context)!.about),
-              onTap: () => PlatformInfos.showDialog(context),
+              onTap: () => PlatformInfos.showLicenseDialog(context),
               trailing: const Icon(Icons.chevron_right_outlined),
             ),
           ],
