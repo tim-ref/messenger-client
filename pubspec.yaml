@@ -129,8 +129,14 @@ flutter:
     - assets/sounds/
     - assets/js/
     - assets/js/package/
-    - fonts/Roboto/LICENSE.txt
+    - fonts/MaterialIcons-LICENSE.txt
     - fonts/NotoEmoji/LICENSE.txt
+    - fonts/Roboto/LICENSE.txt
+    - packages/cupertino_icons/assets/LICENSE.txt
+    - packages/flutter_inappwebview/assets/LICENSE.txt
+    - packages/flutter_math_fork/lib/katex_fonts/LICENSE.txt
+    - packages/wakelock_web/assets/LICENSE.txt
+    - README.md
 
   fonts:
     - family: Roboto

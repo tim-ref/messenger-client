@@ -179,7 +179,7 @@ abstract class PlatformInfos {
                     ),
                     mode: LaunchMode.externalApplication,
                   ),
-                  child: const Text('Original Fork'),
+                  child: const Text('Original fork'),
                 ),
               ),
               SizedBox(
@@ -203,7 +203,7 @@ abstract class PlatformInfos {
                     ),
                     mode: LaunchMode.externalApplication,
                   ),
-                  child: const Text('Source Code'),
+                  child: const Text('Source code repository'),
                 ),
               ),
               SizedBox(
@@ -211,7 +211,31 @@ abstract class PlatformInfos {
                 child: TextButton(
                   onPressed: () async => await launchUrl(
                     Uri.parse(
-                      'https://github.com/tim-ref/messenger-client-dependencies',
+                      'https://github.com/tim-ref/messenger-client/tree/v1.17.0',
+                    ),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  child: const Text('Source code'),
+                ),
+              ),
+              SizedBox(
+                height: buttonHeight,
+                child: TextButton(
+                  onPressed: () async => await launchUrl(
+                    Uri.parse(
+                      'https://github.com/tim-ref/messenger-client-dependencies/',
+                    ),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  child: const Text('Third-party libraries repository'),
+                ),
+              ),
+              SizedBox(
+                height: buttonHeight,
+                child: TextButton(
+                  onPressed: () async => await launchUrl(
+                    Uri.parse(
+                      'https://github.com/tim-ref/messenger-client-dependencies/tree/v1.17.0',
                     ),
                     mode: LaunchMode.externalApplication,
                   ),

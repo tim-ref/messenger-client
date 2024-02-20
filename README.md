@@ -15,9 +15,13 @@ Original fork: https://github.com/krille-chan/fluffychat
 
 License: https://github.com/tim-ref/messenger-client/blob/main/LICENSE
 
-Source code: https://github.com/tim-ref/messenger-client
+Source code repository: https://github.com/tim-ref/messenger-client
 
-Third-party libraries: https://github.com/tim-ref/messenger-client-dependencies
+Source code: https://github.com/tim-ref/messenger-client/tree/v1.17.0
+
+Third-party libraries repository: https://github.com/tim-ref/messenger-client-dependencies
+
+Third-party libraries: https://github.com/tim-ref/messenger-client-dependencies/tree/v1.17.0
 
 Noto Emoji: https://github.com/googlefonts/noto-emoji/
 
