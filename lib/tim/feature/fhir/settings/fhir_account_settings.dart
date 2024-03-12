@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/tim/feature/fhir/fhir_endpoint_address_converter.dart';
 import 'package:fluffychat/tim/feature/fhir/settings/fhir_account_service.dart';
 import 'package:fluffychat/tim/feature/fhir/settings/fhir_visibility_form.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
@@ -38,7 +39,7 @@ class _FhirAccountSettingsState extends State<FhirAccountSettings> {
   @override
   void initState() {
     final client = TimProvider.of(context).matrix().client();
-    final mxid = client.userID;
+    final mxid = convertSigilToUri(client.userID);
     _fhirAccountService = TimProvider.of(context).fhirAccountService();
     _mxidController.value = TextEditingValue(
       text: mxid,
@@ -173,12 +174,13 @@ class _FhirAccountSettingsState extends State<FhirAccountSettings> {
 
   _onVisibilityChanged(BuildContext context, bool visible) async {
     final client = TimProvider.of(context).matrix().client();
-    final mxId = _mxidController.text;
+    final mxIdUri = _mxidController.text;
+    final mxId = convertUriToSigil(mxIdUri);
     final displayName = await client.getDisplayName(mxId);
     setState(() {
       _fhirVisible = _fhirAccountService.setFhirVisibility(
         visible,
-        _mxidController.text,
+        mxIdUri,
         displayName ?? mxId,
         _authToken!,
       );

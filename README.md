@@ -17,11 +17,11 @@ License: https://github.com/tim-ref/messenger-client/blob/main/LICENSE
 
 Source code repository: https://github.com/tim-ref/messenger-client
 
-Source code: https://github.com/tim-ref/messenger-client/tree/v1.17.0
+Source code: https://github.com/tim-ref/messenger-client/tree/v1.18.0
 
 Third-party libraries repository: https://github.com/tim-ref/messenger-client-dependencies
 
-Third-party libraries: https://github.com/tim-ref/messenger-client-dependencies/tree/v1.17.0
+Third-party libraries: https://github.com/tim-ref/messenger-client-dependencies/tree/v1.18.0
 
 Noto Emoji: https://github.com/googlefonts/noto-emoji/
 

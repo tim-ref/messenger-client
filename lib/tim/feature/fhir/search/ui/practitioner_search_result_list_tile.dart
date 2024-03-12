@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/tim/feature/fhir/fhir_endpoint_address_converter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 
@@ -70,11 +71,13 @@ class PractitionerSearchResultListTile extends StatelessWidget {
         return GestureDetector(
           onTap: () async {
             final roomId = context.vRouter.pathParameters['roomid'];
+            final mxIdUri = _searchResult.endpointAdresses![index];
+            final mxId = convertUriToSigil(mxIdUri);
             if (roomId != null) {
               _inviteToGroup(
-                  context, roomId, _searchResult.endpointAdresses![index]);
+                  context, roomId, mxId);
             } else {
-              _showUserProfile(context, _searchResult.endpointAdresses![index]);
+              _showUserProfile(context, mxId);
             }
           },
           child: Text(

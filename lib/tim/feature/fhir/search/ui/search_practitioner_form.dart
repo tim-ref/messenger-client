@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/tim/feature/fhir/fhir_endpoint_address_converter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 
@@ -50,17 +51,19 @@ class _SearchPractitionerFormState extends State<SearchPractitionerForm> {
       () => _updateParams(MapEntry(address, _addressCtrl.text)),
     );
     _telematikIdCtrl.addListener(
-      () => _updateParams(
-          MapEntry(practitionerTelematikId, _telematikIdCtrl.text)),
+      () => _updateParams(MapEntry(practitionerTelematikId, _telematikIdCtrl.text)),
     );
     _endpointCtrl.addListener(
       () {
-        if (_endpointCtrl.text.isValidMatrixId) {
+        final searchText = _endpointCtrl.text;
+
+        if (searchText.startsWith(uriPrefix) &&
+            convertUriToSigil(searchText).isValidMatrixId) {
           searchParams.remove(displayName);
-          _updateParams(MapEntry(mxid, _endpointCtrl.text));
+          _updateParams(MapEntry(mxid, searchText));
         } else {
           searchParams.remove(mxid);
-          _updateParams(MapEntry(displayName, _endpointCtrl.text));
+          _updateParams(MapEntry(displayName, searchText));
         }
       },
     );
@@ -68,8 +71,7 @@ class _SearchPractitionerFormState extends State<SearchPractitionerForm> {
       () {
         final l10n = L10n.of(context)!;
         // get correct id for current selected value
-        final selectedL10nVal =
-            practitionerQualificationMapping.keys.firstWhere(
+        final selectedL10nVal = practitionerQualificationMapping.keys.firstWhere(
           (element) => element.call(l10n) == _qualificationsCtrl.text,
           orElse: () => practitionerQualificationMapping.keys.first,
         );
@@ -156,8 +158,7 @@ class _SearchPractitionerFormState extends State<SearchPractitionerForm> {
               borderRadius: BorderRadius.circular(8),
               items: practitionerQualificationMapping.keys
                   .map((fn) => fn.call(l10n))
-                  .map(
-                      (e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                  .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
                   .toList(),
               onChanged: (value) {
                 if (value is String) {
@@ -183,8 +184,7 @@ class _SearchPractitionerFormState extends State<SearchPractitionerForm> {
               ifAbsent: () => searchParam.value.trim(),
             )
           : searchParams.remove(searchParam.key);
-      widget.searchQuery
-          .add(FhirQueryBuilder.buildPractitionerRoleQuery(searchParams));
+      widget.searchQuery.add(FhirQueryBuilder.buildPractitionerRoleQuery(searchParams));
     }
   }
 
@@ -193,8 +193,7 @@ class _SearchPractitionerFormState extends State<SearchPractitionerForm> {
         searchParams[searchParam.key] != searchParam.value) {
       return true;
     } else {
-      return !searchParams.containsKey(searchParam.key) &&
-          searchParam.value.isNotEmpty;
+      return !searchParams.containsKey(searchParam.key) && searchParam.value.isNotEmpty;
     }
   }
 

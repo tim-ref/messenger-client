@@ -211,7 +211,7 @@ abstract class PlatformInfos {
                 child: TextButton(
                   onPressed: () async => await launchUrl(
                     Uri.parse(
-                      'https://github.com/tim-ref/messenger-client/tree/v1.17.0',
+                      'https://github.com/tim-ref/messenger-client/tree/v1.18.0',
                     ),
                     mode: LaunchMode.externalApplication,
                   ),
@@ -235,7 +235,7 @@ abstract class PlatformInfos {
                 child: TextButton(
                   onPressed: () async => await launchUrl(
                     Uri.parse(
-                      'https://github.com/tim-ref/messenger-client-dependencies/tree/v1.17.0',
+                      'https://github.com/tim-ref/messenger-client-dependencies/tree/v1.18.0',
                     ),
                     mode: LaunchMode.externalApplication,
                   ),
