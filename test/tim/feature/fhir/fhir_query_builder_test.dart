@@ -33,7 +33,7 @@ void main() {
     //expect
     expect(
       FhirQueryBuilder.buildPractitionerRoleQuery(
-          {practitionerName: enteredName}),
+          {practitionerName: enteredName},),
       equals(expectedQuery),
     );
   });
@@ -59,7 +59,7 @@ void main() {
     //expect
     expect(
       FhirQueryBuilder.buildPractitionerRoleQuery(
-          {practitionerTelematikId: enteredTelematikId}),
+          {practitionerTelematikId: enteredTelematikId},),
       equals(expectedQuery),
     );
   });
@@ -84,7 +84,7 @@ void main() {
     //expect
     expect(
       FhirQueryBuilder.buildPractitionerRoleQuery(
-          {practitionerQualification: enteredQualification}),
+          {practitionerQualification: enteredQualification},),
       equals(expectedQuery),
     );
   });
@@ -122,7 +122,7 @@ void main() {
     //expect
     expect(
       FhirQueryBuilder.buildHealthcareServiceQuery(
-          {healthcareServiceName: enteredName}),
+          {healthcareServiceName: enteredName},),
       equals(expectedQuery),
     );
   });
@@ -137,7 +137,7 @@ void main() {
     //expect
     expect(
       FhirQueryBuilder.buildHealthcareServiceQuery(
-          {organizationName: enteredName}),
+          {organizationName: enteredName},),
       equals(expectedQuery),
     );
   });
@@ -165,7 +165,7 @@ void main() {
     //expect
     expect(
       FhirQueryBuilder.buildHealthcareServiceQuery(
-          {organizationTelematikId: enteredTelematikId}),
+          {organizationTelematikId: enteredTelematikId},),
       equals(expectedQuery),
     );
   });
@@ -181,7 +181,7 @@ void main() {
     //expect
     expect(
       FhirQueryBuilder.buildHealthcareServiceQuery(
-          {organizationType: enteredOrganizationType}),
+          {organizationType: enteredOrganizationType},),
       equals(expectedQuery),
     );
   });

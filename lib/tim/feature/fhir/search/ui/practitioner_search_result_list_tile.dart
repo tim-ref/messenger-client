@@ -10,6 +10,7 @@
  */
 
 import 'package:fluffychat/tim/feature/fhir/fhir_endpoint_address_converter.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 
@@ -26,8 +27,7 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 class PractitionerSearchResultListTile extends StatelessWidget {
   final PractitionerSearchResult _searchResult;
 
-  const PractitionerSearchResultListTile(this._searchResult, {Key? key})
-      : super(key: key);
+  const PractitionerSearchResultListTile(this._searchResult, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Card(
@@ -75,7 +75,10 @@ class PractitionerSearchResultListTile extends StatelessWidget {
             final mxId = convertUriToSigil(mxIdUri);
             if (roomId != null) {
               _inviteToGroup(
-                  context, roomId, mxId);
+                context,
+                roomId,
+                mxId,
+              );
             } else {
               _showUserProfile(context, mxId);
             }
@@ -98,7 +101,7 @@ class PractitionerSearchResultListTile extends StatelessWidget {
         await showOkCancelAlertDialog(
           context: context,
           title: L10n.of(context)!.inviteContactToGroup(
-            room.getLocalizedDisplayname(
+            room.getLocalizedDisplaynameFromCustomNameEvent(
               MatrixLocals(L10n.of(context)!),
             ),
           ),

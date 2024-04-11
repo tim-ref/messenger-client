@@ -42,8 +42,7 @@ class _FakeUri_0 extends _i1.SmartFake implements Uri {
         );
 }
 
-class _FakeGetRoomEventsResponse_1 extends _i1.SmartFake
-    implements _i2.GetRoomEventsResponse {
+class _FakeGetRoomEventsResponse_1 extends _i1.SmartFake implements _i2.GetRoomEventsResponse {
   _FakeGetRoomEventsResponse_1(
     Object parent,
     Invocation parentInvocation,
@@ -125,8 +124,7 @@ class MockTimMatrixClient extends _i1.Mock implements _i3.TimMatrixClient {
             #filter: filter,
           },
         ),
-        returnValue: _i4.Future<_i2.GetRoomEventsResponse>.value(
-            _FakeGetRoomEventsResponse_1(
+        returnValue: _i4.Future<_i2.GetRoomEventsResponse>.value(_FakeGetRoomEventsResponse_1(
           this,
           Invocation.method(
             #getRoomEvents,
@@ -162,6 +160,89 @@ class MockTimMatrixClient extends _i1.Mock implements _i3.TimMatrixClient {
             #waitForSync: waitForSync,
             #powerLevelContentOverride: powerLevelContentOverride,
             #preset: preset,
+          },
+        ),
+        returnValue: _i4.Future<String>.value(''),
+      ) as _i4.Future<String>);
+  @override
+  _i4.Future<String> startDirectChatWithCustomRoomType(
+    String? mxid, {
+    bool? isCaseReference = false,
+    Map<String, dynamic>? creationContent,
+    List<_i2.Invite3pid>? invite3pid,
+    String? name,
+    String? roomAliasName,
+    String? roomVersion,
+    String? topic,
+    _i2.Visibility? visibility,
+    bool? enableEncryption,
+    List<_i2.StateEvent>? initialState,
+    bool? waitForSync = true,
+    Map<String, dynamic>? powerLevelContentOverride,
+    _i2.CreateRoomPreset? preset = _i2.CreateRoomPreset.trustedPrivateChat,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #startDirectChatWithCustomRoomType,
+          [mxid],
+          {
+            #isCaseReference: isCaseReference,
+            #creationContent: creationContent,
+            #invite3pid: invite3pid,
+            #name: name,
+            #roomAliasName: roomAliasName,
+            #roomVersion: roomVersion,
+            #topic: topic,
+            #visibility: visibility,
+            #enableEncryption: enableEncryption,
+            #initialState: initialState,
+            #waitForSync: waitForSync,
+            #powerLevelContentOverride: powerLevelContentOverride,
+            #preset: preset,
+          },
+        ),
+        returnValue: _i4.Future<String>.value(''),
+      ) as _i4.Future<String>);
+  @override
+  _i4.Future<String> createGroupChatWithCustomRoomType({
+    bool? isCaseReference = false,
+    String? name,
+    bool? enableEncryption,
+    List<String>? invite,
+    _i2.CreateRoomPreset? preset = _i2.CreateRoomPreset.privateChat,
+    List<_i2.StateEvent>? initialState,
+    _i2.Visibility? visibility,
+    bool? waitForSync = true,
+    bool? groupCall = false,
+    Map<String, dynamic>? powerLevelContentOverride,
+    Map<String, dynamic>? creationContent,
+    List<_i2.Invite3pid>? invite3pid,
+    bool? isDirect = false,
+    String? roomAliasName,
+    String? roomVersion,
+    String? topic,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createGroupChatWithCustomRoomType,
+          [],
+          {
+            #isCaseReference: isCaseReference,
+            #name: name,
+            #enableEncryption: enableEncryption,
+            #invite: invite,
+            #preset: preset,
+            #initialState: initialState,
+            #visibility: visibility,
+            #waitForSync: waitForSync,
+            #groupCall: groupCall,
+            #powerLevelContentOverride: powerLevelContentOverride,
+            #creationContent: creationContent,
+            #invite3pid: invite3pid,
+            #isDirect: isDirect,
+            #roomAliasName: roomAliasName,
+            #roomVersion: roomVersion,
+            #topic: topic,
           },
         ),
         returnValue: _i4.Future<String>.value(''),

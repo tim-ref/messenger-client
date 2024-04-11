@@ -17,6 +17,7 @@ import 'package:fluffychat/tim/feature/archive/model/plain_text_export.dart';
 import 'package:fluffychat/tim/feature/archive/share_room_archive.dart';
 import 'package:fluffychat/tim/shared/matrix/tim_matrix_client.dart';
 import 'package:fluffychat/tim/shared/matrix/tim_matrix_crypto.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:mockito/annotations.dart';
@@ -53,13 +54,25 @@ void main() {
     // Let the first call to client.getRoomEvents return the one event and also provide an "end" token to start the next
     // request with.
     when(
-      clientMock.getRoomEvents(room.id, matrix.Direction.f,
-          from: null, to: null, limit: anyNamed("limit"), filter: anyNamed("filter")),
+      clientMock.getRoomEvents(
+        room.id,
+        matrix.Direction.f,
+        from: null,
+        to: null,
+        limit: anyNamed("limit"),
+        filter: anyNamed("filter"),
+      ),
     ).thenAnswer((_) async => matrix.GetRoomEventsResponse(chunk: events, start: "", end: "end"));
     // Let the second call indicates that there is no more data by setting "end" to null.
     when(
-      clientMock.getRoomEvents(room.id, matrix.Direction.f,
-          from: "end", to: null, limit: anyNamed("limit"), filter: anyNamed("filter")),
+      clientMock.getRoomEvents(
+        room.id,
+        matrix.Direction.f,
+        from: "end",
+        to: null,
+        limit: anyNamed("limit"),
+        filter: anyNamed("filter"),
+      ),
     ).thenAnswer((_) async => matrix.GetRoomEventsResponse(chunk: [], start: ""));
   }
 
@@ -119,10 +132,13 @@ void main() {
 }
 
 void _expectZipFileToContain(
-    matrix.Room room, String zipFilePath, Iterable<matrix.MatrixEvent> events) {
+  matrix.Room room,
+  String zipFilePath,
+  Iterable<matrix.MatrixEvent> events,
+) {
   final plainTextExport = RoomPlainTextExport(
     roomId: room.id,
-    roomName: room.name,
+    roomName: room.displayName,
     messages: events
         .map((e) => matrix.Event.fromMatrixEvent(e, room))
         .map(

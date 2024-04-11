@@ -23,7 +23,7 @@ class HbaAuthenticationFactory {
   HbaAuthentication getHbaAuthentication() {
     if (kIsWeb) {
       return HbaAuthenticationAuthenticator(
-          Authenticator(), VzdClient(Client()));
+          Authenticator(), VzdClient(Client()),);
     } else {
       return HbaTokenDispenserAuthentication(Client());
     }

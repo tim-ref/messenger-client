@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -30,10 +30,8 @@ class VerificationRequestContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final events = event.aggregatedEvents(timeline, 'm.reference');
     final done = events.where((e) => e.type == EventTypes.KeyVerificationDone);
-    final start =
-        events.where((e) => e.type == EventTypes.KeyVerificationStart);
-    final cancel =
-        events.where((e) => e.type == EventTypes.KeyVerificationCancel);
+    final start = events.where((e) => e.type == EventTypes.KeyVerificationStart);
+    final cancel = events.where((e) => e.type == EventTypes.KeyVerificationCancel);
     final fullyDone = done.length >= 2;
     final started = start.isNotEmpty;
     final canceled = cancel.isNotEmpty;
@@ -58,9 +56,7 @@ class VerificationRequestContent extends StatelessWidget {
             children: <Widget>[
               Icon(
                 Icons.lock_outlined,
-                color: canceled
-                    ? Colors.red
-                    : (fullyDone ? Colors.green : Colors.grey),
+                color: canceled ? Colors.red : (fullyDone ? Colors.green : Colors.grey),
               ),
               const SizedBox(width: 8),
               Text(
@@ -71,7 +67,7 @@ class VerificationRequestContent extends StatelessWidget {
                         : (started
                             ? L10n.of(context)!.loadingPleaseWait
                             : L10n.of(context)!.newVerificationRequest)),
-              )
+              ),
             ],
           ),
         ),

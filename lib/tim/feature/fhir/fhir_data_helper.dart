@@ -51,7 +51,7 @@ class FhirDataHelper {
                 .map((entry) => entry['resource'])
                 .where((resource) =>
                     resource['resourceType'] ==
-                    ResourceType.PractitionerRole.name)
+                    ResourceType.PractitionerRole.name,)
                 .length >
             0;
   }
@@ -106,7 +106,7 @@ class FhirDataHelper {
   ) {
     if (oldPractitionerRole == null) {
       throw Exception(
-          'Cannot update PractitionerRole because old PractitionerRole is null');
+          'Cannot update PractitionerRole because old PractitionerRole is null',);
     }
     final pr = {...oldPractitionerRole!};
     if (visible) {
@@ -146,7 +146,7 @@ class FhirDataHelper {
       return queryResponse['entry']
           .map((entry) => entry['resource'])
           .where((resource) =>
-              resource['resourceType'] == ResourceType.PractitionerRole.name)
+              resource['resourceType'] == ResourceType.PractitionerRole.name,)
           .first;
     } catch (e, s) {
       Logs().e('No PractitionerRole in Entries', e, s);
@@ -170,7 +170,7 @@ class FhirDataHelper {
   }
 
   bool _alreadyContainsEndpointReference(
-      List<dynamic> endpointReferences, String endpointId) {
+      List<dynamic> endpointReferences, String endpointId,) {
     return endpointReferences
         .where((reference) => reference['reference'].contains(endpointId))
         .isNotEmpty;

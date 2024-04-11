@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
@@ -38,8 +39,7 @@ class ChatAppBarTitle extends StatelessWidget {
           ? () => showAdaptiveBottomSheet(
                 context: context,
                 builder: (c) => UserBottomSheet(
-                  user: room
-                      .unsafeGetUserFromMemoryOrFallback(directChatMatrixID),
+                  user: room.unsafeGetUserFromMemoryOrFallback(directChatMatrixID),
                   outerContext: context,
                   onMention: () => controller.sendController.text +=
                       '${room.unsafeGetUserFromMemoryOrFallback(directChatMatrixID).mention} ',
@@ -47,24 +47,22 @@ class ChatAppBarTitle extends StatelessWidget {
               )
           : controller.isArchived
               ? null
-              : () =>
-                  VRouter.of(context).toSegments(['rooms', room.id, 'details']),
+              : () => VRouter.of(context).toSegments(['rooms', room.id, 'details']),
       child: Row(
         children: [
           Hero(
             tag: 'content_banner',
             child: Avatar(
               mxContent: room.avatar,
-              name: room.getLocalizedDisplayname(
-                MatrixLocals(L10n.of(context)!),
-              ),
+              name:
+                  room.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(context)!)),
               size: 32,
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              room.getLocalizedDisplayname(MatrixLocals(L10n.of(context)!)),
+              room.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(context)!)),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(

@@ -118,8 +118,7 @@ class _ContactApprovalDetailsState extends State<ContactApprovalDetails> {
     );
 
     if (pickedDate != null) {
-      final utcDate =
-          DateTime.utc(pickedDate.year, pickedDate.month, pickedDate.day);
+      final utcDate = DateTime.utc(pickedDate.year, pickedDate.month, pickedDate.day);
       final formattedDate = DateFormat('dd.MM.yyyy').format(utcDate);
       setState(() {
         _endDateController.text = formattedDate;

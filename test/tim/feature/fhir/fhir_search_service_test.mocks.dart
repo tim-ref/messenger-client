@@ -80,8 +80,7 @@ class MockFhirRepository extends _i1.Mock implements _i3.FhirRepository {
             token,
           ],
         ),
-        returnValue:
-            _i4.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValue: _i4.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
       ) as _i4.Future<Map<String, dynamic>>);
   @override
   _i4.Future<Map<String, dynamic>> createResource(
@@ -98,8 +97,7 @@ class MockFhirRepository extends _i1.Mock implements _i3.FhirRepository {
             bodyJson,
           ],
         ),
-        returnValue:
-            _i4.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValue: _i4.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
       ) as _i4.Future<Map<String, dynamic>>);
   @override
   _i4.Future<Map<String, dynamic>> updateResource(
@@ -118,8 +116,7 @@ class MockFhirRepository extends _i1.Mock implements _i3.FhirRepository {
             bodyJson,
           ],
         ),
-        returnValue:
-            _i4.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValue: _i4.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
       ) as _i4.Future<Map<String, dynamic>>);
   @override
   _i4.Future<Map<String, dynamic>> deleteResource(
@@ -136,8 +133,7 @@ class MockFhirRepository extends _i1.Mock implements _i3.FhirRepository {
             token,
           ],
         ),
-        returnValue:
-            _i4.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValue: _i4.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
       ) as _i4.Future<Map<String, dynamic>>);
   @override
   _i4.Future<_i2.Response> get(

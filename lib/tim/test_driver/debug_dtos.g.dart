@@ -18,6 +18,10 @@ RoomDebugDto _$RoomDebugDtoFromJson(Map<String, dynamic> json) => RoomDebugDto(
       (json['states'] as List<dynamic>)
           .map((e) => StateDebugDto.fromJson(e as Map<String, dynamic>))
           .toList(),
+      json['topic'] as String?,
+      json['roomType'] as String,
+      json['isCaseReference'] as bool,
+      json['caseReferenceContent'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$RoomDebugDtoToJson(RoomDebugDto instance) =>
@@ -29,6 +33,10 @@ Map<String, dynamic> _$RoomDebugDtoToJson(RoomDebugDto instance) =>
       'members': instance.members,
       'directChatMatrixID': instance.directChatMatrixID,
       'states': instance.states,
+      'topic': instance.topic,
+      'roomType': instance.roomType,
+      'isCaseReference': instance.isCaseReference,
+      'caseReferenceContent': instance.caseReferenceContent,
     };
 
 MemberDebugDto _$MemberDebugDtoFromJson(Map<String, dynamic> json) =>

@@ -2472,5 +2472,5 @@
   "timFhirSearchEmpty": "Keine Ergebnisse gefunden.",
   "filenameDialogSendFileError": "Datei konnte nicht gesendet werden!",
   "chatSettingsArchiveDownloadError": "Archiv konnte nicht geladen werden!",
-  "timFhirSearchEmpty": "Keine Ergebnisse gefunden."
+  "createRoomWithCaseReference": "Erstelle Raum mit Fallbezug"
 }

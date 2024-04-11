@@ -20,7 +20,7 @@ import 'package:mockito/mockito.dart';
 import 'hba_authentication_authenticator_test.mocks.dart';
 
 final aValidToken = TimAuthToken(
-    accessToken: "accessToken", tokenType: "tokenType", expiresIn: 123);
+    accessToken: "accessToken", tokenType: "tokenType", expiresIn: 123,);
 
 @GenerateMocks([Authenticator, VzdClient])
 void main() {
@@ -36,7 +36,7 @@ void main() {
 
   test("hba auth authenticator flow", () async {
     when(vzdClient.getChallengePath()).thenAnswer((_) async =>
-        "http://challengeResponse?state=state&redirect_uri=redirect_uri");
+        "http://challengeResponse?state=state&redirect_uri=redirect_uri",);
     when(authenticator.waitForAuthCode())
         .thenAnswer((_) async => "the auth code");
     when(vzdClient.authCodeToToken(any, any, any))
@@ -47,7 +47,7 @@ void main() {
     expect(token, equals(aValidToken));
 
     verify(authenticator.openAuthenticator(
-        "http://challengeResponse?state=state&redirect_uri=redirect_uri"));
+        "http://challengeResponse?state=state&redirect_uri=redirect_uri",),);
     verify(vzdClient.authCodeToToken("redirect_uri", "the auth code", "state"));
   });
 }

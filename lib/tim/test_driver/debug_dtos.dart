@@ -11,6 +11,7 @@
 
 import 'dart:convert';
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:matrix/matrix.dart';
 
@@ -25,6 +26,10 @@ class RoomDebugDto {
   List<MemberDebugDto> members;
   String? directChatMatrixID;
   List<StateDebugDto> states;
+  String? topic;
+  String roomType;
+  bool isCaseReference;
+  Map<String, dynamic>? caseReferenceContent;
 
   RoomDebugDto(
     this.roomId,
@@ -34,43 +39,69 @@ class RoomDebugDto {
     this.members,
     this.directChatMatrixID,
     this.states,
+    this.topic,
+    this.roomType,
+    this.isCaseReference,
+    this.caseReferenceContent,
   );
 
   Map<String, dynamic> toJson() => _$RoomDebugDtoToJson(this);
 
-  factory RoomDebugDto.fromJson(Map<String, dynamic> json) =>
-      _$RoomDebugDtoFromJson(json);
+  factory RoomDebugDto.fromJson(Map<String, dynamic> json) => _$RoomDebugDtoFromJson(json);
 
   factory RoomDebugDto.fromMatrixRoom(Room r) {
+    final roomStates = generateListFromStates(r.states);
+    final creatorId = roomStates.firstWhere((e) => e.type == "m.room.create").content["creator"];
+    final roomAccess = r.joinRules == JoinRules.public ? "public" : "private";
+
     final members = r
         .getParticipants()
-        .map((e) => MemberDebugDto(e.id, _getMemberState(e)))
+        .map((e) => MemberDebugDto(e.id, _getMemberState(e, creatorId)))
         .toList();
-    final roomAccess = r.joinRules == JoinRules.public ? "public" : "private";
-    final roomStates = generateListFromStates(r.states)
-        .map((e) => StateDebugDto(
-              e.content.toString(),
-              e.eventId,
-              e.roomId,
-              e.senderId,
-              e.stateKey,
-              e.type,
-            ))
+
+    // creator of room is invite which should be join
+    if (members.any(
+      (member) =>
+          member.mxid == creatorId && member.membershipState == Membership.invite.toString(),
+    )) {
+      members.firstWhere((member) => member.mxid == creatorId).membershipState =
+          Membership.join.toString();
+    }
+
+    final roomStateDebugDtos = roomStates
+        .map(
+          (e) => StateDebugDto(
+            e.content.toString(),
+            e.eventId,
+            e.roomId,
+            e.senderId,
+            e.stateKey,
+            e.type,
+          ),
+        )
         .toList();
 
     return RoomDebugDto(
       r.id,
-      r.name,
+      r.displayName,
       roomAccess,
       r.encrypted,
       members,
       r.directChatMatrixID,
-      roomStates,
+      roomStateDebugDtos,
+      r.displayTopic,
+      r.roomType,
+      r.isCaseReferenceRoom,
+      r.caseReferenceContent,
     );
   }
 }
 
-String _getMemberState(User e) {
+// Fix membership state issue
+//
+// User.membership returns membership.join as default if missing =>
+// invited member is joined before join was triggered
+String _getMemberState(User e, String creatorId) {
   if (e.content['membership'] != null) {
     return e.membership.toString();
   } else {
@@ -87,8 +118,7 @@ class MemberDebugDto {
 
   Map<String, dynamic> toJson() => _$MemberDebugDtoToJson(this);
 
-  factory MemberDebugDto.fromJson(Map<String, dynamic> json) =>
-      _$MemberDebugDtoFromJson(json);
+  factory MemberDebugDto.fromJson(Map<String, dynamic> json) => _$MemberDebugDtoFromJson(json);
 }
 
 @JsonSerializable()
@@ -111,17 +141,15 @@ class StateDebugDto {
 
   Map<String, dynamic> toJson() => _$StateDebugDtoToJson(this);
 
-  factory StateDebugDto.fromJson(Map<String, dynamic> json) =>
-      _$StateDebugDtoFromJson(json);
+  factory StateDebugDto.fromJson(Map<String, dynamic> json) => _$StateDebugDtoFromJson(json);
 }
 
 List<Event> generateListFromStates(Map<String, Map<String, Event>> states) {
   // first turn the outer map into a list of all inner maps
   final outerMapAsList = states.entries.map((entry) => entry.value).toList();
   // then turn all the inner maps into lists
-  final innerMapsAsLists = outerMapAsList
-      .map((m) => m.entries.map((e) => e.value).toList())
-      .toList();
+  final innerMapsAsLists =
+      outerMapAsList.map((m) => m.entries.map((e) => e.value).toList()).toList();
   // then flatten the list of lists to get all events as a list
   final flattenedList = innerMapsAsLists.flatten();
   return flattenedList;
@@ -139,7 +167,7 @@ String timelineToMessageJsonString(Timeline t) {
         (e) => MessageDebugDto(
           e.eventId,
           e.originServerTs.toUtc().toIso8601String(),
-          e.content["msgtype"] == "m.text" ? e.text : e.content["fileName"],
+          e.content["msgtype"] == "m.text" ? e.text : e.content["fileName"] ?? "",
           e.senderId,
           e.content["msgtype"] ?? "",
           const JsonEncoder().convert(e),
@@ -151,9 +179,7 @@ String timelineToMessageJsonString(Timeline t) {
 }
 
 List<Event> keepMessageEvents(Timeline timeline) {
-  return timeline.events
-      .where((event) => event.type == "m.room.message")
-      .toList();
+  return timeline.events.where((event) => event.type == "m.room.message").toList();
 }
 
 @JsonSerializable(createFactory: false)

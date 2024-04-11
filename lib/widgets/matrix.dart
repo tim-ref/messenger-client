@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -10,7 +10,6 @@
  */
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -29,7 +28,6 @@ import 'package:flutter_app_lock/flutter_app_lock.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:matrix/encryption.dart';
 import 'package:matrix/matrix.dart';
@@ -73,8 +71,7 @@ class Matrix extends StatefulWidget {
   MatrixState createState() => MatrixState();
 
   /// Returns the (nearest) Client instance of your application.
-  static MatrixState of(BuildContext context) =>
-      Provider.of<MatrixState>(context, listen: false);
+  static MatrixState of(BuildContext context) => Provider.of<MatrixState>(context, listen: false);
 }
 
 class MatrixState extends State<Matrix> with WidgetsBindingObserver {
@@ -102,10 +99,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
   }
 
   bool get webrtcIsSupported =>
-      kIsWeb ||
-      PlatformInfos.isMobile ||
-      PlatformInfos.isWindows ||
-      PlatformInfos.isMacOS;
+      kIsWeb || PlatformInfos.isMobile || PlatformInfos.isWindows || PlatformInfos.isMacOS;
 
   VoipPlugin? voipPlugin;
 
@@ -165,8 +159,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
                 : a.bundle!.priority!.compareTo(b.bundle!.priority!),
       );
     }
-    return resBundles
-        .map((k, v) => MapEntry(k, v.map((vv) => vv.client).toList()));
+    return resBundles.map((k, v) => MapEntry(k, v.map((vv) => vv.client).toList()));
   }
 
   bool get hasComplexBundles => accountBundles.values.any((v) => v.length > 1);
@@ -179,11 +172,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     }
     final candidate = _loginClientCandidate ??= ClientManager.createClient(
       '${AppConfig.applicationName}-${DateTime.now().millisecondsSinceEpoch}',
-    )..onLoginStateChanged
-          .stream
-          .where((l) => l == LoginState.loggedIn)
-          .first
-          .then((_) {
+    )..onLoginStateChanged.stream.where((l) => l == LoginState.loggedIn).first.then((_) {
         if (!widget.clients.contains(_loginClientCandidate)) {
           widget.clients.add(_loginClientCandidate!);
         }
@@ -259,11 +248,9 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
 
   bool webHasFocus = true;
 
-  String? get activeRoomId =>
-      VRouter.of(navigatorContext).pathParameters['roomid'];
+  String? get activeRoomId => VRouter.of(navigatorContext).pathParameters['roomid'];
 
-  final linuxNotifications =
-      PlatformInfos.isLinux ? NotificationsClient() : null;
+  final linuxNotifications = PlatformInfos.isLinux ? NotificationsClient() : null;
   final Map<String, int> linuxNotificationIds = {};
 
   @override
@@ -279,8 +266,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       LoadingDialog.defaultTitle = L10n.of(context)!.loadingPleaseWait;
       LoadingDialog.defaultBackLabel = L10n.of(context)!.close;
-      LoadingDialog.defaultOnError =
-          (e) => (e as Object?)!.toLocalizedString(context);
+      LoadingDialog.defaultOnError = (e) => (e as Object?)!.toLocalizedString(context);
     });
   }
 
@@ -292,24 +278,20 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
       );
       return;
     }
-    onRoomKeyRequestSub[name] ??=
-        c.onRoomKeyRequest.stream.listen((RoomKeyRequest request) async {
-      if (request.requestingDevice.isValid &&
-          request.requestingDevice.verified
-      ) {
+    onRoomKeyRequestSub[name] ??= c.onRoomKeyRequest.stream.listen((RoomKeyRequest request) async {
+      if (request.requestingDevice.isValid && request.requestingDevice.verified) {
         Logs().i(
           '[Key Request] Request is from a device in the group, that is not blocked, forwarding key...',
         );
         await request.forwardKey();
       }
     });
-    onKeyVerificationRequestSub[name] ??= c.onKeyVerificationRequest.stream
-        .listen((KeyVerification request) async {
+    onKeyVerificationRequestSub[name] ??=
+        c.onKeyVerificationRequest.stream.listen((KeyVerification request) async {
       var hidPopup = false;
       request.onUpdate = () {
         if (!hidPopup &&
-            {KeyVerificationState.done, KeyVerificationState.error}
-                .contains(request.state)) {
+            {KeyVerificationState.done, KeyVerificationState.error}.contains(request.state)) {
           Navigator.of(navigatorContext).pop('dialog');
         }
         hidPopup = true;
@@ -378,8 +360,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         ([TargetPlatform.linux].contains(Theme.of(context).platform)
                 ? SharedPreferences.getInstance()
                     .then((prefs) => prefs.getString(SettingKeys.appLockKey))
-                : const FlutterSecureStorage()
-                    .read(key: SettingKeys.appLockKey))
+                : const FlutterSecureStorage().read(key: SettingKeys.appLockKey))
             .then((lock) {
           if (lock?.isNotEmpty ?? false) {
             AppLock.of(widget.context)!.enable();
@@ -411,8 +392,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
             context: context,
             title: L10n.of(context)!.oopsSomethingWentWrong,
             message: errorMsg,
-            okLabel:
-                link == null ? L10n.of(context)!.ok : L10n.of(context)!.help,
+            okLabel: link == null ? L10n.of(context)!.ok : L10n.of(context)!.help,
             cancelLabel: L10n.of(context)!.doNotShowAgain,
           );
           if (result == OkCancelResult.ok && link != null) {
@@ -439,8 +419,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     Logs().v('AppLifecycleState = $state');
-    final foreground = state != AppLifecycleState.detached &&
-        state != AppLifecycleState.paused;
+    final foreground = state != AppLifecycleState.detached && state != AppLifecycleState.paused;
     client.backgroundSync = foreground;
     client.syncPresence = foreground ? null : PresenceType.unavailable;
     client.requestHistoryOnLimitedTimeline = !foreground;
@@ -455,8 +434,8 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
       }
     });
     store.getItem(SettingKeys.fontSizeFactor).then(
-          (value) => AppConfig.fontSizeFactor =
-              double.tryParse(value ?? '') ?? AppConfig.fontSizeFactor,
+          (value) =>
+              AppConfig.fontSizeFactor = double.tryParse(value ?? '') ?? AppConfig.fontSizeFactor,
         );
     store.getItem(SettingKeys.bubbleSizeFactor).then(
           (value) => AppConfig.bubbleSizeFactor =

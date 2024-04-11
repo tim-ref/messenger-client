@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -63,8 +63,7 @@ class SettingsNotifications extends StatefulWidget {
   const SettingsNotifications({Key? key}) : super(key: key);
 
   @override
-  SettingsNotificationsController createState() =>
-      SettingsNotificationsController();
+  SettingsNotificationsController createState() => SettingsNotificationsController();
 }
 
 class SettingsNotificationsController extends State<SettingsNotifications> {
@@ -73,25 +72,15 @@ class SettingsNotificationsController extends State<SettingsNotifications> {
     if (pushRules == null) return null;
     switch (item.type) {
       case PushRuleKind.content:
-        return pushRules.content
-            ?.singleWhereOrNull((r) => r.ruleId == item.key)
-            ?.enabled;
+        return pushRules.content?.singleWhereOrNull((r) => r.ruleId == item.key)?.enabled;
       case PushRuleKind.override:
-        return pushRules.override
-            ?.singleWhereOrNull((r) => r.ruleId == item.key)
-            ?.enabled;
+        return pushRules.override?.singleWhereOrNull((r) => r.ruleId == item.key)?.enabled;
       case PushRuleKind.room:
-        return pushRules.room
-            ?.singleWhereOrNull((r) => r.ruleId == item.key)
-            ?.enabled;
+        return pushRules.room?.singleWhereOrNull((r) => r.ruleId == item.key)?.enabled;
       case PushRuleKind.sender:
-        return pushRules.sender
-            ?.singleWhereOrNull((r) => r.ruleId == item.key)
-            ?.enabled;
+        return pushRules.sender?.singleWhereOrNull((r) => r.ruleId == item.key)?.enabled;
       case PushRuleKind.underride:
-        return pushRules.underride
-            ?.singleWhereOrNull((r) => r.ruleId == item.key)
-            ?.enabled;
+        return pushRules.underride?.singleWhereOrNull((r) => r.ruleId == item.key)?.enabled;
     }
   }
 
@@ -117,7 +106,7 @@ class SettingsNotificationsController extends State<SettingsNotifications> {
           label: L10n.of(context)!.delete,
           isDestructiveAction: true,
           key: true,
-        )
+        ),
       ],
     );
     if (delete != true) return;

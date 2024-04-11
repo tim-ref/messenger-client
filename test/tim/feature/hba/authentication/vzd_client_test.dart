@@ -23,7 +23,7 @@ void main() {
 
       return Response(
           """{"status": 302, "location": "https://challenge-path?foo=bar&bar=baz"}""",
-          200);
+          200,);
     });
 
     final sut = VzdClient(mockClient);
@@ -50,7 +50,7 @@ void main() {
     final sut = VzdClient(mockClient);
 
     await expectLater(sut.authCodeToToken("code", "state", "http://challenge"),
-        throwsA(isA<Exception>()));
+        throwsA(isA<Exception>()),);
   });
 
   test('authToToken', () async {

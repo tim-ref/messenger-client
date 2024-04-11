@@ -29,7 +29,7 @@ class ContactDebugWidget extends StatelessWidget {
         return snapshot.hasData
             ? Text(
                 jsonEncode(
-                    snapshot.requireData?.map((e) => e.toJson()).toList()),
+                    snapshot.requireData?.map((e) => e.toJson()).toList(),),
                 key: const ValueKey("contactList"),
               )
             : const Text("no contact data yet");

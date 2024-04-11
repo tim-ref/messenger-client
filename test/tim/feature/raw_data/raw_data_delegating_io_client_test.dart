@@ -48,14 +48,14 @@ void main() {
     );
     when(userAgentBuilder.buildUserAgent()).thenReturn(userAgent);
     when(ioClient.send(request)).thenAnswer(
-        (_) async => IOStreamedResponse(Stream.value([1, 3, 3, 7]), 200));
+        (_) async => IOStreamedResponse(Stream.value([1, 3, 3, 7]), 200),);
 
     // when
     client.send(request);
 
     // expect
     expect(
-        request.headers['Useragent'], equals(jsonEncode(userAgent.toJson())));
+        request.headers['Useragent'], equals(jsonEncode(userAgent.toJson())),);
     verify(ioClient.send(request)).called(1);
   });
 }

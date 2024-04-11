@@ -56,7 +56,7 @@ class _SearchHealthcareServiceFormState
     );
     _telematikIdCtrl.addListener(
       () => _updateParams(
-          MapEntry(organizationTelematikId, _telematikIdCtrl.text)),
+          MapEntry(organizationTelematikId, _telematikIdCtrl.text),),
     );
     _orgaTypeCtrl.addListener(
       () => _updateParams(MapEntry(organizationType, _orgaTypeCtrl.text)),

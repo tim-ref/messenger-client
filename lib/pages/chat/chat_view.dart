@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 09.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -33,6 +33,7 @@ import 'package:fluffychat/widgets/connection_status_header.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/unread_rooms_badge.dart';
 import '../../utils/stream_extension.dart';
+import '../../tim/feature/chat/case_reference_popup_widget.dart';
 import 'chat_emoji_picker.dart';
 import 'chat_input_row.dart';
 
@@ -126,18 +127,19 @@ class ChatView extends StatelessWidget {
             icon: const Icon(Icons.delete_forever_outlined),
             label: Text(L10n.of(context)!.delete),
           ),
-        )
+        ),
       ];
     } else {
       return [
-        if (Matrix.of(context).voipPlugin != null &&
-            controller.room.isDirectChat)
+        if (Matrix.of(context).voipPlugin != null && controller.room.isDirectChat)
           IconButton(
             onPressed: controller.onPhoneButtonTap,
             icon: const Icon(Icons.call_outlined),
             tooltip: L10n.of(context)!.placeCall,
           ),
         EncryptionButton(controller.room),
+        if (controller.timCaseReferenceContent.isNotEmpty)
+          CaseReferencePopupWidget(caseReference: controller.timCaseReferenceContent),
         Semantics(
           label: "roomPopupMenu",
           container: true,
@@ -175,8 +177,7 @@ class ChatView extends StatelessWidget {
         onTapDown: (_) => controller.setReadMarker(),
         behavior: HitTestBehavior.opaque,
         child: StreamBuilder(
-          stream: controller.room.onUpdate.stream
-              .rateLimit(const Duration(seconds: 1)),
+          stream: controller.room.onUpdate.stream.rateLimit(const Duration(seconds: 1)),
           builder: (context, snapshot) => FutureBuilder(
             future: controller.loadTimelineFuture,
             builder: (BuildContext context, snapshot) {
@@ -208,17 +209,17 @@ class ChatView extends StatelessWidget {
                   title: ChatAppBarTitle(controller),
                   actions: _appBarActions(context),
                 ),
-                floatingActionButton: controller.showScrollDownButton &&
-                        controller.selectedEvents.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.only(bottom: 56.0),
-                        child: FloatingActionButton(
-                          onPressed: controller.scrollDown,
-                          mini: true,
-                          child: const Icon(Icons.arrow_downward_outlined),
-                        ),
-                      )
-                    : null,
+                floatingActionButton:
+                    controller.showScrollDownButton && controller.selectedEvents.isEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(bottom: 56.0),
+                            child: FloatingActionButton(
+                              onPressed: controller.scrollDown,
+                              mini: true,
+                              child: const Icon(Icons.arrow_downward_outlined),
+                            ),
+                          )
+                        : null,
                 body: DropTarget(
                   onDragDone: controller.onDragDone,
                   onDragEntered: controller.onDragEntered,
@@ -259,8 +260,7 @@ class ChatView extends StatelessWidget {
                                   builder: (context) {
                                     if (controller.timeline == null) {
                                       return const Center(
-                                        child:
-                                            CircularProgressIndicator.adaptive(
+                                        child: CircularProgressIndicator.adaptive(
                                           strokeWidth: 2,
                                         ),
                                       );
@@ -288,32 +288,24 @@ class ChatView extends StatelessWidget {
                                 alignment: Alignment.center,
                                 child: Material(
                                   borderRadius: const BorderRadius.only(
-                                    bottomLeft:
-                                        Radius.circular(AppConfig.borderRadius),
-                                    bottomRight:
-                                        Radius.circular(AppConfig.borderRadius),
+                                    bottomLeft: Radius.circular(AppConfig.borderRadius),
+                                    bottomRight: Radius.circular(AppConfig.borderRadius),
                                   ),
                                   elevation: 4,
                                   shadowColor: Colors.black.withAlpha(64),
                                   clipBehavior: Clip.hardEdge,
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
+                                  color: Theme.of(context).brightness == Brightness.light
                                       ? Colors.white
                                       : Colors.black,
-                                  child: controller.room.isAbandonedDMRoom ==
-                                          true
+                                  child: controller.room.isAbandonedDMRoom == true
                                       ? Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                           children: [
                                             TextButton.icon(
                                               style: TextButton.styleFrom(
-                                                padding:
-                                                    const EdgeInsets.all(16),
+                                                padding: const EdgeInsets.all(16),
                                                 foregroundColor:
-                                                    Theme.of(context)
-                                                        .colorScheme
-                                                        .error,
+                                                    Theme.of(context).colorScheme.error,
                                               ),
                                               icon: const Icon(
                                                 Icons.archive_outlined,
@@ -325,14 +317,12 @@ class ChatView extends StatelessWidget {
                                             ),
                                             TextButton.icon(
                                               style: TextButton.styleFrom(
-                                                padding:
-                                                    const EdgeInsets.all(16),
+                                                padding: const EdgeInsets.all(16),
                                               ),
                                               icon: const Icon(
                                                 Icons.forum_outlined,
                                               ),
-                                              onPressed:
-                                                  controller.recreateChat,
+                                              onPressed: controller.recreateChat,
                                               label: Text(
                                                 L10n.of(context)!.reopenChat,
                                               ),
@@ -358,9 +348,7 @@ class ChatView extends StatelessWidget {
                       ),
                       if (controller.dragging)
                         Container(
-                          color: Theme.of(context)
-                              .scaffoldBackgroundColor
-                              .withOpacity(0.9),
+                          color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
                           alignment: Alignment.center,
                           child: const Icon(
                             Icons.upload_outlined,

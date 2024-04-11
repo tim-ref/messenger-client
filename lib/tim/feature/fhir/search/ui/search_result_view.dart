@@ -86,7 +86,7 @@ class SearchResultView extends StatelessWidget {
             return PractitionerSearchResultListTile(entry);
           }
           return HealthcareServiceSearchResultListTile(
-              entry as HealthcareServiceSearchResult);
+              entry as HealthcareServiceSearchResult,);
         },
       );
 

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -56,13 +57,11 @@ class InputBar extends StatelessWidget {
   }) : super(key: key);
 
   List<Map<String, String?>> getSuggestions(String text) {
-    if (controller!.selection.baseOffset !=
-            controller!.selection.extentOffset ||
+    if (controller!.selection.baseOffset != controller!.selection.extentOffset ||
         controller!.selection.baseOffset < 0) {
       return []; // no entries if there is selected text
     }
-    final searchText =
-        controller!.text.substring(0, controller!.selection.baseOffset);
+    final searchText = controller!.text.substring(0, controller!.selection.baseOffset);
     final List<Map<String, String?>> ret = <Map<String, String?>>[];
     const maxResults = 30;
 
@@ -80,8 +79,7 @@ class InputBar extends StatelessWidget {
         if (ret.length > maxResults) return ret;
       }
     }
-    final emojiMatch =
-        RegExp(r'(?:\s|^):(?:([-\w]+)~)?([-\w]+)$').firstMatch(searchText);
+    final emojiMatch = RegExp(r'(?:\s|^):(?:([-\w]+)~)?([-\w]+)$').firstMatch(searchText);
     if (emojiMatch != null) {
       final emoteSearch = emojiMatch[2]!.toLowerCase();
       final matchingUnicodeEmojis = Emoji.all()
@@ -125,8 +123,7 @@ class InputBar extends StatelessWidget {
       for (final user in room.getParticipants()) {
         if ((user.displayName != null &&
                 (user.displayName!.toLowerCase().contains(userSearch) ||
-                    slugify(user.displayName!.toLowerCase())
-                        .contains(userSearch))) ||
+                    slugify(user.displayName!.toLowerCase()).contains(userSearch))) ||
             user.id.split(':')[0].toLowerCase().contains(userSearch)) {
           ret.add({
             'type': 'user',
@@ -151,24 +148,16 @@ class InputBar extends StatelessWidget {
         final state = r.getState(EventTypes.RoomCanonicalAlias);
         if ((state != null &&
                 ((state.content['alias'] is String &&
-                        state.content['alias']
-                            .split(':')[0]
-                            .toLowerCase()
-                            .contains(roomSearch)) ||
+                        state.content['alias'].split(':')[0].toLowerCase().contains(roomSearch)) ||
                     (state.content['alt_aliases'] is List &&
                         state.content['alt_aliases'].any(
-                          (l) =>
-                              l is String &&
-                              l
-                                  .split(':')[0]
-                                  .toLowerCase()
-                                  .contains(roomSearch),
+                          (l) => l is String && l.split(':')[0].toLowerCase().contains(roomSearch),
                         )))) ||
-            (r.name.toLowerCase().contains(roomSearch))) {
+            (r.getLocalizedDisplaynameFromCustomNameEvent().toLowerCase().contains(roomSearch))) {
           ret.add({
             'type': 'room',
             'mxid': (r.canonicalAlias.isNotEmpty) ? r.canonicalAlias : r.id,
-            'displayname': r.getLocalizedDisplayname(),
+            'displayname': r.getLocalizedDisplaynameFromCustomNameEvent(),
             'avatar_url': r.avatar?.toString(),
           });
         }
@@ -231,9 +220,7 @@ class InputBar extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             MxcImage(
-              uri: suggestion['mxc'] is String
-                  ? Uri.parse(suggestion['mxc'] ?? '')
-                  : null,
+              uri: suggestion['mxc'] is String ? Uri.parse(suggestion['mxc'] ?? '') : null,
               width: size,
               height: size,
             ),
@@ -270,8 +257,7 @@ class InputBar extends StatelessWidget {
           children: <Widget>[
             Avatar(
               mxContent: url,
-              name: suggestion.tryGet<String>('displayname') ??
-                  suggestion.tryGet<String>('mxid'),
+              name: suggestion.tryGet<String>('displayname') ?? suggestion.tryGet<String>('mxid'),
               size: size,
               client: client,
             ),
@@ -285,8 +271,7 @@ class InputBar extends StatelessWidget {
   }
 
   void insertSuggestion(_, Map<String, String?> suggestion) {
-    final replaceText =
-        controller!.text.substring(0, controller!.selection.baseOffset);
+    final replaceText = controller!.text.substring(0, controller!.selection.baseOffset);
     var startText = '';
     final afterText = replaceText == controller!.text
         ? ''
@@ -356,15 +341,12 @@ class InputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final useShortCuts = (PlatformInfos.isWeb ||
-        PlatformInfos.isDesktop ||
-        AppConfig.sendOnEnter);
+    final useShortCuts = (PlatformInfos.isWeb || PlatformInfos.isDesktop || AppConfig.sendOnEnter);
     return Shortcuts(
       shortcuts: !useShortCuts
           ? {}
           : {
-              LogicalKeySet(LogicalKeyboardKey.shift, LogicalKeyboardKey.enter):
-                  NewLineIntent(),
+              LogicalKeySet(LogicalKeyboardKey.shift, LogicalKeyboardKey.enter): NewLineIntent(),
               LogicalKeySet(LogicalKeyboardKey.enter): SubmitLineIntent(),
             },
       child: Actions(
@@ -426,15 +408,14 @@ class InputBar extends StatelessWidget {
               textCapitalization: TextCapitalization.sentences,
             ),
             suggestionsCallback: getSuggestions,
-            itemBuilder: (c, s) =>
-                buildSuggestion(c, s, Matrix.of(context).client),
+            itemBuilder: (c, s) => buildSuggestion(c, s, Matrix.of(context).client),
             onSuggestionSelected: (Map<String, String?> suggestion) =>
                 insertSuggestion(context, suggestion),
             errorBuilder: (BuildContext context, Object? error) => const SizedBox.shrink(),
             loadingBuilder: (BuildContext context) => const SizedBox.shrink(),
             // fix loading briefly flickering a dark box
-            noItemsFoundBuilder: (BuildContext context) =>const SizedBox
-                .shrink(), // fix loading briefly showing no suggestions
+            noItemsFoundBuilder: (BuildContext context) =>
+                const SizedBox.shrink(), // fix loading briefly showing no suggestions
           ),
         ),
       ),

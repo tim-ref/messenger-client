@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -40,14 +41,12 @@ class ChatListView extends StatelessWidget {
         NavigationDestination(
           icon: UnreadRoomsBadge(
             badgePosition: badgePosition,
-            filter:
-                controller.getRoomFilterByActiveFilter(ActiveFilter.messages),
+            filter: controller.getRoomFilterByActiveFilter(ActiveFilter.messages),
             child: const Icon(Icons.forum_outlined),
           ),
           selectedIcon: UnreadRoomsBadge(
             badgePosition: badgePosition,
-            filter:
-                controller.getRoomFilterByActiveFilter(ActiveFilter.messages),
+            filter: controller.getRoomFilterByActiveFilter(ActiveFilter.messages),
             child: const Icon(Icons.forum),
           ),
           label: L10n.of(context)!.messages,
@@ -69,14 +68,12 @@ class ChatListView extends StatelessWidget {
         NavigationDestination(
           icon: UnreadRoomsBadge(
             badgePosition: badgePosition,
-            filter:
-                controller.getRoomFilterByActiveFilter(ActiveFilter.allChats),
+            filter: controller.getRoomFilterByActiveFilter(ActiveFilter.allChats),
             child: const Icon(Icons.forum_outlined),
           ),
           selectedIcon: UnreadRoomsBadge(
             badgePosition: badgePosition,
-            filter:
-                controller.getRoomFilterByActiveFilter(ActiveFilter.allChats),
+            filter: controller.getRoomFilterByActiveFilter(ActiveFilter.allChats),
             child: const Icon(Icons.forum),
           ),
           label: L10n.of(context)!.chats,
@@ -106,11 +103,8 @@ class ChatListView extends StatelessWidget {
               return;
             }
             if (controller.activeFilter !=
-                (AppConfig.separateChatTypes
-                    ? ActiveFilter.messages
-                    : ActiveFilter.allChats)) {
-              controller
-                  .onDestinationSelected(AppConfig.separateChatTypes ? 1 : 0);
+                (AppConfig.separateChatTypes ? ActiveFilter.messages : ActiveFilter.allChats)) {
+              controller.onDestinationSelected(AppConfig.separateChatTypes ? 1 : 0);
               redirector.stopRedirection();
               return;
             }
@@ -121,13 +115,12 @@ class ChatListView extends StatelessWidget {
                   FluffyThemes.getDisplayNavigationRail(context)) ...[
                 Builder(
                   builder: (context) {
-                    final allSpaces =
-                        client.rooms.where((room) => room.isSpace);
+                    final allSpaces = client.rooms.where((room) => room.isSpace);
                     final rootSpaces = allSpaces
                         .where(
                           (space) => !allSpaces.any(
-                            (parentSpace) => parentSpace.spaceChildren
-                                .any((child) => child.roomId == space.id),
+                            (parentSpace) =>
+                                parentSpace.spaceChildren.any((child) => child.roomId == space.id),
                           ),
                         )
                         .toList();
@@ -149,19 +142,17 @@ class ChatListView extends StatelessWidget {
                             );
                           }
                           i -= destinations.length;
-                          final isSelected =
-                              controller.activeFilter == ActiveFilter.spaces &&
-                                  rootSpaces[i].id == controller.activeSpaceId;
+                          final isSelected = controller.activeFilter == ActiveFilter.spaces &&
+                              rootSpaces[i].id == controller.activeSpaceId;
                           return NaviRailItem(
-                            toolTip: rootSpaces[i].getLocalizedDisplayname(
+                            toolTip: rootSpaces[i].getLocalizedDisplaynameFromCustomNameEvent(
                               MatrixLocals(L10n.of(context)!),
                             ),
                             isSelected: isSelected,
-                            onTap: () =>
-                                controller.setActiveSpace(rootSpaces[i].id),
+                            onTap: () => controller.setActiveSpace(rootSpaces[i].id),
                             icon: Avatar(
                               mxContent: rootSpaces[i].avatar,
-                              name: rootSpaces[i].getLocalizedDisplayname(
+                              name: rootSpaces[i].getLocalizedDisplaynameFromCustomNameEvent(
                                 MatrixLocals(L10n.of(context)!),
                               ),
                               size: 32,
@@ -189,18 +180,16 @@ class ChatListView extends StatelessWidget {
                         ? NavigationBar(
                             height: 64,
                             selectedIndex: controller.selectedIndex,
-                            onDestinationSelected:
-                                controller.onDestinationSelected,
+                            onDestinationSelected: controller.onDestinationSelected,
                             destinations: getNavigationDestinations(context),
                           )
                         : null,
                     floatingActionButton: KeyBoardShortcuts(
                       keysToPress: {
                         LogicalKeyboardKey.controlLeft,
-                        LogicalKeyboardKey.keyN
+                        LogicalKeyboardKey.keyN,
                       },
-                      onKeysPressed: () =>
-                          VRouter.of(context).to('/newprivatechat'),
+                      onKeysPressed: () => VRouter.of(context).to('/newprivatechat'),
                       helpLabel: L10n.of(context)!.newChat,
                       child: selectMode == SelectMode.normal &&
                               controller.filteredRooms.isNotEmpty &&

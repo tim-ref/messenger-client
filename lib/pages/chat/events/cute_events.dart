@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -57,7 +57,7 @@ class _CuteContentState extends State<CuteContent> {
                   widget.event.text,
                   style: const TextStyle(fontSize: 150),
                 ),
-                if (label != null) Text(label)
+                if (label != null) Text(label),
               ],
             ),
           ),
@@ -87,21 +87,15 @@ class _CuteContentState extends State<CuteContent> {
     switch (widget.event.content['cute_type']) {
       case 'googly_eyes':
         return L10n.of(context)?.googlyEyesContent(
-          user?.displayName ??
-              widget.event.senderFromMemoryOrFallback.displayName ??
-              '',
+          user?.displayName ?? widget.event.senderFromMemoryOrFallback.displayName ?? '',
         );
       case 'cuddle':
         return L10n.of(context)?.cuddleContent(
-          user?.displayName ??
-              widget.event.senderFromMemoryOrFallback.displayName ??
-              '',
+          user?.displayName ?? widget.event.senderFromMemoryOrFallback.displayName ?? '',
         );
       case 'hug':
         return L10n.of(context)?.hugContent(
-          user?.displayName ??
-              widget.event.senderFromMemoryOrFallback.displayName ??
-              '',
+          user?.displayName ?? widget.event.senderFromMemoryOrFallback.displayName ?? '',
         );
     }
   }
@@ -121,8 +115,7 @@ class CuteEventOverlay extends StatefulWidget {
   State<CuteEventOverlay> createState() => _CuteEventOverlayState();
 }
 
-class _CuteEventOverlayState extends State<CuteEventOverlay>
-    with TickerProviderStateMixin {
+class _CuteEventOverlayState extends State<CuteEventOverlay> with TickerProviderStateMixin {
   final List<Size> items = List.generate(
     50,
     (index) => Size(
@@ -162,10 +155,7 @@ class _CuteEventOverlayState extends State<CuteEventOverlay>
                   .map(
                     (position) => Positioned(
                       left: position.width * width,
-                      bottom: (height *
-                              .25 *
-                              position.height *
-                              (controller?.value ?? 0)) -
+                      bottom: (height * .25 * position.height * (controller?.value ?? 0)) -
                           _CuteOverlayContent.size,
                       child: _CuteOverlayContent(
                         emoji: widget.emoji,

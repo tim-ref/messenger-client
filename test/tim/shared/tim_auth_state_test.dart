@@ -67,7 +67,7 @@ TimAuthToken setupToken(DateTime expiryDate) {
       'server': {
         'id': '3e4fc296',
         'loc': 'euw-2',
-      }
+      },
     },
     issuer: 'unittest',
   );

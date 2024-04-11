@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,6 +11,7 @@
 
 import 'dart:async';
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:callkeep/callkeep.dart';
@@ -99,8 +100,7 @@ class CallKeepManager {
 
   String get appName => 'FluffyChat';
 
-  Future<bool> get hasPhoneAccountEnabled async =>
-      await _callKeep.hasPhoneAccount();
+  Future<bool> get hasPhoneAccountEnabled async => await _callKeep.hasPhoneAccount();
 
   Map<String, dynamic> get alertOptions => <String, dynamic>{
         'alertTitle': 'Permissions required',
@@ -245,9 +245,8 @@ class CallKeepManager {
     addCall(call.callId, callKeeper);
     await _callKeep.displayIncomingCall(
       call.callId,
-      '${call.room.getLocalizedDisplayname()} (FluffyChat)',
-      localizedCallerName:
-          '${call.room.getLocalizedDisplayname()} (FluffyChat)',
+      '${call.room.getLocalizedDisplaynameFromCustomNameEvent()} (FluffyChat)',
+      localizedCallerName: '${call.room.getLocalizedDisplaynameFromCustomNameEvent()} (FluffyChat)',
       handleType: 'number',
       hasVideo: call.type == CallType.kVideo,
     );
@@ -342,8 +341,7 @@ class CallKeepManager {
     }
     final callUUID = event.callUUID!;
     if (event.callUUID == null) {
-      final call =
-          await _voipPlugin!.voip.inviteToCall(event.handle!, CallType.kVideo);
+      final call = await _voipPlugin!.voip.inviteToCall(event.handle!, CallType.kVideo);
       addCall(callUUID, CallKeeper(this, call));
     }
     await _callKeep.startCall(callUUID, event.handle!, event.handle!);

@@ -107,8 +107,7 @@ class MockTimAuthRepository extends _i1.Mock implements _i4.TimAuthRepository {
         )),
       ) as _i5.Future<_i2.TimAuthToken>);
   @override
-  _i5.Future<_i2.TimAuthToken> getHbaTokenFromUrl(String? url) =>
-      (super.noSuchMethod(
+  _i5.Future<_i2.TimAuthToken> getHbaTokenFromUrl(String? url) => (super.noSuchMethod(
         Invocation.method(
           #getHbaTokenFromUrl,
           [url],
@@ -260,8 +259,7 @@ class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
             token,
           ],
         ),
-        returnValue:
-            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValue: _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
       ) as _i5.Future<Map<String, dynamic>>);
   @override
   _i5.Future<Map<String, dynamic>> createResource(
@@ -278,8 +276,7 @@ class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
             bodyJson,
           ],
         ),
-        returnValue:
-            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValue: _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
       ) as _i5.Future<Map<String, dynamic>>);
   @override
   _i5.Future<Map<String, dynamic>> updateResource(
@@ -298,8 +295,7 @@ class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
             bodyJson,
           ],
         ),
-        returnValue:
-            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValue: _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
       ) as _i5.Future<Map<String, dynamic>>);
   @override
   _i5.Future<Map<String, dynamic>> deleteResource(
@@ -316,8 +312,7 @@ class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
             token,
           ],
         ),
-        returnValue:
-            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValue: _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
       ) as _i5.Future<Map<String, dynamic>>);
   @override
   _i5.Future<_i3.Response> get(

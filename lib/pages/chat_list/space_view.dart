@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -99,15 +100,14 @@ class _SpaceViewState extends State<SpaceView> {
   ]) async {
     final client = Matrix.of(context).client;
     final activeSpaceId = widget.controller.activeSpaceId;
-    final activeSpace =
-        activeSpaceId == null ? null : client.getRoomById(activeSpaceId);
+    final activeSpace = activeSpaceId == null ? null : client.getRoomById(activeSpaceId);
     final action = await showModalActionSheet<SpaceChildContextAction>(
       context: context,
       title: spaceChild?.name ??
-          room?.getLocalizedDisplayname(
+          room?.getLocalizedDisplaynameFromCustomNameEvent(
             MatrixLocals(L10n.of(context)!),
           ),
-      message: spaceChild?.topic ?? room?.topic,
+      message: spaceChild?.topic ?? room?.displayTopic,
       actions: [
         if (room == null)
           SheetAction(
@@ -160,8 +160,7 @@ class _SpaceViewState extends State<SpaceView> {
       final rootSpaces = allSpaces
           .where(
             (space) => !allSpaces.any(
-              (parentSpace) => parentSpace.spaceChildren
-                  .any((child) => child.roomId == space.id),
+              (parentSpace) => parentSpace.spaceChildren.any((child) => child.roomId == space.id),
             ),
           )
           .toList();
@@ -174,7 +173,7 @@ class _SpaceViewState extends State<SpaceView> {
             delegate: SliverChildBuilderDelegate(
               (context, i) {
                 final rootSpace = rootSpaces[i];
-                final displayname = rootSpace.getLocalizedDisplayname(
+                final displayname = rootSpace.getLocalizedDisplaynameFromCustomNameEvent(
                   MatrixLocals(L10n.of(context)!),
                 );
                 return Material(
@@ -190,12 +189,10 @@ class _SpaceViewState extends State<SpaceView> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     subtitle: Text(
-                      L10n.of(context)!
-                          .numChats(rootSpace.spaceChildren.length.toString()),
+                      L10n.of(context)!.numChats(rootSpace.spaceChildren.length.toString()),
                     ),
                     onTap: () => widget.controller.setActiveSpace(rootSpace.id),
-                    onLongPress: () =>
-                        _onSpaceChildContextMenu(null, rootSpace),
+                    onLongPress: () => _onSpaceChildContextMenu(null, rootSpace),
                     trailing: const Icon(Icons.chevron_right_outlined),
                   ),
                 );
@@ -223,7 +220,7 @@ class _SpaceViewState extends State<SpaceView> {
               IconButton(
                 onPressed: _refresh,
                 icon: const Icon(Icons.refresh_outlined),
-              )
+              ),
             ],
           );
         }
@@ -240,8 +237,7 @@ class _SpaceViewState extends State<SpaceView> {
           );
         }
         final parentSpace = allSpaces.firstWhereOrNull(
-          (space) =>
-              space.spaceChildren.any((child) => child.roomId == activeSpaceId),
+          (space) => space.spaceChildren.any((child) => child.roomId == activeSpaceId),
         );
         final spaceChildren = response.rooms;
         final canLoadMore = response.nextBatch != null;
@@ -263,13 +259,12 @@ class _SpaceViewState extends State<SpaceView> {
                     if (i == 0) {
                       return ListTile(
                         leading: BackButton(
-                          onPressed: () =>
-                              widget.controller.setActiveSpace(parentSpace?.id),
+                          onPressed: () => widget.controller.setActiveSpace(parentSpace?.id),
                         ),
                         title: Text(
                           parentSpace == null
                               ? L10n.of(context)!.allSpaces
-                              : parentSpace.getLocalizedDisplayname(
+                              : parentSpace.getLocalizedDisplaynameFromCustomNameEvent(
                                   MatrixLocals(L10n.of(context)!),
                                 ),
                         ),
@@ -278,9 +273,7 @@ class _SpaceViewState extends State<SpaceView> {
                               ? const CircularProgressIndicator.adaptive()
                               : const Icon(Icons.refresh_outlined),
                           onPressed:
-                              snapshot.connectionState != ConnectionState.done
-                                  ? null
-                                  : _refresh,
+                              snapshot.connectionState != ConnectionState.done ? null : _refresh,
                         ),
                       );
                     }
@@ -300,20 +293,15 @@ class _SpaceViewState extends State<SpaceView> {
                     if (room != null && !room.isSpace) {
                       return ChatListItem(
                         room,
-                        onLongPress: () =>
-                            _onSpaceChildContextMenu(spaceChild, room),
+                        onLongPress: () => _onSpaceChildContextMenu(spaceChild, room),
                         activeChat: widget.controller.activeChat == room.id,
                       );
                     }
                     final isSpace = spaceChild.roomType == 'm.space';
-                    final topic = spaceChild.topic?.isEmpty ?? true
-                        ? null
-                        : spaceChild.topic;
+                    final topic = spaceChild.topic?.isEmpty ?? true ? null : spaceChild.topic;
                     if (spaceChild.roomId == activeSpaceId) {
                       return SearchTitle(
-                        title: spaceChild.name ??
-                            spaceChild.canonicalAlias ??
-                            'Space',
+                        title: spaceChild.name ?? spaceChild.canonicalAlias ?? 'Space',
                         icon: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Avatar(
@@ -323,10 +311,7 @@ class _SpaceViewState extends State<SpaceView> {
                             fontSize: 9,
                           ),
                         ),
-                        color: Theme.of(context)
-                            .colorScheme
-                            .secondaryContainer
-                            .withAlpha(128),
+                        color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(128),
                         trailing: const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.0),
                           child: Icon(Icons.edit_outlined),
@@ -347,8 +332,7 @@ class _SpaceViewState extends State<SpaceView> {
                                   spaceChild.canonicalAlias ??
                                   L10n.of(context)!.chat,
                               maxLines: 1,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                           if (!isSpace) ...[
@@ -365,21 +349,16 @@ class _SpaceViewState extends State<SpaceView> {
                         ],
                       ),
                       onTap: () => _onJoinSpaceChild(spaceChild),
-                      onLongPress: () =>
-                          _onSpaceChildContextMenu(spaceChild, room),
+                      onLongPress: () => _onSpaceChildContextMenu(spaceChild, room),
                       subtitle: Text(
                         topic ??
-                            (isSpace
-                                ? L10n.of(context)!.enterSpace
-                                : L10n.of(context)!.enterRoom),
+                            (isSpace ? L10n.of(context)!.enterSpace : L10n.of(context)!.enterRoom),
                         maxLines: 1,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onBackground,
                         ),
                       ),
-                      trailing: isSpace
-                          ? const Icon(Icons.chevron_right_outlined)
-                          : null,
+                      trailing: isSpace ? const Icon(Icons.chevron_right_outlined) : null,
                     );
                   },
                   childCount: spaceChildren.length + 1 + (canLoadMore ? 1 : 0),

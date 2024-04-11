@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,7 +11,6 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:emoji_proposal/emoji_proposal.dart';
 import 'package:matrix/matrix.dart';
 
 import 'package:fluffychat/config/app_config.dart';
@@ -41,14 +40,7 @@ class ReactionsPicker extends StatelessWidget {
             if (!display) {
               return const SizedBox.shrink();
             }
-            final proposals = proposeEmojis(
-              controller.selectedEvents.first.plaintextBody,
-              number: 25,
-              languageCodes: EmojiProposalLanguageCodes.values.toSet(),
-            );
-            final emojis = proposals.isNotEmpty
-                ? proposals.map((e) => e.char).toList()
-                : List<String>.from(AppEmojis.emojis);
+            final emojis = List<String>.from(AppEmojis.emojis);
             final allReactionEvents = controller.selectedEvents.first
                 .aggregatedEvents(
                   controller.timeline!,
@@ -56,8 +48,7 @@ class ReactionsPicker extends StatelessWidget {
                 )
                 .where(
                   (event) =>
-                      event.senderId == event.room.client.userID &&
-                      event.type == 'm.reaction',
+                      event.senderId == event.room.client.userID && event.type == 'm.reaction',
                 );
 
             for (final event in allReactionEvents) {
@@ -107,9 +98,8 @@ class ReactionsPicker extends StatelessWidget {
                     ),
                     child: const Icon(Icons.add_outlined),
                   ),
-                  onTap: () =>
-                      controller.pickEmojiReactionAction(allReactionEvents),
-                )
+                  onTap: () => controller.pickEmojiReactionAction(allReactionEvents),
+                ),
               ],
             );
           },

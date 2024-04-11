@@ -39,7 +39,7 @@ class SearchTitle extends StatelessWidget {
                     key: const ValueKey("practitionerRole"),
                     textStyle: Theme.of(context).textTheme.titleLarge,
                     child: Text(
-                        L10n.of(context)!.timFhirResourceTypePractitionerRole),
+                        L10n.of(context)!.timFhirResourceTypePractitionerRole,),
                     onTap: () {
                       selectedSearchType.add(ResourceType.PractitionerRole);
                     },
@@ -48,7 +48,7 @@ class SearchTitle extends StatelessWidget {
                     key: const ValueKey("healthcareService"),
                     textStyle: Theme.of(context).textTheme.titleLarge,
                     child: Text(
-                        L10n.of(context)!.timFhirResourceTypeHealthcareService),
+                        L10n.of(context)!.timFhirResourceTypeHealthcareService,),
                     onTap: () {
                       selectedSearchType.add(ResourceType.HealthcareService);
                     },

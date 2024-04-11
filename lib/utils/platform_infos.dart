@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.02.2024
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -132,8 +132,7 @@ abstract class PlatformInfos {
                           'by Famedly GmbH.\n\nYou may convey this Messenger Client under the terms of the version 3 of the GNU Affero General Public License, available from the URL',
                     ),
                     TextSpan(
-                      text:
-                          ' https://github.com/tim-ref/messenger-client/blob/main/LICENSE',
+                      text: ' https://github.com/tim-ref/messenger-client/blob/main/LICENSE',
                       style: const TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () async {
@@ -150,8 +149,7 @@ abstract class PlatformInfos {
                           '.\n\nThis Messenger Client is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\nFurther third-party libraries and the underlying license information are available from the URL',
                     ),
                     TextSpan(
-                      text:
-                          ' https://github.com/tim-ref/messenger-client-dependencies',
+                      text: ' https://github.com/tim-ref/messenger-client-dependencies',
                       style: const TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () async {
@@ -164,8 +162,7 @@ abstract class PlatformInfos {
                         },
                     ),
                     const TextSpan(
-                      text:
-                      '.',
+                      text: '.',
                     ),
                   ],
                 ),
@@ -211,7 +208,7 @@ abstract class PlatformInfos {
                 child: TextButton(
                   onPressed: () async => await launchUrl(
                     Uri.parse(
-                      'https://github.com/tim-ref/messenger-client/tree/v1.18.0',
+                      'https://github.com/tim-ref/messenger-client/tree/v${packageInfo.version}',
                     ),
                     mode: LaunchMode.externalApplication,
                   ),
@@ -235,7 +232,7 @@ abstract class PlatformInfos {
                 child: TextButton(
                   onPressed: () async => await launchUrl(
                     Uri.parse(
-                      'https://github.com/tim-ref/messenger-client-dependencies/tree/v1.18.0',
+                      'https://github.com/tim-ref/messenger-client-dependencies/tree/v${packageInfo.version}',
                     ),
                     mode: LaunchMode.externalApplication,
                   ),
@@ -265,7 +262,7 @@ abstract class PlatformInfos {
                   ),
                   child: const Text('Imprint'),
                 ),
-              )
+              ),
             ],
           ),
         ),

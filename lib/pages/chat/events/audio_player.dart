@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -32,8 +32,7 @@ class AudioPlayerWidget extends StatefulWidget {
 
   static const int wavesCount = 40;
 
-  const AudioPlayerWidget(this.event, {this.color = Colors.black, Key? key})
-      : super(key: key);
+  const AudioPlayerWidget(this.event, {this.color = Colors.black, Key? key}) : super(key: key);
 
   @override
   AudioPlayerState createState() => AudioPlayerState();
@@ -126,17 +125,16 @@ class AudioPlayerState extends State<AudioPlayerWidget> {
       setState(() {
         statusText =
             '${state.inMinutes.toString().padLeft(2, '0')}:${(state.inSeconds % 60).toString().padLeft(2, '0')}';
-        currentPosition = ((state.inMilliseconds.toDouble() / maxPosition) *
-                AudioPlayerWidget.wavesCount)
-            .round();
+        currentPosition =
+            ((state.inMilliseconds.toDouble() / maxPosition) * AudioPlayerWidget.wavesCount)
+                .round();
       });
     });
     onDurationChanged ??= audioPlayer.durationStream.listen((max) {
       if (max == null || max == Duration.zero) return;
       setState(() => maxPosition = max.inMilliseconds.toDouble());
     });
-    onPlayerStateChanged ??=
-        audioPlayer.playingStream.listen((_) => setState(() {}));
+    onPlayerStateChanged ??= audioPlayer.playingStream.listen((_) => setState(() {}));
     final audioFile = this.audioFile;
     if (audioFile != null) {
       audioPlayer.setFilePath(audioFile.path);
@@ -156,9 +154,8 @@ class AudioPlayerState extends State<AudioPlayerWidget> {
   static const double buttonSize = 36;
 
   String? get _durationString {
-    final durationInt = widget.event.content
-        .tryGetMap<String, dynamic>('info')
-        ?.tryGet<int>('duration');
+    final durationInt =
+        widget.event.content.tryGetMap<String, dynamic>('info')?.tryGet<int>('duration');
     if (durationInt == null) return null;
     final duration = Duration(milliseconds: durationInt);
     return '${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
@@ -238,10 +235,7 @@ class AudioPlayerState extends State<AudioPlayerWidget> {
                     child: InkWell(
                       onTap: () => audioPlayer?.seek(
                         Duration(
-                          milliseconds:
-                              (maxPosition / AudioPlayerWidget.wavesCount)
-                                      .round() *
-                                  i,
+                          milliseconds: (maxPosition / AudioPlayerWidget.wavesCount).round() * i,
                         ),
                       ),
                       child: Container(
@@ -260,7 +254,7 @@ class AudioPlayerState extends State<AudioPlayerWidget> {
                         ),
                       ),
                     ),
-                  )
+                  ),
               ],
             ),
           ),

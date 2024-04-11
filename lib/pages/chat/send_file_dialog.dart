@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -73,11 +73,8 @@ class SendFileDialogState extends State<SendFileDialog> {
   @override
   Widget build(BuildContext context) {
     var sendStr = L10n.of(context)!.sendFile;
-    final bool allFilesAreImages =
-        widget.files.every((file) => file is MatrixImageFile);
-    final sizeString = widget.files
-        .fold<double>(0, (p, file) => p + file.bytes.length)
-        .sizeString;
+    final bool allFilesAreImages = widget.files.every((file) => file is MatrixImageFile);
+    final sizeString = widget.files.fold<double>(0, (p, file) => p + file.bytes.length).sizeString;
     final fileName = widget.files.length == 1
         ? widget.files.single.name
         : L10n.of(context)!.countFiles(widget.files.length.toString());
@@ -111,7 +108,7 @@ class SendFileDialogState extends State<SendFileDialog> {
                 child: Text('${L10n.of(context)!.sendOriginal} ($sizeString)'),
               ),
             ],
-          )
+          ),
         ],
       );
     } else {

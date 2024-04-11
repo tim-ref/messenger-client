@@ -133,7 +133,7 @@ void main() {
       final entries =
           FhirSearchServiceTestData.practitionerRoleCompleteEntries();
       entries.addAll(FhirSearchServiceTestData
-          .practitionerRoleEntriesWithoutPractitioner());
+          .practitionerRoleEntriesWithoutPractitioner(),);
       return entries;
     });
 
@@ -147,7 +147,7 @@ void main() {
     expect(result[0].endpointNames![0], equals('Tim Endpoint 1'));
     expect(result[0].practitionerQualifications![0].code, equals('131723.123'));
     expect(result[0].practitionerQualifications![0].display,
-        equals('Test Qualification'));
+        equals('Test Qualification'),);
   });
 
   test('searchPractitionerRole() should not include results without endpoints',
@@ -159,7 +159,7 @@ void main() {
       final entries =
           FhirSearchServiceTestData.practitionerRoleCompleteEntries();
       entries.addAll(
-          FhirSearchServiceTestData.practitionerRoleEntriesWithoutEndpoint());
+          FhirSearchServiceTestData.practitionerRoleEntriesWithoutEndpoint(),);
       return entries;
     });
 
@@ -214,7 +214,7 @@ void main() {
     expect(result[0].statusList, equals(['active']));
     expect(result[0].managingOrganization, equals('id'));
     expect(result[0].connectionTypeList.first.system,
-        equals(Uri.parse('https://someSystem.com')));
+        equals(Uri.parse('https://someSystem.com')),);
     expect(result[0].connectionTypeList.first.version, equals('1'));
     expect(result[0].connectionTypeList.first.code, equals('some code'));
     expect(result[0].connectionTypeList.first.display, equals('some display'));
@@ -222,13 +222,13 @@ void main() {
     expect(result[0].payloadTypeList.first.length, equals(1));
     expect(result[0].payloadTypeList.first.first.coding!.length, equals(1));
     expect(result[0].payloadTypeList.first.first.coding!.first.system,
-        equals(Uri.parse('https://someSystem.com')));
+        equals(Uri.parse('https://someSystem.com')),);
     expect(result[0].payloadTypeList.first.first.coding!.first.version,
-        equals('1'));
+        equals('1'),);
     expect(result[0].payloadTypeList.first.first.coding!.first.code,
-        equals('some code'));
+        equals('some code'),);
     expect(result[0].payloadTypeList.first.first.coding!.first.display,
-        equals('some display'));
+        equals('some display'),);
   });
 
   test(
@@ -250,7 +250,7 @@ void main() {
 }
 
 String buildPRQuery() => FhirQueryBuilder.buildPractitionerRoleQuery(
-    {practitionerName: "FirstName"});
+    {practitionerName: "FirstName"},);
 
 String _buildHSQuery() => FhirQueryBuilder.buildHealthcareServiceQuery(
-    {organizationName: "OrganizationName", address: "SomeAddress"});
+    {organizationName: "OrganizationName", address: "SomeAddress"},);

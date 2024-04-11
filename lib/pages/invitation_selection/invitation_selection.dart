@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,6 +11,7 @@
 
 import 'dart:async';
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -28,8 +29,7 @@ class InvitationSelection extends StatefulWidget {
   const InvitationSelection({Key? key}) : super(key: key);
 
   @override
-  InvitationSelectionController createState() =>
-      InvitationSelectionController();
+  InvitationSelectionController createState() => InvitationSelectionController();
 }
 
 class InvitationSelectionController extends State<InvitationSelection> {
@@ -68,7 +68,7 @@ class InvitationSelectionController extends State<InvitationSelection> {
         await showOkCancelAlertDialog(
           context: context,
           title: L10n.of(context)!.inviteContactToGroup(
-            room.getLocalizedDisplayname(
+            room.getLocalizedDisplaynameFromCustomNameEvent(
               MatrixLocals(L10n.of(context)!),
             ),
           ),
@@ -134,13 +134,11 @@ class InvitationSelectionController extends State<InvitationSelection> {
           .getRoomById(roomId!)!
           .getParticipants()
           .where(
-            (user) =>
-                [Membership.join, Membership.invite].contains(user.membership),
+            (user) => [Membership.join, Membership.invite].contains(user.membership),
           )
           .toList();
       foundProfiles.removeWhere(
-        (profile) =>
-            participants.indexWhere((u) => u.id == profile.userId) != -1,
+        (profile) => participants.indexWhere((u) => u.id == profile.userId) != -1,
       );
     });
   }

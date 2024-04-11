@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,8 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -53,7 +55,9 @@ class ArchiveController extends State<Archive> {
       context: context,
       future: () async {
         while (archive.isNotEmpty) {
-          Logs().v('Forget room ${archive.last.getLocalizedDisplayname()}');
+          Logs().v(
+            'Forget room ${archive.last.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(context)!))}',
+          );
           await archive.last.forget();
           archive.removeLast();
         }

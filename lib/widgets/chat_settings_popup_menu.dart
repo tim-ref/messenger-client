@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -28,8 +28,7 @@ class ChatSettingsPopupMenu extends StatefulWidget {
   final Room room;
   final bool displayChatDetails;
 
-  const ChatSettingsPopupMenu(this.room, this.displayChatDetails, {Key? key})
-      : super(key: key);
+  const ChatSettingsPopupMenu(this.room, this.displayChatDetails, {Key? key}) : super(key: key);
 
   @override
   ChatSettingsPopupMenuState createState() => ChatSettingsPopupMenuState();
@@ -119,7 +118,7 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
         KeyBoardShortcuts(
           keysToPress: {
             LogicalKeyboardKey.controlLeft,
-            LogicalKeyboardKey.keyI
+            LogicalKeyboardKey.keyI,
           },
           helpLabel: L10n.of(context)!.chatDetails,
           onKeysPressed: _showChatDetails,
@@ -150,15 +149,13 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
               case 'mute':
                 await showFutureLoadingDialog(
                   context: context,
-                  future: () =>
-                      widget.room.setPushRuleState(PushRuleState.mentionsOnly),
+                  future: () => widget.room.setPushRuleState(PushRuleState.mentionsOnly),
                 );
                 break;
               case 'unmute':
                 await showFutureLoadingDialog(
                   context: context,
-                  future: () =>
-                      widget.room.setPushRuleState(PushRuleState.notify),
+                  future: () => widget.room.setPushRuleState(PushRuleState.notify),
                 );
                 break;
               case 'details':
@@ -177,7 +174,8 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                 );
                 if (result.error != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(L10n.of(context)!.chatSettingsArchiveDownloadError)));
+                    SnackBar(content: Text(L10n.of(context)!.chatSettingsArchiveDownloadError)),
+                  );
                 }
                 break;
             }

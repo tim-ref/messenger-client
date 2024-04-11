@@ -19,3 +19,37 @@ const String tokenDispenserPassword = 'TOKEN_DISPENSER_PASSWORD';
 
 const String fhirAuthTokenStorageKey = 'fhirAuthToken';
 const String defaultTokenDispenserUrl = 'TOKEN_DISPENSER_URL';
+
+/// Types of room within TIM specification
+enum TimRoomType {
+  /// default room type if no case reference is needed
+  defaultValue(value: 'de.gematik.tim.roomtype.default.v1'),
+
+  /// special case reference for rooms, will be replaced by FHIR search API in the future
+  caseReference(value: 'de.gematik.tim.roomtype.casereference.v1');
+
+  const TimRoomType({required this.value});
+
+  /// the defined room type value
+  final String value;
+}
+
+/// Types of initial state events within TIM specification
+enum TimRoomStateEventType {
+  /// default room state event if no case reference is needed
+  defaultValue(value: 'de.gematik.tim.room.default.v1'),
+
+  /// special case reference event for custom rooms
+  caseReference(value: 'de.gematik.tim.room.casereference.v1'),
+
+  /// custom room name event
+  roomName(value: 'de.gematik.tim.room.name'),
+
+  /// custom room topic event
+  roomTopic(value: 'de.gematik.tim.room.topic');
+
+  const TimRoomStateEventType({required this.value});
+
+  /// the defined room state event value
+  final String value;
+}

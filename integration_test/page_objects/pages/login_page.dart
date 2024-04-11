@@ -31,13 +31,13 @@ class LoginPage extends PageObject implements PageIdentifiable {
   Finder usernameTextField() {
     return find.byWidgetPredicate((widget) =>
         widget is TextField &&
-        widget.decoration?.hintText == localizations.emailOrUsername);
+        widget.decoration?.hintText == localizations.emailOrUsername,);
   }
 
   Finder passwordTextField() {
     return find.byWidgetPredicate((widget) =>
         widget is TextField &&
-        widget.decoration?.hintText == localizations.password);
+        widget.decoration?.hintText == localizations.password,);
   }
 
   Future<void> login(User user) async {

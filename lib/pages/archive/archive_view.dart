@@ -1,3 +1,14 @@
+/*
+ * Modified by akquinet GmbH on 10.04.2024
+ * Originally forked from https://github.com/krille-chan/fluffychat
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
@@ -24,7 +35,8 @@ class ArchiveView extends StatelessWidget {
           title: Text(L10n.of(context)!.archive),
           actions: [
             // always show clear archive button when test driver is enabled
-            if ((const bool.fromEnvironment(enableTestDriver)) || (snapshot.data?.isNotEmpty ?? false))
+            if ((const bool.fromEnvironment(enableTestDriver)) ||
+                (snapshot.data?.isNotEmpty ?? false))
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextButton.icon(
@@ -33,7 +45,7 @@ class ArchiveView extends StatelessWidget {
                   label: Text(L10n.of(context)!.clearArchive),
                   icon: const Icon(Icons.cleaning_services_outlined),
                 ),
-              )
+              ),
           ],
         ),
         body: Builder(

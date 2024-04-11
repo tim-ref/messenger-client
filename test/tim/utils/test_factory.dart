@@ -24,10 +24,10 @@ abstract class TestFactory {
 
   static Room room({String? id, String? name, Client? client}) {
     final result = Room(
-        id: id ?? "roomId${_num++}", client: client ?? TestFactory.client());
+        id: id ?? "roomId${_num++}", client: client ?? TestFactory.client(),);
     // A room name is derived from a room name event, which we add here.
     result.states[EventTypes.RoomName] = {
-      "": Event.fromMatrixEvent(matrixEventRoomName(name: name), result)
+      "": Event.fromMatrixEvent(matrixEventRoomName(name: name), result),
     };
     return result;
   }
@@ -36,12 +36,12 @@ abstract class TestFactory {
           {String? body,
           String? senderId,
           String? eventId,
-          DateTime? originServerTs}) =>
+          DateTime? originServerTs,}) =>
       matrixEvent(
         type: EventTypes.Message,
         content: {
           "body": body ?? "test message ${_num++}",
-          "msgtype": "m.text"
+          "msgtype": "m.text",
         },
         senderId: senderId,
         eventId: eventId,
@@ -53,13 +53,13 @@ abstract class TestFactory {
           String? body,
           String? senderId,
           String? eventId,
-          DateTime? originServerTs}) =>
+          DateTime? originServerTs,}) =>
       matrixEvent(
         type: EventTypes.Message,
         content: {
           "body": body ?? "test message ${_num++}",
           "msgtype": "m.text",
-          "url": url
+          "url": url,
         },
         senderId: senderId,
         eventId: eventId,
@@ -70,7 +70,7 @@ abstract class TestFactory {
           {String? name,
           String? senderId,
           String? eventId,
-          DateTime? originServerTs}) =>
+          DateTime? originServerTs,}) =>
       matrixEvent(
         type: EventTypes.RoomName,
         content: {"name": name ?? "roomName${_num++}"},
@@ -108,7 +108,7 @@ abstract class TestFactory {
             content: content,
             senderId: senderId,
             eventId: eventId,
-            originServerTs: originServerTs),
+            originServerTs: originServerTs,),
         room ?? TestFactory.room(),
       );
 

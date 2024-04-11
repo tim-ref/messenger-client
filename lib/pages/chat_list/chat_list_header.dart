@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -30,11 +30,9 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
 
     return SliverAppBar(
       floating: true,
-      pinned:
-          FluffyThemes.isColumnMode(context) || selectMode != SelectMode.normal,
+      pinned: FluffyThemes.isColumnMode(context) || selectMode != SelectMode.normal,
       scrolledUnderElevation: selectMode == SelectMode.normal ? 0 : null,
-      backgroundColor:
-          selectMode == SelectMode.normal ? Colors.transparent : null,
+      backgroundColor: selectMode == SelectMode.normal ? Colors.transparent : null,
       automaticallyImplyLeading: false,
       leading: selectMode == SelectMode.normal
           ? null
@@ -65,11 +63,9 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
                       textInputAction: TextInputAction.search,
                       onChanged: controller.onSearchEnter,
                       decoration: InputDecoration(
-
                         border: UnderlineInputBorder(
                           borderSide: BorderSide.none,
-                          borderRadius:
-                              BorderRadius.circular(AppConfig.borderRadius),
+                          borderRadius: BorderRadius.circular(AppConfig.borderRadius),
                         ),
                         hintText: L10n.of(context)!.search,
                         floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -83,10 +79,10 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
                             : const SearchMoreIconButton(path: '/fhir/search'),
                         suffixIcon: SizedBox(
                           width: 0,
-                          child: ClientChooserButton(controller)
-                        )
+                          child: ClientChooserButton(controller),
+                        ),
                       ),
-                    )
+                    ),
                   ),
                 ),
       actions: selectMode == SelectMode.share

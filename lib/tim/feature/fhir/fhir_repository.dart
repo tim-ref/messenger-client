@@ -62,7 +62,7 @@ class FhirRepository extends TimRestRepository {
       uri,
       headers: <String, String>{
         HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
+        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
       },
     );
     _handleErroneousResponse(response);
@@ -80,7 +80,7 @@ class FhirRepository extends TimRestRepository {
       uri,
       headers: <String, String>{
         HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
+        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
       },
       body: bodyJson,
     );
@@ -101,7 +101,7 @@ class FhirRepository extends TimRestRepository {
       uri,
       headers: <String, String>{
         HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
+        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
       },
       body: bodyJson,
     );
@@ -121,7 +121,7 @@ class FhirRepository extends TimRestRepository {
       uri,
       headers: <String, String>{
         HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
+        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
       },
     );
     _handleErroneousResponse(response);

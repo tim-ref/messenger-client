@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -66,10 +66,8 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
 
   @override
   void dispose() {
-    widget.request.onUpdate =
-        originalOnUpdate; // don't want to get updates anymore
-    if (![KeyVerificationState.error, KeyVerificationState.done]
-        .contains(widget.request.state)) {
+    widget.request.onUpdate = originalOnUpdate; // don't want to get updates anymore
+    if (![KeyVerificationState.error, KeyVerificationState.done].contains(widget.request.state)) {
       widget.request.cancel('m.user');
     }
     super.dispose();
@@ -107,15 +105,13 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
   @override
   Widget build(BuildContext context) {
     User? user;
-    final directChatId =
-        widget.request.client.getDirectChatFromUserId(widget.request.userId);
+    final directChatId = widget.request.client.getDirectChatFromUserId(widget.request.userId);
     if (directChatId != null) {
       user = widget.request.client
           .getRoomById(directChatId)!
           .unsafeGetUserFromMemoryOrFallback(widget.request.userId);
     }
-    final displayName =
-        user?.calcDisplayname() ?? widget.request.userId.localpart!;
+    final displayName = user?.calcDisplayname() ?? widget.request.userId.localpart!;
     var title = Text(L10n.of(context)!.verifyTitle);
     Widget body;
     final buttons = <Widget>[];
@@ -191,7 +187,7 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
             const SizedBox(height: 16),
             Text(
               L10n.of(context)!.askVerificationRequest(displayName),
-            )
+            ),
           ],
         );
         buttons.add(
@@ -262,8 +258,7 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
           title = Text(L10n.of(context)!.compareNumbersMatch);
           final numbers = widget.request.sasNumbers;
           final numbstr = '${numbers[0]}-${numbers[1]}-${numbers[2]}';
-          compareWidget =
-              TextSpan(text: numbstr, style: const TextStyle(fontSize: 40));
+          compareWidget = TextSpan(text: numbstr, style: const TextStyle(fontSize: 40));
         }
         body = Column(
           mainAxisSize: MainAxisSize.min,

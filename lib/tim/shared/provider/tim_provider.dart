@@ -166,5 +166,5 @@ class TimProviderState extends State<TimProvider> implements TimServices {
 
   http.Client _httpClient() => RawDataDelegatingClient(
       FixedTimeoutHttpClient(http.Client(), const Duration(seconds: 180)),
-      UserAgentBuilder());
+      UserAgentBuilder(),);
 }

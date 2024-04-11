@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -32,8 +32,7 @@ class ChatInputRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (controller.showEmojiPicker &&
-        controller.emojiPickerType == EmojiPickerType.reaction) {
+    if (controller.showEmojiPicker && controller.emojiPickerType == EmojiPickerType.reaction) {
       return const SizedBox.shrink();
     }
     return Row(
@@ -89,10 +88,9 @@ class ChatInputRow extends StatelessWidget {
               KeyBoardShortcuts(
                 keysToPress: {
                   LogicalKeyboardKey.altLeft,
-                  LogicalKeyboardKey.keyA
+                  LogicalKeyboardKey.keyA,
                 },
-                onKeysPressed: () =>
-                    controller.onAddPopupMenuButtonSelected('file'),
+                onKeysPressed: () => controller.onAddPopupMenuButtonSelected('file'),
                 helpLabel: L10n.of(context)!.sendFile,
                 child: AnimatedContainer(
                   duration: FluffyThemes.animationDuration,
@@ -108,8 +106,7 @@ class ChatInputRow extends StatelessWidget {
                     child: PopupMenuButton<String>(
                       icon: const Icon(Icons.add_outlined),
                       onSelected: controller.onAddPopupMenuButtonSelected,
-                      itemBuilder: (BuildContext context) =>
-                          <PopupMenuEntry<String>>[
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                         PopupMenuItem<String>(
                           value: 'file-test',
                           key: const ValueKey("file-test"),
@@ -174,9 +171,7 @@ class ChatInputRow extends StatelessWidget {
                               contentPadding: const EdgeInsets.all(0),
                             ),
                           ),
-                        if (controller.room
-                            .getImagePacks(ImagePackUsage.sticker)
-                            .isNotEmpty)
+                        if (controller.room.getImagePacks(ImagePackUsage.sticker).isNotEmpty)
                           PopupMenuItem<String>(
                             value: 'sticker',
                             child: ListTile(
@@ -213,7 +208,7 @@ class ChatInputRow extends StatelessWidget {
                 child: KeyBoardShortcuts(
                   keysToPress: {
                     LogicalKeyboardKey.altLeft,
-                    LogicalKeyboardKey.keyE
+                    LogicalKeyboardKey.keyE,
                   },
                   onKeysPressed: controller.emojiPickerAction,
                   helpLabel: L10n.of(context)!.emojis,
@@ -234,9 +229,7 @@ class ChatInputRow extends StatelessWidget {
                         );
                       },
                       child: Icon(
-                        controller.showEmojiPicker
-                            ? Icons.keyboard
-                            : Icons.emoji_emotions_outlined,
+                        controller.showEmojiPicker ? Icons.keyboard : Icons.emoji_emotions_outlined,
                         key: ValueKey(controller.showEmojiPicker),
                       ),
                     ),
@@ -261,8 +254,7 @@ class ChatInputRow extends StatelessWidget {
                     maxLines: 8,
                     autofocus: !PlatformInfos.isMobile,
                     keyboardType: TextInputType.multiline,
-                    textInputAction:
-                        AppConfig.sendOnEnter ? TextInputAction.send : null,
+                    textInputAction: AppConfig.sendOnEnter ? TextInputAction.send : null,
                     onSubmitted: controller.onInputBarSubmitted,
                     focusNode: controller.inputFocus,
                     controller: controller.sendController,
@@ -277,8 +269,7 @@ class ChatInputRow extends StatelessWidget {
                   ),
                 ),
               ),
-              if (PlatformInfos.platformCanRecord &&
-                  controller.inputText.isEmpty)
+              if (PlatformInfos.platformCanRecord && controller.inputText.isEmpty)
                 Container(
                   height: 56,
                   alignment: Alignment.center,
@@ -341,8 +332,7 @@ class _ChatAccountPicker extends StatelessWidget {
                     builder: (context, snapshot) => ListTile(
                       leading: Avatar(
                         mxContent: snapshot.data?.avatarUrl,
-                        name: snapshot.data?.displayName ??
-                            client.userID!.localpart,
+                        name: snapshot.data?.displayName ?? client.userID!.localpart,
                         size: 20,
                       ),
                       title: Text(snapshot.data?.displayName ?? client.userID!),
@@ -354,8 +344,7 @@ class _ChatAccountPicker extends StatelessWidget {
               .toList(),
           child: Avatar(
             mxContent: snapshot.data?.avatarUrl,
-            name: snapshot.data?.displayName ??
-                Matrix.of(context).client.userID!.localpart,
+            name: snapshot.data?.displayName ?? Matrix.of(context).client.userID!.localpart,
             size: 20,
           ),
         ),

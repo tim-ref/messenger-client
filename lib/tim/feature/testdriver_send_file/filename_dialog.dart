@@ -107,7 +107,7 @@ class FilenameDialogState extends State<FilenameDialog> {
         widget.room.sendFileEvent(matrixFile, extraContent: {
           "fileId": fileId,
           "fileName": matrixFilename,
-        });
+        },);
       } else {
         throw Exception("No permission to send matrix file $matrixFilename");
       }

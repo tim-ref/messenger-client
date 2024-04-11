@@ -16,6 +16,7 @@ import 'dart:io';
 
 import 'package:archive/archive_io.dart';
 import 'package:collection/collection.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart' as matrix;
@@ -63,7 +64,7 @@ Future<void> shareRoomArchive({
   required RenderBox? renderBox,
 }) async {
   final zipFile = await _exportRoomToZipFile(client, crypto, room);
-  await _shareFile(room.name, zipFile, renderBox);
+  await _shareFile(room.displayName, zipFile, renderBox);
 }
 
 Future<File> _exportRoomToZipFile(
@@ -76,9 +77,10 @@ Future<File> _exportRoomToZipFile(
   final messages = await _fetchRoomMessages(client, crypto, room);
   final messagesJsonFile = File("${tempDir.path}/messages.json");
   await messagesJsonFile.writeAsString(
-      jsonEncode(_roomMessagesToExport(room, messages).toJson()));
+    jsonEncode(_roomMessagesToExport(room, messages).toJson()),
+  );
 
-  final zipFile = File("${tempDir.path}/tim-archive_${room.name}.zip");
+  final zipFile = File("${tempDir.path}/tim-archive_${room.displayName}.zip");
   final zip = ZipFileEncoder();
   try {
     zip.create(zipFile.path);
@@ -102,7 +104,10 @@ Future<Directory> recreateTempDir() async {
 }
 
 Future<Iterable<matrix.Event>> _fetchRoomMessages(
-    TimMatrixClient client, TimMatrixCrypto crypto, matrix.Room room) async {
+  TimMatrixClient client,
+  TimMatrixCrypto crypto,
+  matrix.Room room,
+) async {
   final List<matrix.Event> result = [];
   matrix.GetRoomEventsResponse page;
   String? pageToken;
@@ -124,8 +129,12 @@ Future<Iterable<matrix.Event>> _fetchRoomMessages(
     result.addAll(
       await Future.wait(
         // A decryption attempt returns the original event on any failure, which we'd then filter at the end.
-        page.chunk.map((e) => crypto.decryptRoomEvent(
-            room.id, matrix.Event.fromMatrixEvent(e, room))),
+        page.chunk.map(
+          (e) => crypto.decryptRoomEvent(
+            room.id,
+            matrix.Event.fromMatrixEvent(e, room),
+          ),
+        ),
       ),
     );
     pageToken = page.end;
@@ -136,29 +145,36 @@ Future<Iterable<matrix.Event>> _fetchRoomMessages(
 }
 
 RoomPlainTextExport _roomMessagesToExport(
-        matrix.Room room, Iterable<matrix.Event> messages) =>
+  matrix.Room room,
+  Iterable<matrix.Event> messages,
+) =>
     RoomPlainTextExport(
-        roomId: room.id,
-        roomName: room.name,
-        messages: messages
-            .map((m) => PlainTextMessage(
-                  eventId: m.eventId,
-                  senderId: m.senderId,
-                  originServerTs: m.originServerTs.toIso8601String(),
-                  text: m.text,
-                ))
-            .toList());
+      roomId: room.id,
+      roomName: room.displayName,
+      messages: messages
+          .map(
+            (m) => PlainTextMessage(
+              eventId: m.eventId,
+              senderId: m.senderId,
+              originServerTs: m.originServerTs.toIso8601String(),
+              text: m.text,
+            ),
+          )
+          .toList(),
+    );
 
 Future<Iterable<File>> fetchAttachments(
-    Directory tempDir, Iterable<matrix.Event> messages) async {
+  Directory tempDir,
+  Iterable<matrix.Event> messages,
+) async {
   final List<File> results = [];
 
-  final attachmentBatch = messages
-      .where((e) => e.hasAttachment)
-      .slices(_attachmentDownloadBatchSize);
+  final attachmentBatch =
+      messages.where((e) => e.hasAttachment).slices(_attachmentDownloadBatchSize);
   for (final attachments in attachmentBatch) {
-    final matrixFiles = await Future.wait(attachments
-        .map((e) => _withRetry(() => e.downloadAndDecryptAttachment())));
+    final matrixFiles = await Future.wait(
+      attachments.map((e) => _withRetry(() => e.downloadAndDecryptAttachment())),
+    );
     for (final matrixFile in matrixFiles) {
       final file = await _uniqueNewFile("${tempDir.path}/${matrixFile.name}");
       await file.writeAsBytes(matrixFile.bytes);
@@ -171,8 +187,7 @@ Future<Iterable<File>> fetchAttachments(
 
 Future<T> _withRetry<T>(FutureOr<T> Function() fn) => retry(
       fn,
-      retryIf: (e) =>
-          e is http.ClientException, // all HTTP requests should fail with this
+      retryIf: (e) => e is http.ClientException, // all HTTP requests should fail with this
       maxAttempts: _httpMaxAttempts,
     );
 
@@ -191,8 +206,11 @@ Future<File> _uniqueNewFile(String filePath) async {
   var nextNumber = 2;
   while (await (file = File(nextPath)).exists()) {
     nextPath = extMatch != null
-        ? filePath.replaceRange(extMatch.start, extMatch.end,
-            " (${nextNumber++})${extMatch.group(0)}")
+        ? filePath.replaceRange(
+            extMatch.start,
+            extMatch.end,
+            " (${nextNumber++})${extMatch.group(0)}",
+          )
         : "$filePath (${nextNumber++})";
   }
   return file;
@@ -204,8 +222,10 @@ final _fileExtensionRegex = RegExp(r"\.[^/.]+$");
 Future<void> _shareFile(String subject, File file, RenderBox? renderBox) =>
 // using "*/*" will open a very generic share dialog where, in theory,
 // any app that can receive a file is applicable
-    Share.shareXFiles([XFile(file.path, mimeType: "*/*")],
-        subject: subject,
-        // compare: https://github.com/fluttercommunity/plus_plugins/tree/main/packages/share_plus/share_plus#ipad
-        sharePositionOrigin:
-            renderBox == null ? null : renderBox.localToGlobal(Offset.zero) & renderBox.size);
+    Share.shareXFiles(
+      [XFile(file.path, mimeType: "*/*")],
+      subject: subject,
+      // compare: https://github.com/fluttercommunity/plus_plugins/tree/main/packages/share_plus/share_plus#ipad
+      sharePositionOrigin:
+          renderBox == null ? null : renderBox.localToGlobal(Offset.zero) & renderBox.size,
+    );

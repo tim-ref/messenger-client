@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -22,8 +22,7 @@ extension UiaRequestManager on MatrixState {
   Future uiaRequestHandler(UiaRequest uiaRequest) async {
     final l10n = L10n.of(navigatorContext)!;
     try {
-      if (uiaRequest.state != UiaRequestState.waitForUser ||
-          uiaRequest.nextStages.isEmpty) {
+      if (uiaRequest.state != UiaRequestState.waitForUser || uiaRequest.nextStages.isEmpty) {
         Logs().d('Uia Request Stage: ${uiaRequest.state}');
         return;
       }
@@ -43,7 +42,7 @@ extension UiaRequestManager on MatrixState {
                     maxLines: 1,
                     obscureText: true,
                     hintText: '******',
-                  )
+                  ),
                 ],
               ))
                   ?.single;
@@ -58,7 +57,6 @@ extension UiaRequestManager on MatrixState {
             ),
           );
         case AuthenticationTypes.emailIdentity:
-          final currentThreepidCreds = this.currentThreepidCreds;
           if (currentThreepidCreds == null) {
             return uiaRequest.cancel(
               UiaException(L10n.of(widget.context)!.serverRequiresEmail),
@@ -68,7 +66,7 @@ extension UiaRequestManager on MatrixState {
             session: uiaRequest.session,
             type: AuthenticationTypes.emailIdentity,
             threepidCreds: ThreepidCreds(
-              sid: currentThreepidCreds.sid,
+              sid: currentThreepidCreds!.sid,
               clientSecret: currentClientSecret,
             ),
           );

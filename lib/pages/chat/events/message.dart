@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -65,7 +65,7 @@ class Message extends StatelessWidget {
       EventTypes.Message,
       EventTypes.Sticker,
       EventTypes.Encrypted,
-      EventTypes.CallInvite
+      EventTypes.CallInvite,
     }.contains(event.type)) {
       if (event.type.startsWith('m.call.')) {
         return const SizedBox.shrink();
@@ -98,24 +98,21 @@ class Message extends StatelessWidget {
     final textColor = ownMessage
         ? Theme.of(context).colorScheme.onPrimary
         : Theme.of(context).colorScheme.onBackground;
-    final rowMainAxisAlignment =
-        ownMessage ? MainAxisAlignment.end : MainAxisAlignment.start;
+    final rowMainAxisAlignment = ownMessage ? MainAxisAlignment.end : MainAxisAlignment.start;
 
     final displayEvent = event.getDisplayEvent(timeline);
     final borderRadius = BorderRadius.only(
-      topLeft: !ownMessage
-          ? const Radius.circular(4)
-          : const Radius.circular(AppConfig.borderRadius),
+      topLeft:
+          !ownMessage ? const Radius.circular(4) : const Radius.circular(AppConfig.borderRadius),
       topRight: const Radius.circular(AppConfig.borderRadius),
       bottomLeft: const Radius.circular(AppConfig.borderRadius),
-      bottomRight: ownMessage
-          ? const Radius.circular(4)
-          : const Radius.circular(AppConfig.borderRadius),
+      bottomRight:
+          ownMessage ? const Radius.circular(4) : const Radius.circular(AppConfig.borderRadius),
     );
     final noBubble = {
           MessageTypes.Video,
           MessageTypes.Image,
-          MessageTypes.Sticker
+          MessageTypes.Sticker,
         }.contains(event.messageType) &&
         !event.redacted;
     final noPadding = {
@@ -124,9 +121,8 @@ class Message extends StatelessWidget {
     }.contains(event.messageType);
 
     if (ownMessage) {
-      color = displayEvent.status.isError
-          ? Colors.redAccent
-          : Theme.of(context).colorScheme.primary;
+      color =
+          displayEvent.status.isError ? Colors.redAccent : Theme.of(context).colorScheme.primary;
     }
 
     final rowChildren = <Widget>[
@@ -173,17 +169,14 @@ class Message extends StatelessWidget {
                     : FutureBuilder<User?>(
                         future: event.fetchSenderUser(),
                         builder: (context, snapshot) {
-                          final displayname =
-                              snapshot.data?.calcDisplayname() ??
-                                  event.senderFromMemoryOrFallback
-                                      .calcDisplayname();
+                          final displayname = snapshot.data?.calcDisplayname() ??
+                              event.senderFromMemoryOrFallback.calcDisplayname();
                           return Text(
                             displayname,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: (Theme.of(context).brightness ==
-                                      Brightness.light
+                              color: (Theme.of(context).brightness == Brightness.light
                                   ? displayname.color
                                   : displayname.lightColorText),
                             ),
@@ -202,16 +195,13 @@ class Message extends StatelessWidget {
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onHover: (b) => useMouse = true,
-                  onTap: !useMouse && longPressSelect
-                      ? () {}
-                      : () => onSelect!(event),
+                  onTap: !useMouse && longPressSelect ? () {} : () => onSelect!(event),
                   onLongPress: !longPressSelect ? null : () => onSelect!(event),
                   borderRadius: borderRadius,
                   key: ValueKey("ChatMessage-${event.eventId}"),
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.circular(AppConfig.borderRadius),
+                      borderRadius: BorderRadius.circular(AppConfig.borderRadius),
                     ),
                     padding: noBubble || noPadding
                         ? EdgeInsets.zero
@@ -225,8 +215,7 @@ class Message extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            if (event.relationshipType ==
-                                RelationshipTypes.reply)
+                            if (event.relationshipType == RelationshipTypes.reply)
                               FutureBuilder<Event?>(
                                 future: event.getReplyEvent(timeline),
                                 builder: (BuildContext context, snapshot) {
@@ -236,7 +225,7 @@ class Message extends StatelessWidget {
                                           eventId: event.relationshipEventId!,
                                           content: {
                                             'msgtype': 'm.text',
-                                            'body': '...'
+                                            'body': '...',
                                           },
                                           senderId: event.senderId,
                                           type: 'm.room.message',
@@ -253,8 +242,7 @@ class Message extends StatelessWidget {
                                     child: AbsorbPointer(
                                       child: Container(
                                         margin: EdgeInsets.symmetric(
-                                          vertical:
-                                              4.0 * AppConfig.bubbleSizeFactor,
+                                          vertical: 4.0 * AppConfig.bubbleSizeFactor,
                                         ),
                                         child: ReplyContent(
                                           replyEvent,
@@ -321,8 +309,7 @@ class Message extends StatelessWidget {
         displayReadMarker) {
       container = Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment:
-            ownMessage ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: ownMessage ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
           if (displayTime || selected)
             Padding(
@@ -335,12 +322,8 @@ class Message extends StatelessWidget {
                 child: Material(
                   color: displayTime
                       ? Theme.of(context).colorScheme.background
-                      : Theme.of(context)
-                          .colorScheme
-                          .background
-                          .withOpacity(0.33),
-                  borderRadius:
-                      BorderRadius.circular(AppConfig.borderRadius / 2),
+                      : Theme.of(context).colorScheme.background.withOpacity(0.33),
+                  borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
                   clipBehavior: Clip.antiAlias,
                   child: Padding(
                     padding: const EdgeInsets.all(6.0),
@@ -382,8 +365,7 @@ class Message extends StatelessWidget {
                   ),
                   child: Text(
                     L10n.of(context)!.readUpToHere,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.primary),
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
                 Expanded(
@@ -412,8 +394,7 @@ class Message extends StatelessWidget {
           color: selected
               ? Theme.of(context).primaryColor.withAlpha(100)
               : Theme.of(context).primaryColor.withAlpha(0),
-          constraints:
-              const BoxConstraints(maxWidth: FluffyThemes.columnWidth * 2.5),
+          constraints: const BoxConstraints(maxWidth: FluffyThemes.columnWidth * 2.5),
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 8.0,

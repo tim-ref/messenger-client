@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -26,6 +26,7 @@ import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/ios_badge_client_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
@@ -56,16 +57,14 @@ class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final roomId = context.vRouter.pathParameters['roomid'];
-    final room =
-        roomId == null ? null : Matrix.of(context).client.getRoomById(roomId);
+    final room = roomId == null ? null : Matrix.of(context).client.getRoomById(roomId);
     if (room == null) {
       return Scaffold(
         appBar: AppBar(title: Text(L10n.of(context)!.oopsSomethingWentWrong)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child:
-                Text(L10n.of(context)!.youAreNoLongerParticipatingInThisChat),
+            child: Text(L10n.of(context)!.youAreNoLongerParticipatingInThisChat),
           ),
         ),
       );
@@ -92,6 +91,8 @@ class ChatController extends State<ChatPageWithRoom> {
   Room get room => widget.room;
 
   late Client matrixClient;
+
+  Map get timCaseReferenceContent => widget.room.caseReferenceContent;
 
   Timeline? timeline;
 
@@ -186,8 +187,8 @@ class ChatController extends State<ChatPageWithRoom> {
       context: context,
       future: () async {
         final client = room.client;
-        final waitForSync = client.onSync.stream
-            .firstWhere((s) => s.rooms?.leave?.containsKey(room.id) ?? false);
+        final waitForSync =
+            client.onSync.stream.firstWhere((s) => s.rooms?.leave?.containsKey(room.id) ?? false);
         await room.leave();
         await waitForSync;
         return await client.startDirectChat(userId);
@@ -268,8 +269,7 @@ class ChatController extends State<ChatPageWithRoom> {
     if (timeline?.allowNewEvent == false ||
         scrollController.position.pixels > 0 && showScrollDownButton == false) {
       setState(() => showScrollDownButton = true);
-    } else if (scrollController.position.pixels == 0 &&
-        showScrollDownButton == true) {
+    } else if (scrollController.position.pixels == 0 && showScrollDownButton == true) {
       setState(() => showScrollDownButton = false);
     }
   }
@@ -358,9 +358,7 @@ class ChatController extends State<ChatPageWithRoom> {
 
   void setReadMarker({String? eventId}) {
     if (_setReadMarkerFuture != null) return;
-    if (eventId == null &&
-        !room.hasNewMessages &&
-        room.notificationCount == 0) {
+    if (eventId == null && !room.hasNewMessages && room.notificationCount == 0) {
       return;
     }
     if (!Matrix.of(context).webHasFocus) return;
@@ -508,7 +506,7 @@ class ChatController extends State<ChatPageWithRoom> {
           MatrixImageFile(
             bytes: bytes,
             name: file.path,
-          )
+          ),
         ],
         room: room,
       ),
@@ -529,7 +527,7 @@ class ChatController extends State<ChatPageWithRoom> {
           MatrixVideoFile(
             bytes: bytes,
             name: file.path,
-          )
+          ),
         ],
         room: room,
       ),
@@ -763,16 +761,15 @@ class ChatController extends State<ChatPageWithRoom> {
     if (isArchived) return false;
     final clients = Matrix.of(context).currentBundle;
     for (final event in selectedEvents) {
-      if (event.canRedact == false &&
-          !(clients!.any((cl) => event.senderId == cl!.userID))) return false;
+      if (event.canRedact == false && !(clients!.any((cl) => event.senderId == cl!.userID)))
+        return false;
     }
     return true;
   }
 
   void forwardEventsAction() async {
     if (selectedEvents.length == 1) {
-      Matrix.of(context).shareContent =
-          selectedEvents.first.getDisplayEvent(timeline!).content;
+      Matrix.of(context).shareContent = selectedEvents.first.getDisplayEvent(timeline!).content;
     } else {
       Matrix.of(context).shareContent = {
         'msgtype': 'm.text',
@@ -850,8 +847,7 @@ class ChatController extends State<ChatPageWithRoom> {
     setState(() => showEmojiPicker = false);
     if (emoji == null) return;
     // make sure we don't send the same emoji twice
-    if (_allReactionEvents
-        .any((e) => e.content['m.relates_to']['key'] == emoji.emoji)) return;
+    if (_allReactionEvents.any((e) => e.content['m.relates_to']['key'] == emoji.emoji)) return;
     return sendEmojiAction(emoji.emoji);
   }
 
@@ -938,10 +934,7 @@ class ChatController extends State<ChatPageWithRoom> {
           useRootNavigator: false,
           context: context,
           title: L10n.of(context)!.goToTheNewRoom,
-          message: room
-              .getState(EventTypes.RoomTombstone)!
-              .parsedTombstoneContent
-              .body,
+          message: room.getState(EventTypes.RoomTombstone)!.parsedTombstoneContent.body,
           okLabel: L10n.of(context)!.ok,
           cancelLabel: L10n.of(context)!.cancel,
         )) {
@@ -950,10 +943,7 @@ class ChatController extends State<ChatPageWithRoom> {
     final result = await showFutureLoadingDialog(
       context: context,
       future: () => room.client.joinRoom(
-        room
-            .getState(EventTypes.RoomTombstone)!
-            .parsedTombstoneContent
-            .replacementRoom,
+        room.getState(EventTypes.RoomTombstone)!.parsedTombstoneContent.replacementRoom,
       ),
     );
     await showFutureLoadingDialog(
@@ -1038,8 +1028,7 @@ class ChatController extends State<ChatPageWithRoom> {
       cancelLabel: L10n.of(context)!.cancel,
     );
     if (response == OkCancelResult.ok) {
-      final events = room.pinnedEventIds
-        ..removeWhere((oldEvent) => oldEvent == eventId);
+      final events = room.pinnedEventIds..removeWhere((oldEvent) => oldEvent == eventId);
       showFutureLoadingDialog(
         context: context,
         future: () => room.setPinnedEvents(events),
@@ -1050,8 +1039,7 @@ class ChatController extends State<ChatPageWithRoom> {
   void pinEvent() {
     final pinnedEventIds = room.pinnedEventIds;
     final selectedEventIds = selectedEvents.map((e) => e.eventId).toSet();
-    final unpin = selectedEventIds.length == 1 &&
-        pinnedEventIds.contains(selectedEventIds.single);
+    final unpin = selectedEventIds.length == 1 && pinnedEventIds.contains(selectedEventIds.single);
     if (unpin) {
       pinnedEventIds.removeWhere(selectedEventIds.contains);
     } else {
@@ -1077,8 +1065,7 @@ class ChatController extends State<ChatPageWithRoom> {
       final clients = currentRoomBundle;
       for (final client in clients) {
         final prefix = client!.sendPrefix;
-        if ((prefix.isNotEmpty) &&
-            text.toLowerCase() == '${prefix.toLowerCase()} ') {
+        if ((prefix.isNotEmpty) && text.toLowerCase() == '${prefix.toLowerCase()} ') {
           setMatrixClient(client);
           setState(() {
             inputText = '';
@@ -1101,18 +1088,18 @@ class ChatController extends State<ChatPageWithRoom> {
       });
       if (!currentlyTyping) {
         currentlyTyping = true;
-        room.setTyping(true,
-            timeout: const Duration(seconds: 30).inMilliseconds);
+        room.setTyping(
+          true,
+          timeout: const Duration(seconds: 30).inMilliseconds,
+        );
       }
     }
     setState(() => inputText = text);
   }
 
-  bool get isArchived =>
-      {Membership.leave, Membership.ban}.contains(room.membership);
+  bool get isArchived => {Membership.leave, Membership.ban}.contains(room.membership);
 
-  void showEventInfo([Event? event]) =>
-      (event ?? selectedEvents.single).showInfoDialog(context);
+  void showEventInfo([Event? event]) => (event ?? selectedEvents.single).showInfoDialog(context);
 
   void onPhoneButtonTap() async {
     // VoIP required Android SDK 21
@@ -1151,8 +1138,7 @@ class ChatController extends State<ChatPageWithRoom> {
 
     final success = await showFutureLoadingDialog(
       context: context,
-      future: () =>
-          Matrix.of(context).voipPlugin!.voip.requestTurnServerCredentials(),
+      future: () => Matrix.of(context).voipPlugin!.voip.requestTurnServerCredentials(),
     );
     if (success.result != null) {
       final voipPlugin = Matrix.of(context).voipPlugin;

@@ -150,7 +150,7 @@ void main() {
 
       when(
         httpClient.post(expectedMatrixTokenUri,
-            headers: _expectedOpenIdHeaders(), body: jsonEncode({})),
+            headers: _expectedOpenIdHeaders(), body: jsonEncode({}),),
       ).thenAnswer((_) async => http.Response(jsonEncode(_expectedOpenIdToken()), 200));
       when(
         httpClient.get(expectedFhirTokenUri, headers: _expectedFhirHeaders()),
@@ -158,7 +158,7 @@ void main() {
 
       // expect
       final forbiddenMatcher = isA<HttpException>().having((e) => e.message, "message",
-          contains("Unexpected status 403 for call to URI: $expectedFhirTokenUri"));
+          contains("Unexpected status 403 for call to URI: $expectedFhirTokenUri"),);
       expectLater(repo.getFhirToken(), throwsA(forbiddenMatcher));
     });
   });
@@ -192,7 +192,7 @@ void main() {
 
     //expect
     final unauthorizedMatcher = isA<HttpException>().having((e) => e.message, "message",
-        contains("Unexpected status 401 for call to URI: $expectedUri"));
+        contains("Unexpected status 401 for call to URI: $expectedUri"),);
     expectLater(repo.getOpenIdToken(), throwsA(unauthorizedMatcher));
   });
 
@@ -207,7 +207,7 @@ void main() {
 
 Map<String, String> _expectedOpenIdHeaders() => <String, String>{
       HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-      HttpHeaders.authorizationHeader: 'Bearer ogAccessToken'
+      HttpHeaders.authorizationHeader: 'Bearer ogAccessToken',
     };
 
 Map<String, String> _expectedFhirHeaders() => <String, String>{

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -23,8 +23,7 @@ import 'settings_notifications.dart';
 class SettingsNotificationsView extends StatelessWidget {
   final SettingsNotificationsController controller;
 
-  const SettingsNotificationsView(this.controller, {Key? key})
-      : super(key: key);
+  const SettingsNotificationsView(this.controller, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +50,7 @@ class SettingsNotificationsView extends StatelessWidget {
                   ),
                   onChanged: (_) => showFutureLoadingDialog(
                     context: context,
-                    future: () => Matrix.of(context)
-                        .client
-                        .setMuteAllPushNotifications(
+                    future: () => Matrix.of(context).client.setMuteAllPushNotifications(
                           !Matrix.of(context).client.allPushNotificationsMuted,
                         ),
                   ),
@@ -69,12 +66,11 @@ class SettingsNotificationsView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  for (var item in NotificationSettingsItem.items)
+                  for (final item in NotificationSettingsItem.items)
                     SwitchListTile.adaptive(
                       value: controller.getNotificationSetting(item) ?? true,
                       title: Text(item.title(context)),
-                      onChanged: (bool enabled) =>
-                          controller.setNotificationSetting(item, enabled),
+                      onChanged: (bool enabled) => controller.setNotificationSetting(item, enabled),
                     ),
                 },
                 const Divider(thickness: 1),
@@ -88,8 +84,7 @@ class SettingsNotificationsView extends StatelessWidget {
                   ),
                 ),
                 FutureBuilder<List<Pusher>?>(
-                  future: controller.pusherFuture ??=
-                      Matrix.of(context).client.getPushers(),
+                  future: controller.pusherFuture ??= Matrix.of(context).client.getPushers(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       Center(

@@ -19,7 +19,7 @@ class RoomPlainTextExport {
   final List<PlainTextMessage> messages;
 
   RoomPlainTextExport(
-      {required this.roomId, required this.roomName, required this.messages});
+      {required this.roomId, required this.roomName, required this.messages,});
 
   Map<String, dynamic> toJson() =>
       {'roomId': roomId, 'roomName': roomName, 'messages': messages};
@@ -49,6 +49,6 @@ class PlainTextMessage {
         'eventId': eventId,
         'senderId': senderId,
         'originServerTs': originServerTs,
-        'text': text
+        'text': text,
       };
 }

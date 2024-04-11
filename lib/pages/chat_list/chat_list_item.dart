@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -97,8 +98,7 @@ class ChatListItem extends StatelessWidget {
       final shareContent = Matrix.of(context).shareContent;
       if (shareContent != null) {
         final shareFile = shareContent.tryGet<MatrixFile>('file');
-        if (shareContent.tryGet<String>('msgtype') ==
-                'chat.fluffy.shared_file' &&
+        if (shareContent.tryGet<String>('msgtype') == 'chat.fluffy.shared_file' &&
             shareFile != null) {
           await showDialog(
             context: context,
@@ -147,15 +147,14 @@ class ChatListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMuted = room.pushRuleState != PushRuleState.notify;
     final typingText = room.getLocalizedTypingText(context);
-    final ownMessage =
-        room.lastEvent?.senderId == Matrix.of(context).client.userID;
+    final ownMessage = room.lastEvent?.senderId == Matrix.of(context).client.userID;
     final unread = room.isUnread || room.membership == Membership.invite;
     final unreadBubbleSize = unread || room.hasNewMessages
         ? room.notificationCount > 0
             ? 20.0
             : 14.0
         : 0.0;
-    final displayname = room.getLocalizedDisplayname(
+    final displayname = room.getLocalizedDisplaynameFromCustomNameEvent(
       MatrixLocals(L10n.of(context)!),
     );
     return Padding(
@@ -240,9 +239,7 @@ class ChatListItem extends StatelessWidget {
           subtitle: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              if (typingText.isEmpty &&
-                  ownMessage &&
-                  room.lastEvent!.status.isSending) ...[
+              if (typingText.isEmpty && ownMessage && room.lastEvent!.status.isSending) ...[
                 const SizedBox(
                   width: 16,
                   height: 16,
@@ -281,8 +278,7 @@ class ChatListItem extends StatelessWidget {
                               plaintextBody: true,
                               removeMarkdown: true,
                               withSenderNamePrefix: !room.isDirectChat ||
-                                  room.directChatMatrixID !=
-                                      room.lastEvent?.senderId,
+                                  room.directChatMatrixID != room.lastEvent?.senderId,
                             ) ??
                             Future.value(L10n.of(context)!.emptyChat),
                         builder: (context, snapshot) {
@@ -296,10 +292,8 @@ class ChatListItem extends StatelessWidget {
                                       hideEdit: true,
                                       plaintextBody: true,
                                       removeMarkdown: true,
-                                      withSenderNamePrefix:
-                                          !room.isDirectChat ||
-                                              room.directChatMatrixID !=
-                                                  room.lastEvent?.senderId,
+                                      withSenderNamePrefix: !room.isDirectChat ||
+                                          room.directChatMatrixID != room.lastEvent?.senderId,
                                     ) ??
                                     L10n.of(context)!.emptyChat,
                             softWrap: false,
@@ -307,9 +301,7 @@ class ChatListItem extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontWeight: unread ? FontWeight.w600 : null,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                               decoration: room.lastEvent?.redacted == true
                                   ? TextDecoration.lineThrough
                                   : null,
@@ -324,16 +316,11 @@ class ChatListItem extends StatelessWidget {
                 curve: FluffyThemes.animationCurve,
                 padding: const EdgeInsets.symmetric(horizontal: 7),
                 height: unreadBubbleSize,
-                width: room.notificationCount == 0 &&
-                        !unread &&
-                        !room.hasNewMessages
+                width: room.notificationCount == 0 && !unread && !room.hasNewMessages
                     ? 0
-                    : (unreadBubbleSize - 9) *
-                            room.notificationCount.toString().length +
-                        9,
+                    : (unreadBubbleSize - 9) * room.notificationCount.toString().length + 9,
                 decoration: BoxDecoration(
-                  color: room.highlightCount > 0 ||
-                          room.membership == Membership.invite
+                  color: room.highlightCount > 0 || room.membership == Membership.invite
                       ? Colors.red
                       : room.notificationCount > 0 || room.markedUnread
                           ? Theme.of(context).colorScheme.primary
@@ -349,15 +336,14 @@ class ChatListItem extends StatelessWidget {
                                 ? Colors.white
                                 : room.notificationCount > 0
                                     ? Theme.of(context).colorScheme.onPrimary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
+                                    : Theme.of(context).colorScheme.onPrimaryContainer,
                             fontSize: 13,
                           ),
                         )
                       : const SizedBox.shrink(),
                 ),
               ),
+              if (room.isCaseReferenceRoom) const Icon(Icons.attach_file,size: 16,),
             ],
           ),
           onTap: () => clickAction(context),

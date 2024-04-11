@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -61,9 +61,7 @@ class SettingsSecurityController extends State<SettingsSecurity> {
     if (input == null) return;
     final success = await showFutureLoadingDialog(
       context: context,
-      future: () => Matrix.of(context)
-          .client
-          .changePassword(input.last, oldPassword: input.first),
+      future: () => Matrix.of(context).client.changePassword(input.last, oldPassword: input.first),
     );
     if (success.error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -73,8 +71,7 @@ class SettingsSecurityController extends State<SettingsSecurity> {
   }
 
   void setAppLockAction() async {
-    final currentLock =
-        await const FlutterSecureStorage().read(key: SettingKeys.appLockKey);
+    final currentLock = await const FlutterSecureStorage().read(key: SettingKeys.appLockKey);
     if (currentLock?.isNotEmpty ?? false) {
       await AppLock.of(context)!.showLockScreen();
     }
@@ -87,8 +84,7 @@ class SettingsSecurityController extends State<SettingsSecurity> {
       textFields: [
         DialogTextField(
           validator: (text) {
-            if (text!.isEmpty ||
-                (text.length == 4 && int.tryParse(text)! >= 0)) {
+            if (text!.isEmpty || (text.length == 4 && int.tryParse(text)! >= 0)) {
               return null;
             }
             return L10n.of(context)!.pleaseEnter4Digits;
@@ -97,12 +93,11 @@ class SettingsSecurityController extends State<SettingsSecurity> {
           obscureText: true,
           maxLines: 1,
           minLines: 1,
-        )
+        ),
       ],
     );
     if (newLock != null) {
-      await const FlutterSecureStorage()
-          .write(key: SettingKeys.appLockKey, value: newLock.single);
+      await const FlutterSecureStorage().write(key: SettingKeys.appLockKey, value: newLock.single);
       if (newLock.single.isEmpty) {
         AppLock.of(context)!.disable();
       } else {
@@ -130,9 +125,8 @@ class SettingsSecurityController extends State<SettingsSecurity> {
       title: L10n.of(context)!.confirmMatrixId,
       textFields: [
         DialogTextField(
-          validator: (text) => text == supposedMxid
-              ? null
-              : L10n.of(context)!.supposedMxid(supposedMxid),
+          validator: (text) =>
+              text == supposedMxid ? null : L10n.of(context)!.supposedMxid(supposedMxid),
         ),
       ],
       okLabel: L10n.of(context)!.delete,
@@ -153,7 +147,7 @@ class SettingsSecurityController extends State<SettingsSecurity> {
           hintText: '******',
           minLines: 1,
           maxLines: 1,
-        )
+        ),
       ],
     );
     if (input == null) return;

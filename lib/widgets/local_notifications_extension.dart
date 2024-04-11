@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,6 +11,7 @@
 
 import 'dart:io';
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:desktop_lifecycle/desktop_lifecycle.dart';
@@ -44,11 +45,10 @@ extension LocalNotificationsExtension on MatrixState {
     if (room.notificationCount == 0) return;
     final event = Event.fromJson(eventUpdate.content, room);
     final title =
-        room.getLocalizedDisplayname(MatrixLocals(L10n.of(widget.context)!));
+        room.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(widget.context)!));
     final body = await event.calcLocalizedBody(
       MatrixLocals(L10n.of(widget.context)!),
-      withSenderNamePrefix:
-          !room.isDirectChat || room.lastEvent?.senderId == client.userID,
+      withSenderNamePrefix: !room.isDirectChat || room.lastEvent?.senderId == client.userID,
       plaintextBody: true,
       hideReply: true,
       hideEdit: true,
@@ -68,8 +68,7 @@ extension LocalNotificationsExtension on MatrixState {
         );
     if (kIsWeb) {
       html.AudioElement()
-        ..src =
-            'assets/assets/sounds/WoodenBeaver_stereo_message-new-instant.ogg'
+        ..src = 'assets/assets/sounds/WoodenBeaver_stereo_message-new-instant.ogg'
         ..autoplay = true
         ..load();
       html.Notification(
@@ -86,8 +85,7 @@ extension LocalNotificationsExtension on MatrixState {
       File? appIconFile;
       if (appIconUrl != null) {
         final tempDirectory = await getApplicationSupportDirectory();
-        final avatarDirectory =
-            await Directory('${tempDirectory.path}/notiavatars/').create();
+        final avatarDirectory = await Directory('${tempDirectory.path}/notiavatars/').create();
         appIconFile = File(
           '${avatarDirectory.path}/${Uri.encodeComponent(appIconUrl.toString())}',
         );
@@ -117,8 +115,7 @@ extension LocalNotificationsExtension on MatrixState {
         ],
       );
       notification.action.then((actionStr) {
-        final action = DesktopNotificationActions.values
-            .singleWhere((a) => a.name == actionStr);
+        final action = DesktopNotificationActions.values.singleWhere((a) => a.name == actionStr);
         switch (action) {
           case DesktopNotificationActions.seen:
             if (AppConfig.sendReadReceipts) room.setReadMarker(event.eventId, mRead: event.eventId);

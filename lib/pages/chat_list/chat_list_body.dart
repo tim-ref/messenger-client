@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 
@@ -67,8 +68,7 @@ class ChatListViewBody extends StatelessWidget {
             .where((s) => s.hasRoomUpdate)
             .rateLimit(const Duration(seconds: 1)),
         builder: (context, _) {
-          if (controller.activeFilter == ActiveFilter.spaces &&
-              !controller.isSearchMode) {
+          if (controller.activeFilter == ActiveFilter.spaces && !controller.isSearchMode) {
             return SpaceView(
               controller,
               scrollController: controller.scrollController,
@@ -93,8 +93,7 @@ class ChatListViewBody extends StatelessWidget {
                           AnimatedContainer(
                             clipBehavior: Clip.hardEdge,
                             decoration: const BoxDecoration(),
-                            height: roomSearchResult == null ||
-                                    roomSearchResult.chunk.isEmpty
+                            height: roomSearchResult == null || roomSearchResult.chunk.isEmpty
                                 ? 0
                                 : 106,
                             duration: FluffyThemes.animationDuration,
@@ -106,16 +105,13 @@ class ChatListViewBody extends StatelessWidget {
                                     itemCount: roomSearchResult.chunk.length,
                                     itemBuilder: (context, i) => _SearchItem(
                                       title: roomSearchResult.chunk[i].name ??
-                                          roomSearchResult.chunk[i]
-                                              .canonicalAlias?.localpart ??
+                                          roomSearchResult.chunk[i].canonicalAlias?.localpart ??
                                           L10n.of(context)!.group,
-                                      avatar:
-                                          roomSearchResult.chunk[i].avatarUrl,
+                                      avatar: roomSearchResult.chunk[i].avatarUrl,
                                       onPressed: () => showAdaptiveBottomSheet(
                                         context: context,
                                         builder: (c) => PublicRoomBottomSheet(
-                                          roomAlias: roomSearchResult
-                                                  .chunk[i].canonicalAlias ??
+                                          roomAlias: roomSearchResult.chunk[i].canonicalAlias ??
                                               roomSearchResult.chunk[i].roomId,
                                           outerContext: context,
                                           chunk: roomSearchResult.chunk[i],
@@ -131,8 +127,7 @@ class ChatListViewBody extends StatelessWidget {
                           AnimatedContainer(
                             clipBehavior: Clip.hardEdge,
                             decoration: const BoxDecoration(),
-                            height: userSearchResult == null ||
-                                    userSearchResult.results.isEmpty
+                            height: userSearchResult == null || userSearchResult.results.isEmpty
                                 ? 0
                                 : 106,
                             duration: FluffyThemes.animationDuration,
@@ -143,18 +138,14 @@ class ChatListViewBody extends StatelessWidget {
                                     scrollDirection: Axis.horizontal,
                                     itemCount: userSearchResult.results.length,
                                     itemBuilder: (context, i) => _SearchItem(
-                                      title: userSearchResult
-                                              .results[i].displayName ??
-                                          userSearchResult
-                                              .results[i].userId.localpart ??
+                                      title: userSearchResult.results[i].displayName ??
+                                          userSearchResult.results[i].userId.localpart ??
                                           L10n.of(context)!.unknownDevice,
-                                      avatar:
-                                          userSearchResult.results[i].avatarUrl,
+                                      avatar: userSearchResult.results[i].avatarUrl,
                                       onPressed: () => showAdaptiveBottomSheet(
                                         context: context,
                                         builder: (c) => ProfileBottomSheet(
-                                          userId: userSearchResult
-                                              .results[i].userId,
+                                          userId: userSearchResult.results[i].userId,
                                           outerContext: context,
                                         ),
                                       ),
@@ -163,25 +154,6 @@ class ChatListViewBody extends StatelessWidget {
                           ),
                         ],
                         const ConnectionStatusHeader(),
-                        AnimatedContainer(
-                          height: controller.isTorBrowser ? 64 : 0,
-                          duration: FluffyThemes.animationDuration,
-                          curve: FluffyThemes.animationCurve,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: const BoxDecoration(),
-                          child: Material(
-                            color: Theme.of(context).colorScheme.surface,
-                            child: ListTile(
-                              leading: const Icon(Icons.vpn_key),
-                              title: Text(L10n.of(context)!.dehydrateTor),
-                              subtitle:
-                                  Text(L10n.of(context)!.dehydrateTorLong),
-                              trailing:
-                                  const Icon(Icons.chevron_right_outlined),
-                              onTap: controller.dehydrate,
-                            ),
-                          ),
-                        ),
                         if (controller.isSearchMode)
                           SearchTitle(
                             title: L10n.of(context)!.chats,
@@ -203,7 +175,7 @@ class ChatListViewBody extends StatelessWidget {
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext context, int i) {
                         if (!rooms[i]
-                            .getLocalizedDisplayname(
+                            .getLocalizedDisplaynameFromCustomNameEvent(
                               MatrixLocals(L10n.of(context)!),
                             )
                             .toLowerCase()
@@ -215,13 +187,11 @@ class ChatListViewBody extends StatelessWidget {
                         return ChatListItem(
                           rooms[i],
                           key: Key('chat_list_item_${rooms[i].id}'),
-                          selected:
-                              controller.selectedRoomIds.contains(rooms[i].id),
+                          selected: controller.selectedRoomIds.contains(rooms[i].id),
                           onTap: controller.selectMode == SelectMode.select
                               ? () => controller.toggleSelection(rooms[i].id)
                               : null,
-                          onLongPress: () =>
-                              controller.toggleSelection(rooms[i].id),
+                          onLongPress: () => controller.toggleSelection(rooms[i].id),
                           activeChat: controller.activeChat == rooms[i].id,
                         );
                       },
@@ -238,8 +208,9 @@ class ChatListViewBody extends StatelessWidget {
     );
 
     return Stack(
-        fit: StackFit.expand,
-        children: [SearchResultDebugWidget(userSearchResult), switcher]);
+      fit: StackFit.expand,
+      children: [SearchResultDebugWidget(userSearchResult), switcher],
+    );
   }
 
   Widget _buildDummyList(BuildContext context) {
@@ -251,10 +222,8 @@ class ChatListViewBody extends StatelessWidget {
     });
 
     const dummyChatCount = 5;
-    final titleColor =
-        Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(100);
-    final subtitleColor =
-        Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(50);
+    final titleColor = Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(100);
+    final subtitleColor = Theme.of(context).textTheme.bodyLarge!.color!.withAlpha(50);
     return ListView.builder(
       key: const Key('dummychats'),
       itemCount: dummyChatCount,

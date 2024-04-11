@@ -41,7 +41,7 @@ class NewContactApprovalController extends State<NewContactApproval> {
   final List<TextInputFormatter> removeMatrixToFormatters = [
     FilteringTextInputFormatter.deny(NewContactApprovalController.prefix),
     FilteringTextInputFormatter.deny(
-        NewContactApprovalController.prefixNoProtocol),
+        NewContactApprovalController.prefixNoProtocol,),
   ];
 
   static const Set<String> supportedSigils = {'@', '!', '#'};

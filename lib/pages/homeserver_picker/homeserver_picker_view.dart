@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.02.2024
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -14,7 +14,7 @@ import 'package:fluffychat/pages/homeserver_picker/homeserver_picker.dart';
 import 'package:fluffychat/widgets/layouts/login_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../utils/platform_infos.dart';
 
@@ -52,7 +52,7 @@ class HomeserverPickerView extends StatelessWidget {
                         hintText: L10n.of(context)!.enterYourHomeserver,
                         suffixIcon: const Icon(Icons.search),
                         errorText: controller.error,
-                        fillColor: Theme.of(context).backgroundColor,
+                        fillColor: Theme.of(context).colorScheme.background,
                       ),
                       readOnly: !AppConfig.allowOtherHomeservers,
                       onSubmitted: (_) => controller.checkHomeserverAction(),
@@ -76,7 +76,7 @@ class HomeserverPickerView extends StatelessWidget {
                     child: Text(L10n.of(context)!.about),
                   ),
                   TextButton(
-                    onPressed: () => launch(AppConfig.privacyUrl),
+                    onPressed: () => launchUrlString(AppConfig.privacyUrl),
                     child: Text(L10n.of(context)!.privacy),
                   ),
                   TextButton(

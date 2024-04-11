@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -30,6 +30,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -68,15 +69,13 @@ class _StreamView extends StatelessWidget {
   bool get isLocal => wrappedStream.isLocal();
 
   bool get mirrored =>
-      wrappedStream.isLocal() &&
-      wrappedStream.purpose == SDPStreamMetadataPurpose.Usermedia;
+      wrappedStream.isLocal() && wrappedStream.purpose == SDPStreamMetadataPurpose.Usermedia;
 
   bool get audioMuted => wrappedStream.audioMuted;
 
   bool get videoMuted => wrappedStream.videoMuted;
 
-  bool get isScreenSharing =>
-      wrappedStream.purpose == SDPStreamMetadataPurpose.Screenshare;
+  bool get isScreenSharing => wrappedStream.purpose == SDPStreamMetadataPurpose.Screenshare;
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +118,7 @@ class _StreamView extends StatelessWidget {
                 color: Colors.white,
                 size: 18.0,
               ),
-            )
+            ),
         ],
       ),
     );
@@ -149,7 +148,7 @@ class Calling extends StatefulWidget {
 class MyCallingPage extends State<Calling> {
   Room? get room => call.room;
 
-  String get displayName => call.room.getLocalizedDisplayname(
+  String get displayName => call.room.getLocalizedDisplaynameFromCustomNameEvent(
         MatrixLocals(L10n.of(context)!),
       );
 
@@ -221,8 +220,7 @@ class MyCallingPage extends State<Calling> {
         setState(() {
           call.tryRemoveStopedStreams();
         });
-      } else if (event == CallEvent.kLocalHoldUnhold ||
-          event == CallEvent.kRemoteHoldUnhold) {
+      } else if (event == CallEvent.kLocalHoldUnhold || event == CallEvent.kRemoteHoldUnhold) {
         setState(() {});
         Logs().i(
           'Call hold event: local ${call.localHold}, remote ${call.remoteOnHold}',
@@ -262,15 +260,10 @@ class MyCallingPage extends State<Calling> {
       MediaQuery.of(context).size.width,
       MediaQuery.of(context).size.height,
     );
-    _localVideoMargin = remoteStream != null
-        ? const EdgeInsets.only(top: 20.0, right: 20.0)
-        : EdgeInsets.zero;
-    _localVideoWidth = remoteStream != null
-        ? shortSide / 3
-        : MediaQuery.of(context).size.width;
-    _localVideoHeight = remoteStream != null
-        ? shortSide / 4
-        : MediaQuery.of(context).size.height;
+    _localVideoMargin =
+        remoteStream != null ? const EdgeInsets.only(top: 20.0, right: 20.0) : EdgeInsets.zero;
+    _localVideoWidth = remoteStream != null ? shortSide / 3 : MediaQuery.of(context).size.width;
+    _localVideoHeight = remoteStream != null ? shortSide / 4 : MediaQuery.of(context).size.height;
   }
 
   void _handleCallState(CallState state) {
@@ -357,9 +350,7 @@ class MyCallingPage extends State<Calling> {
         call.localUserMediaStream!.stream!.getVideoTracks()[0],
       );
       if (PlatformInfos.isMobile) {
-        call.facingMode == 'user'
-            ? call.facingMode = 'environment'
-            : call.facingMode = 'user';
+        call.facingMode == 'user' ? call.facingMode = 'environment' : call.facingMode = 'user';
       }
     }
     setState(() {});
@@ -446,17 +437,14 @@ class MyCallingPage extends State<Calling> {
       case CallState.kInviteSent:
       case CallState.kCreateAnswer:
       case CallState.kConnecting:
-        return call.isOutgoing
-            ? <Widget>[hangupButton]
-            : <Widget>[answerButton, hangupButton];
+        return call.isOutgoing ? <Widget>[hangupButton] : <Widget>[answerButton, hangupButton];
       case CallState.kConnected:
         return <Widget>[
           muteMicButton,
           //switchSpeakerButton,
           if (!voiceonly && !kIsWeb) switchCameraButton,
           if (!voiceonly) muteCameraButton,
-          if (PlatformInfos.isMobile || PlatformInfos.isWeb)
-            screenSharingButton,
+          if (PlatformInfos.isMobile || PlatformInfos.isWeb) screenSharingButton,
           holdButton,
           hangupButton,
         ];
@@ -491,7 +479,7 @@ class MyCallingPage extends State<Calling> {
     if (call.localHold || call.remoteOnHold) {
       var title = '';
       if (call.localHold) {
-        title = '${call.room.getLocalizedDisplayname(
+        title = '${call.room.getLocalizedDisplaynameFromCustomNameEvent(
           MatrixLocals(L10n.of(context)!),
         )} held the call.';
       } else if (call.remoteOnHold) {
@@ -513,7 +501,7 @@ class MyCallingPage extends State<Calling> {
                   color: Colors.white,
                   fontSize: 24.0,
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -560,15 +548,13 @@ class MyCallingPage extends State<Calling> {
         SizedBox(
           width: _localVideoWidth,
           height: _localVideoHeight,
-          child:
-              _StreamView(remoteUserMediaStream!, matrixClient: widget.client),
+          child: _StreamView(remoteUserMediaStream!, matrixClient: widget.client),
         ),
       );
       secondaryStreamViews.add(const SizedBox(height: 10));
     }
 
-    final localStream =
-        call.localUserMediaStream ?? call.localScreenSharingStream;
+    final localStream = call.localUserMediaStream ?? call.localScreenSharingStream;
     if (localStream != null && !isFloating) {
       secondaryStreamViews.add(
         SizedBox(
@@ -619,8 +605,7 @@ class MyCallingPage extends State<Calling> {
       builder: (context, isFloating) {
         return Scaffold(
           resizeToAvoidBottomInset: !isFloating,
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           floatingActionButton: SizedBox(
             width: 320.0,
             height: 150.0,
@@ -649,7 +634,7 @@ class MyCallingPage extends State<Calling> {
                             PIPView.of(context)?.setFloating(true);
                           },
                         ),
-                      )
+                      ),
                   ],
                 ),
               );

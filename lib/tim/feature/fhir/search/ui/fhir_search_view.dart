@@ -103,7 +103,7 @@ class _FhirSearchViewState extends State<FhirSearchView> {
               }
             },
           ),
-          SearchResultView(_searchResults)
+          SearchResultView(_searchResults),
         ],
       );
 

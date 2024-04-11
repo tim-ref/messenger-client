@@ -24,6 +24,6 @@ class TimMatrixCryptoImpl implements TimMatrixCrypto {
 
   @override
   Future<matrix.Event> decryptRoomEvent(
-          String roomId, matrix.Event event) async =>
+          String roomId, matrix.Event event,) async =>
       (await client.encryption?.decryptRoomEvent(roomId, event)) ?? event;
 }

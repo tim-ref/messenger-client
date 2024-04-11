@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 
@@ -25,8 +26,7 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 class HealthcareServiceSearchResultListTile extends StatelessWidget {
   final HealthcareServiceSearchResult _searchResult;
 
-  const HealthcareServiceSearchResultListTile(this._searchResult, {Key? key})
-      : super(key: key);
+  const HealthcareServiceSearchResultListTile(this._searchResult, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Card(
@@ -104,7 +104,7 @@ class HealthcareServiceSearchResultListTile extends StatelessWidget {
         await showOkCancelAlertDialog(
           context: context,
           title: L10n.of(context)!.inviteContactToGroup(
-            room.getLocalizedDisplayname(
+            room.getLocalizedDisplaynameFromCustomNameEvent(
               MatrixLocals(L10n.of(context)!),
             ),
           ),

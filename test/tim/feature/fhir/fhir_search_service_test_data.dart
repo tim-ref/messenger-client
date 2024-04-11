@@ -147,7 +147,7 @@ class FhirSearchServiceTestData {
             id: '1',
             name: [
               HumanName(text: 'Dr FirstName LastName'),
-            ]),
+            ],),
       ),
     ];
   }
@@ -169,7 +169,7 @@ class FhirSearchServiceTestData {
             id: '1',
             name: [
               HumanName(text: 'Dr FirstName LastName'),
-            ]),
+            ],),
       ),
       Entry(
         resource: Endpoint(
@@ -220,7 +220,7 @@ class FhirSearchServiceTestData {
             id: '1',
             name: [
               HumanName(text: 'Dr FirstName LastName'),
-            ]),
+            ],),
       ),
       Entry(
         resource: Endpoint(
@@ -267,7 +267,7 @@ class FhirSearchServiceTestData {
             id: '1',
             name: [
               HumanName(text: 'Dr FirstName LastName'),
-            ]),
+            ],),
       ),
       Entry(
         resource: Endpoint(
@@ -317,7 +317,7 @@ class FhirSearchServiceTestData {
             id: '1',
             name: [
               HumanName(text: 'Dr FirstName LastName'),
-            ]),
+            ],),
       ),
       Entry(
         resource: Endpoint(

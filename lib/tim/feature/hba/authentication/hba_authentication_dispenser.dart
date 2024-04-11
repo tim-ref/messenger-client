@@ -26,7 +26,7 @@ class HbaTokenDispenserAuthentication implements HbaAuthentication {
   final Duration _timeout;
 
   HbaTokenDispenserAuthentication(this._client,
-      {Duration timeout = const Duration(seconds: 30)})
+      {Duration timeout = const Duration(seconds: 30),})
       : _timeout = timeout;
 
   @override

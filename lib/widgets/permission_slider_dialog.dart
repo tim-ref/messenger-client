@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -72,7 +72,7 @@ Future<int?> showPermissionChooser(
             initialText: currentLevel.toString(),
             keyboardType: TextInputType.number,
             autocorrect: false,
-          )
+          ),
         ],
       );
       if (customLevel == null) return null;

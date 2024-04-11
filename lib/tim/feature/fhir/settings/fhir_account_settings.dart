@@ -84,7 +84,7 @@ class _FhirAccountSettingsState extends State<FhirAccountSettings> {
                   child: tokenDispenserUrlUpdated
                       ? const Text(
                           key: ValueKey("tokenDispenserUrlUpdated"),
-                          "Token updated.")
+                          "Token updated.",)
                       : Semantics(
                           label: "tokenDispenserUrl",
                           container: true,
@@ -126,10 +126,10 @@ class _FhirAccountSettingsState extends State<FhirAccountSettings> {
                             default:
                               if (hbaAccessSnapshot.hasError) {
                                 return _buildFhirVisibilityError(
-                                    hbaAccessSnapshot.error);
+                                    hbaAccessSnapshot.error,);
                               } else {
                                 return _buildFhirVisibilityForm(
-                                    hbaAccessSnapshot.hasData);
+                                    hbaAccessSnapshot.hasData,);
                               }
                           }
                         },

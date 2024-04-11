@@ -19,8 +19,7 @@ import 'dart:convert' as _i8;
 import 'dart:typed_data' as _i9;
 
 import 'package:fluffychat/tim/feature/raw_data/user_agent.dart' as _i4;
-import 'package:fluffychat/tim/feature/raw_data/user_agent_builder.dart'
-    as _i10;
+import 'package:fluffychat/tim/feature/raw_data/user_agent_builder.dart' as _i10;
 import 'package:http/src/base_request.dart' as _i7;
 import 'package:http/src/io_client.dart' as _i5;
 import 'package:http/src/io_streamed_response.dart' as _i2;
@@ -38,8 +37,7 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeIOStreamedResponse_0 extends _i1.SmartFake
-    implements _i2.IOStreamedResponse {
+class _FakeIOStreamedResponse_0 extends _i1.SmartFake implements _i2.IOStreamedResponse {
   _FakeIOStreamedResponse_0(
     Object parent,
     Invocation parentInvocation,
@@ -78,14 +76,12 @@ class MockIOClient extends _i1.Mock implements _i5.IOClient {
   }
 
   @override
-  _i6.Future<_i2.IOStreamedResponse> send(_i7.BaseRequest? request) =>
-      (super.noSuchMethod(
+  _i6.Future<_i2.IOStreamedResponse> send(_i7.BaseRequest? request) => (super.noSuchMethod(
         Invocation.method(
           #send,
           [request],
         ),
-        returnValue:
-            _i6.Future<_i2.IOStreamedResponse>.value(_FakeIOStreamedResponse_0(
+        returnValue: _i6.Future<_i2.IOStreamedResponse>.value(_FakeIOStreamedResponse_0(
           this,
           Invocation.method(
             #send,

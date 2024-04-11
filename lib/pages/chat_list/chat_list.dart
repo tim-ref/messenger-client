@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,6 +11,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +26,6 @@ import 'package:vrouter/vrouter.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/pages/chat_list/chat_list_view.dart';
-import 'package:fluffychat/pages/settings_security/settings_security.dart';
 import 'package:fluffychat/utils/famedlysdk_store.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
@@ -39,9 +39,6 @@ import 'package:fluffychat/tim/tim_constants.dart';
 import '../../widgets/fluffy_chat_app.dart';
 import '../../widgets/matrix.dart';
 import '../bootstrap/bootstrap_dialog.dart';
-
-import 'package:fluffychat/utils/tor_stub.dart'
-    if (dart.library.html) 'package:tor_detector_web/tor_detector_web.dart';
 
 enum SelectMode {
   normal,
@@ -74,8 +71,7 @@ class ChatList extends StatefulWidget {
   ChatListController createState() => ChatListController();
 }
 
-class ChatListController extends State<ChatList>
-    with TickerProviderStateMixin, RouteAware {
+class ChatListController extends State<ChatList> with TickerProviderStateMixin, RouteAware {
   StreamSubscription? _intentDataStreamSubscription;
 
   StreamSubscription? _intentFileStreamSubscription;
@@ -83,8 +79,7 @@ class ChatListController extends State<ChatList>
   StreamSubscription? _intentUriStreamSubscription;
 
   bool get displayNavigationBar =>
-      !FluffyThemes.isColumnMode(context) &&
-      (spaces.isNotEmpty || AppConfig.separateChatTypes);
+      !FluffyThemes.isColumnMode(context) && (spaces.isNotEmpty || AppConfig.separateChatTypes);
 
   String? activeSpaceId;
 
@@ -137,30 +132,24 @@ class ChatListController extends State<ChatList>
     });
   }
 
-  ActiveFilter activeFilter = AppConfig.separateChatTypes
-      ? ActiveFilter.messages
-      : ActiveFilter.allChats;
+  ActiveFilter activeFilter =
+      AppConfig.separateChatTypes ? ActiveFilter.messages : ActiveFilter.allChats;
 
   bool Function(Room) getRoomFilterByActiveFilter(ActiveFilter activeFilter) {
     switch (activeFilter) {
       case ActiveFilter.allChats:
         return (room) => !room.isSpace;
       case ActiveFilter.groups:
-        return (room) =>
-            !room.isSpace && !room.isDirectChat;
+        return (room) => !room.isSpace && !room.isDirectChat;
       case ActiveFilter.messages:
-        return (room) =>
-            !room.isSpace && room.isDirectChat;
+        return (room) => !room.isSpace && room.isDirectChat;
       case ActiveFilter.spaces:
         return (r) => r.isSpace;
     }
   }
 
-  List<Room> get filteredRooms => Matrix.of(context)
-      .client
-      .rooms
-      .where(getRoomFilterByActiveFilter(activeFilter))
-      .toList();
+  List<Room> get filteredRooms =>
+      Matrix.of(context).client.rooms.where(getRoomFilterByActiveFilter(activeFilter)).toList();
 
   bool isSearchMode = false;
   Future<QueryPublicRoomsResponse>? publicRoomsResponse;
@@ -186,7 +175,7 @@ class ChatListController extends State<ChatList>
           initialText: searchServer,
           keyboardType: TextInputType.url,
           autocorrect: false,
-        )
+        ),
       ],
     );
     if (newServer == null) return;
@@ -259,8 +248,6 @@ class ChatListController extends State<ChatList>
     if (unfocus) FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  bool isTorBrowser = false;
-
   BoxConstraints? snappingSheetContainerSize;
 
   final ScrollController scrollController = ScrollController();
@@ -289,8 +276,7 @@ class ChatListController extends State<ChatList>
   }
 
   // Needs to match GroupsSpacesEntry for 'separate group' checking.
-  List<Room> get spaces =>
-      Matrix.of(context).client.rooms.where((r) => r.isSpace).toList();
+  List<Room> get spaces => Matrix.of(context).client.rooms.where((r) => r.isSpace).toList();
 
   final selectedRoomIds = <String>{};
 
@@ -320,8 +306,7 @@ class ChatListController extends State<ChatList>
     if (text == null) return;
     if (text.toLowerCase().startsWith(AppConfig.deepLinkPrefix) ||
         text.toLowerCase().startsWith(AppConfig.inviteLinkPrefix) ||
-        (text.toLowerCase().startsWith(AppConfig.schemePrefix) &&
-            !RegExp(r'\s').hasMatch(text))) {
+        (text.toLowerCase().startsWith(AppConfig.schemePrefix) && !RegExp(r'\s').hasMatch(text))) {
       return _processIncomingUris(text);
     }
     Matrix.of(context).shareContent = {
@@ -343,15 +328,15 @@ class ChatListController extends State<ChatList>
     if (!PlatformInfos.isMobile) return;
 
     // For sharing images coming from outside the app while the app is in the memory
-    _intentFileStreamSubscription = ReceiveSharingIntent.getMediaStream()
-        .listen(_processIncomingSharedFiles, onError: print);
+    _intentFileStreamSubscription =
+        ReceiveSharingIntent.getMediaStream().listen(_processIncomingSharedFiles, onError: print);
 
     // For sharing images coming from outside the app while the app is closed
     ReceiveSharingIntent.getInitialMedia().then(_processIncomingSharedFiles);
 
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
-    _intentDataStreamSubscription = ReceiveSharingIntent.getTextStream()
-        .listen(_processIncomingSharedText, onError: print);
+    _intentDataStreamSubscription =
+        ReceiveSharingIntent.getTextStream().listen(_processIncomingSharedText, onError: print);
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
     ReceiveSharingIntent.getInitialText().then(_processIncomingSharedText);
@@ -379,8 +364,6 @@ class ChatListController extends State<ChatList>
       }
     });
 
-    _checkTorBrowser();
-
     // Workaround for chat list loading bug. Can be removed once a proper bugfix is found.
     Future.delayed(const Duration(seconds: 5), reloadChatList);
 
@@ -399,10 +382,8 @@ class ChatListController extends State<ChatList>
   // Workaround for chat list loading bug. Can be removed once a proper bugfix is found.
   void reloadChatList() {
     if (kDebugMode && const bool.fromEnvironment(enableTestDriver)) {
-      if(mounted) {
-        setState(() {
-
-        });
+      if (mounted) {
+        setState(() {});
       }
     }
   }
@@ -451,9 +432,8 @@ class ChatListController extends State<ChatList>
     await showFutureLoadingDialog(
       context: context,
       future: () async {
-        final newState = anySelectedRoomNotMuted
-            ? PushRuleState.mentionsOnly
-            : PushRuleState.notify;
+        final newState =
+            anySelectedRoomNotMuted ? PushRuleState.mentionsOnly : PushRuleState.notify;
         final client = Matrix.of(context).client;
         for (final roomId in selectedRoomIds) {
           final room = client.getRoomById(roomId)!;
@@ -533,8 +513,7 @@ class ChatListController extends State<ChatList>
           .map(
             (space) => AlertDialogAction(
               key: space.id,
-              label: space
-                  .getLocalizedDisplayname(MatrixLocals(L10n.of(context)!)),
+              label: space.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(context)!)),
             ),
           )
           .toList(),
@@ -564,8 +543,7 @@ class ChatListController extends State<ChatList>
   }
 
   bool get anySelectedRoomNotMarkedUnread => selectedRoomIds.any(
-        (roomId) =>
-            !Matrix.of(context).client.getRoomById(roomId)!.markedUnread,
+        (roomId) => !Matrix.of(context).client.getRoomById(roomId)!.markedUnread,
       );
 
   bool get anySelectedRoomNotFavorite => selectedRoomIds.any(
@@ -574,8 +552,7 @@ class ChatListController extends State<ChatList>
 
   bool get anySelectedRoomNotMuted => selectedRoomIds.any(
         (roomId) =>
-            Matrix.of(context).client.getRoomById(roomId)!.pushRuleState ==
-            PushRuleState.notify,
+            Matrix.of(context).client.getRoomById(roomId)!.pushRuleState == PushRuleState.notify,
       );
 
   bool waitForFirstSync = false;
@@ -619,9 +596,7 @@ class ChatListController extends State<ChatList>
   void setActiveClient(Client client) {
     VRouter.of(context).to('/rooms');
     setState(() {
-      activeFilter = AppConfig.separateChatTypes
-          ? ActiveFilter.messages
-          : ActiveFilter.allChats;
+      activeFilter = AppConfig.separateChatTypes ? ActiveFilter.messages : ActiveFilter.allChats;
       activeSpaceId = null;
       selectedRoomIds.clear();
       TimProvider.of(context).timAuthState().disposeHbaToken();
@@ -635,20 +610,16 @@ class ChatListController extends State<ChatList>
     setState(() {
       selectedRoomIds.clear();
       Matrix.of(context).activeBundle = bundle;
-      if (!Matrix.of(context)
-          .currentBundle!
-          .any((client) => client == Matrix.of(context).client)) {
-        Matrix.of(context)
-            .setActiveClient(Matrix.of(context).currentBundle!.first);
+      if (!Matrix.of(context).currentBundle!.any((client) => client == Matrix.of(context).client)) {
+        Matrix.of(context).setActiveClient(Matrix.of(context).currentBundle!.first);
       }
     });
   }
 
   void editBundlesForAccount(String? userId, String? activeBundle) async {
     final l10n = L10n.of(context)!;
-    final client = Matrix.of(context)
-        .widget
-        .clients[Matrix.of(context).getClientIndexByMatrixId(userId!)];
+    final client =
+        Matrix.of(context).widget.clients[Matrix.of(context).getClientIndexByMatrixId(userId!)];
     final action = await showConfirmationDialog<EditBundleAction>(
       context: context,
       title: L10n.of(context)!.editBundlesForAccount,
@@ -687,15 +658,11 @@ class ChatListController extends State<ChatList>
   }
 
   bool get displayBundles =>
-      Matrix.of(context).hasComplexBundles &&
-      Matrix.of(context).accountBundles.keys.length > 1;
+      Matrix.of(context).hasComplexBundles && Matrix.of(context).accountBundles.keys.length > 1;
 
   String? get secureActiveBundle {
     if (Matrix.of(context).activeBundle == null ||
-        !Matrix.of(context)
-            .accountBundles
-            .keys
-            .contains(Matrix.of(context).activeBundle)) {
+        !Matrix.of(context).accountBundles.keys.contains(Matrix.of(context).activeBundle)) {
       return Matrix.of(context).accountBundles.keys.first;
     }
     return Matrix.of(context).activeBundle;
@@ -718,15 +685,6 @@ class ChatListController extends State<ChatList>
   void _hackyWebRTCFixForWeb() {
     ChatList.contextForVoip = context;
   }
-
-  Future<void> _checkTorBrowser() async {
-    if (!kIsWeb) return;
-    final isTor = await TorBrowserDetector.isTorBrowser;
-    isTorBrowser = isTor;
-  }
-
-  Future<void> dehydrate() =>
-      SettingsSecurityController.dehydrateDevice(context);
 }
 
 enum EditBundleAction { addToBundle, removeFromBundle }

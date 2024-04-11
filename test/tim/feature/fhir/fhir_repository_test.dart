@@ -53,7 +53,7 @@ void main() {
     final mockDataFile = File('test_resources/titus_guzman_fhir.json');
     final mockDataString = await mockDataFile.readAsString();
     final query = FhirQueryBuilder.buildPractitionerRoleQuery(
-        {practitionerName: 'Guzman, Titus'});
+        {practitionerName: 'Guzman, Titus'},);
     final uriString = 'https://host/fhir/PractitionerRole?$query';
     final expectedUri = Uri.parse(uriString);
     final expectedBundle = Bundle.fromJson(jsonDecode(mockDataString));
@@ -85,7 +85,7 @@ void main() {
         File('test_resources/healthcare_service_test_org_123.json');
     final mockDataString = await mockDataFile.readAsString();
     final query = FhirQueryBuilder.buildHealthcareServiceQuery(
-        {organizationName: 'Test Organization 123'});
+        {organizationName: 'Test Organization 123'},);
     final uriString = 'https://host/fhir/HealthcareService?$query';
     final expectedUri = Uri.parse(uriString);
     final expectedBundle = Bundle.fromJson(jsonDecode(mockDataString));
@@ -123,7 +123,7 @@ void main() {
             .readAsString();
 
     final query = FhirQueryBuilder.buildPractitionerRoleQuery(
-        {practitionerName: 'Titus'});
+        {practitionerName: 'Titus'},);
     final uriString = 'https://host/fhir/PractitionerRole?$query';
     final expectedUri = Uri.parse(uriString);
 
@@ -133,16 +133,16 @@ void main() {
 
     when(httpClient.get(
       Uri.parse(
-          'http://localhost:8080/fhir?_getpages=08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90&_getpagesoffset=20&_count=20&_format=json&_pretty=true&_include=PractitionerRole%3Aendpoint&_include=PractitionerRole%3Apractitioner&_bundletype=searchset'),
+          'http://localhost:8080/fhir?_getpages=08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90&_getpagesoffset=20&_count=20&_format=json&_pretty=true&_include=PractitionerRole%3Aendpoint&_include=PractitionerRole%3Apractitioner&_bundletype=searchset',),
       headers: expectedHeaders(),
-    )).thenAnswer((_) async => http.Response(allTitusesPage2String, 200));
+    ),).thenAnswer((_) async => http.Response(allTitusesPage2String, 200));
     final expectedPage2 = Bundle.fromJson(jsonDecode(allTitusesPage2String));
 
     when(httpClient.get(
       Uri.parse(
-          'http://localhost:8080/fhir?_getpages=08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90&_getpagesoffset=40&_count=20&_format=json&_pretty=true&_include=PractitionerRole%3Aendpoint&_include=PractitionerRole%3Apractitioner&_bundletype=searchset'),
+          'http://localhost:8080/fhir?_getpages=08a678eb-fdc0-4f4d-ac60-d7d8cf3ced90&_getpagesoffset=40&_count=20&_format=json&_pretty=true&_include=PractitionerRole%3Aendpoint&_include=PractitionerRole%3Apractitioner&_bundletype=searchset',),
       headers: expectedHeaders(),
-    )).thenAnswer((_) async => http.Response(allTitusesPage3String, 200));
+    ),).thenAnswer((_) async => http.Response(allTitusesPage3String, 200));
     final expectedPage3 = Bundle.fromJson(jsonDecode(allTitusesPage3String));
 
     final expectedEntries = [expectedPage1, expectedPage2, expectedPage3]
@@ -159,7 +159,7 @@ void main() {
   test('Should correctly get FHIR visibility', () async {
     // given
     final expectedQuery = FhirQueryBuilder.findOwnerByMxidAndTelematikId(
-        '@test:foo.bar', '1-550-test.foo-bar');
+        '@test:foo.bar', '1-550-test.foo-bar',);
     final uriString = 'https://host/owner/PractitionerRole?$expectedQuery';
     final responseBodyString =
         await File('test_resources/owner_search_with_endpoint.json')

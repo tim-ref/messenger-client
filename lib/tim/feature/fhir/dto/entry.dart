@@ -50,7 +50,7 @@ class Entry {
         return Endpoint.fromJson(json);
       default:
         throw Exception(
-            'Unknown ResourceType provided. Resource Type: ${json['resourceType']}');
+            'Unknown ResourceType provided. Resource Type: ${json['resourceType']}',);
     }
   }
 

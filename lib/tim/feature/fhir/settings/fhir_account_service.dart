@@ -51,7 +51,7 @@ class FhirAccountService {
     try {
       final jwt = JWT.decode(token.accessToken);
       Logs().d(
-          "using TelematikId ${jwt.payload['sub']} to get visibility for mxid $mxid");
+          "using TelematikId ${jwt.payload['sub']} to get visibility for mxid $mxid",);
       final query = FhirQueryBuilder.findOwnerByMxidAndTelematikId(
         mxid,
         jwt.payload['sub']!,

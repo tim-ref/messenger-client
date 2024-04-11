@@ -17,8 +17,7 @@
 import 'dart:async' as _i5;
 
 import 'package:fluffychat/tim/feature/fhir/fhir_config.dart' as _i3;
-import 'package:fluffychat/tim/feature/hba/authentication/hba_authentication.dart'
-    as _i4;
+import 'package:fluffychat/tim/feature/hba/authentication/hba_authentication.dart' as _i4;
 import 'package:fluffychat/tim/shared/tim_auth_token.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -104,8 +103,7 @@ class MockHbaAuthentication extends _i1.Mock implements _i4.HbaAuthentication {
         )),
       ) as _i5.Future<_i2.TimAuthToken>);
   @override
-  _i5.Future<_i2.TimAuthToken> getHbaTokenFromUrl(String? url) =>
-      (super.noSuchMethod(
+  _i5.Future<_i2.TimAuthToken> getHbaTokenFromUrl(String? url) => (super.noSuchMethod(
         Invocation.method(
           #getHbaTokenFromUrl,
           [url],

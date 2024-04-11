@@ -42,14 +42,15 @@ class ContactsProfileBottomSheet extends StatefulWidget {
   State<StatefulWidget> createState() => _ContactsProfileBottomSheetState();
 }
 
-class _ContactsProfileBottomSheetState
-    extends State<ContactsProfileBottomSheet> {
+class _ContactsProfileBottomSheetState extends State<ContactsProfileBottomSheet> {
   bool _approveContactOnDirectMessage = false;
+  bool _isCaseReference = false;
+
+  set isCaseReference(bool value) => setState(() => _isCaseReference = value);
 
   Future<Profile>? _userProfileFuture;
 
-  Future<Profile> _getUserProfileFuture() =>
-      _userProfileFuture ??= runFutureWithRetries(
+  Future<Profile> _getUserProfileFuture() => _userProfileFuture ??= runFutureWithRetries(
         () => Matrix.of(context).client.getProfileFromUserId(widget.userId),
       );
 
@@ -67,16 +68,13 @@ class _ContactsProfileBottomSheetState
                 extendBodyBehindAppBar: true,
                 appBar: AppBar(
                   elevation: 0,
-                  backgroundColor: Theme.of(context)
-                      .scaffoldBackgroundColor
-                      .withOpacity(0.5),
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
                   leading: Semantics(
                     label: "closeContactsProfileBottomSheetButton",
                     container: true,
                     child: IconButton(
                       icon: const Icon(Icons.arrow_downward_outlined),
-                      onPressed:
-                          Navigator.of(context, rootNavigator: false).pop,
+                      onPressed: Navigator.of(context, rootNavigator: false).pop,
                       tooltip: L10n.of(context)!.close,
                     ),
                   ),
@@ -135,9 +133,7 @@ class _ContactsProfileBottomSheetState
     return Column(
       children: [
         Expanded(
-          child: profile == null
-              ? _buildProfileMissing(snapshot)
-              : _buildProfileHeader(profile),
+          child: profile == null ? _buildProfileMissing(snapshot) : _buildProfileHeader(profile),
         ),
         ListTile(
           title: Text(profile?.displayName ?? widget.userId.localpart ?? ''),
@@ -153,8 +149,7 @@ class _ContactsProfileBottomSheetState
                   value: _approveContactOnDirectMessage,
                   onChanged: (bool value) {
                     setState(() {
-                      _approveContactOnDirectMessage =
-                          !_approveContactOnDirectMessage;
+                      _approveContactOnDirectMessage = !_approveContactOnDirectMessage;
                     });
                   },
                 ),
@@ -162,6 +157,11 @@ class _ContactsProfileBottomSheetState
               Text(L10n.of(context)!.timApproveContact),
             ],
           ),
+        SwitchListTile(
+          title: Text(L10n.of(context)!.createRoomWithCaseReference),
+          value: _isCaseReference,
+          onChanged: (value) => isCaseReference = value,
+        ),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
@@ -191,8 +191,10 @@ class _ContactsProfileBottomSheetState
   Widget _buildProfileError() => Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: Text(L10n.of(context)!.timProfileError,
-              key: const ValueKey("profileMissingError")),
+          child: Text(
+            L10n.of(context)!.timProfileError,
+            key: const ValueKey("profileMissingError"),
+          ),
         ),
       );
 
@@ -212,7 +214,10 @@ class _ContactsProfileBottomSheetState
     }
     final result = await showFutureLoadingDialog<String>(
       context: context,
-      future: () => client.startDirectChat(widget.userId),
+      future: () => client.startDirectChatWithCustomRoomType(
+        widget.userId,
+        isCaseReference: _isCaseReference,
+      ),
     );
     if (result.error == null) {
       VRouter.of(context).toSegments(['rooms', result.result!]);
@@ -221,7 +226,9 @@ class _ContactsProfileBottomSheetState
   }
 
   Future<void> _addContactToApprovals(
-      BuildContext context, Profile? profile) async {
+    BuildContext context,
+    Profile? profile,
+  ) async {
     final contact = Contact(
       mxid: profile!.userId,
       displayName: profile.displayName!,
@@ -229,11 +236,8 @@ class _ContactsProfileBottomSheetState
     );
     await showFutureLoadingDialog<Response>(
       context: context,
-      future: () => TimProvider.of(context)
-          .contactsApprovalRepository()
-          .addApproval(contact),
-      onError: (error) =>
-          error is HttpException ? error.message : error.toString(),
+      future: () => TimProvider.of(context).contactsApprovalRepository().addApproval(contact),
+      onError: (error) => error is HttpException ? error.message : error.toString(),
     );
     if (VRouter.of(context).path == '/newcontact') {
       VRouter.of(context).to("/contacts");

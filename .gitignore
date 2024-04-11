@@ -47,7 +47,6 @@ docs/_site/
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
-
 /key.jks
 /android/key.properties
 /android/app/google-services.json
@@ -70,3 +69,7 @@ olm
 
 app-debug.apk
 local.properties
+
+# FVM Version Cache
+.fvm/
+/linux/

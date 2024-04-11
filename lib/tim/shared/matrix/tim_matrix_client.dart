@@ -10,7 +10,9 @@
  */
 
 import 'package:fluffychat/tim/shared/errors/tim_bad_state_exception.dart';
-import 'package:matrix/matrix.dart' as matrix;
+import 'package:fluffychat/tim/shared/matrix/tim_case_reference_content_blob.dart';
+import 'package:fluffychat/tim/tim_constants.dart';
+
 import 'package:matrix/matrix.dart';
 
 /// Abstraction to access Matrix data.
@@ -26,9 +28,9 @@ abstract class TimMatrixClient {
   Room? getRoomById(String id);
 
   /// See [Client.getRoomEvents].
-  Future<matrix.GetRoomEventsResponse> getRoomEvents(
+  Future<GetRoomEventsResponse> getRoomEvents(
     String roomId,
-    matrix.Direction dir, {
+    Direction dir, {
     String? from,
     String? to,
     int? limit,
@@ -43,10 +45,46 @@ abstract class TimMatrixClient {
     Map<String, dynamic>? powerLevelContentOverride,
     CreateRoomPreset? preset = CreateRoomPreset.trustedPrivateChat,
   });
+
+  Future<String> startDirectChatWithCustomRoomType(
+    String mxid, {
+    bool isCaseReference = false,
+    Map<String, dynamic>? creationContent,
+    List<Invite3pid>? invite3pid,
+    String? name,
+    String? roomAliasName,
+    String? roomVersion,
+    String? topic,
+    Visibility? visibility,
+    bool? enableEncryption,
+    List<StateEvent>? initialState,
+    bool waitForSync = true,
+    Map<String, dynamic>? powerLevelContentOverride,
+    CreateRoomPreset? preset = CreateRoomPreset.trustedPrivateChat,
+  });
+
+  Future<String> createGroupChatWithCustomRoomType({
+    bool isCaseReference = false,
+    String? name,
+    bool? enableEncryption,
+    List<String>? invite,
+    CreateRoomPreset preset = CreateRoomPreset.privateChat,
+    List<StateEvent>? initialState,
+    Visibility? visibility,
+    bool waitForSync = true,
+    bool groupCall = false,
+    Map<String, dynamic>? powerLevelContentOverride,
+    Map<String, dynamic>? creationContent,
+    List<Invite3pid>? invite3pid,
+    bool? isDirect = false,
+    String? roomAliasName,
+    String? roomVersion,
+    String? topic,
+  });
 }
 
 class TimMatrixClientImpl implements TimMatrixClient {
-  final matrix.Client client;
+  final Client client;
 
   TimMatrixClientImpl({required this.client});
 
@@ -87,9 +125,9 @@ class TimMatrixClientImpl implements TimMatrixClient {
   }
 
   @override
-  Future<matrix.GetRoomEventsResponse> getRoomEvents(
+  Future<GetRoomEventsResponse> getRoomEvents(
     String roomId,
-    matrix.Direction dir, {
+    Direction dir, {
     String? from,
     String? to,
     int? limit,
@@ -121,5 +159,221 @@ class TimMatrixClientImpl implements TimMatrixClient {
       powerLevelContentOverride: powerLevelContentOverride,
       preset: preset,
     );
+  }
+
+  /// Returns an existing direct room ID with this user or creates a new one.
+  /// By default encryption will be enabled if the client supports encryption
+  /// and the other user has uploaded any encryption keys.
+  @override
+  Future<String> startDirectChatWithCustomRoomType(
+    String mxid, {
+    bool isCaseReference = false,
+    Map<String, dynamic>? creationContent,
+    List<Invite3pid>? invite3pid,
+    String? name,
+    String? roomAliasName,
+    String? roomVersion,
+    String? topic,
+    Visibility? visibility,
+    bool? enableEncryption,
+    List<StateEvent>? initialState,
+    bool waitForSync = true,
+    Map<String, dynamic>? powerLevelContentOverride,
+    CreateRoomPreset? preset = CreateRoomPreset.trustedPrivateChat,
+  }) async {
+    // Try to find an existing direct chat
+    final directChatRoomId = client.getDirectChatFromUserId(mxid);
+    if (directChatRoomId != null) return directChatRoomId;
+
+    creationContent ??= {};
+    initialState ??= [];
+
+    if (!creationContent.containsKey('type')) {
+      creationContent['type'] =
+          isCaseReference ? TimRoomType.caseReference.value : TimRoomType.defaultValue.value;
+
+      if (!initialState.any(
+        (element) =>
+            element.type == TimRoomStateEventType.caseReference.value ||
+            element.type == TimRoomStateEventType.defaultValue.value,
+      )) {
+        initialState.add(
+          isCaseReference
+              ? StateEvent(
+                  content: timCaseReferenceContentBlob,
+                  type: TimRoomStateEventType.caseReference.value,
+                )
+              : StateEvent(
+                  content: {},
+                  type: TimRoomStateEventType.defaultValue.value,
+                ),
+        );
+      }
+    }
+
+    enableEncryption ??= client.encryptionEnabled && await client.userOwnsEncryptionKeys(mxid);
+    if (enableEncryption) {
+      if (!initialState.any((s) => s.type == EventTypes.Encryption)) {
+        initialState.add(
+          StateEvent(
+            content: {
+              'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
+            },
+            type: EventTypes.Encryption,
+          ),
+        );
+      }
+    }
+
+    if (name != null &&
+        !initialState.any(
+          (element) => element.type == TimRoomStateEventType.roomName.value,
+        )) {
+      initialState.add(
+        StateEvent(content: {'name': name}, type: TimRoomStateEventType.roomName.value),
+      );
+    }
+
+    if (topic != null &&
+        !initialState.any(
+          (element) => element.type == TimRoomStateEventType.roomTopic.value,
+        )) {
+      initialState.add(
+        StateEvent(content: {'topic': topic}, type: TimRoomStateEventType.roomTopic.value),
+      );
+    }
+
+    // Start a new direct chat
+    final roomId = await client.createRoom(
+      isDirect: true,
+      invite: [mxid],
+      name: "",
+      topic: "",
+      creationContent: creationContent,
+      initialState: initialState,
+      invite3pid: invite3pid,
+      roomAliasName: roomAliasName,
+      roomVersion: roomVersion,
+      visibility: visibility,
+      preset: preset,
+      powerLevelContentOverride: powerLevelContentOverride,
+    );
+
+    if (waitForSync && getRoomById(roomId) == null) {
+      // Wait for room actually appears in sync
+      await client.waitForRoomInSync(roomId, join: true);
+    }
+
+    await Room(id: roomId, client: client).addToDirectChat(mxid);
+
+    return roomId;
+  }
+
+  /// Simplified method to create a new group chat. By default it is a private
+  /// chat. The encryption is enabled if this client supports encryption and
+  /// the preset is not a public chat.
+  @override
+  Future<String> createGroupChatWithCustomRoomType({
+    bool isCaseReference = false,
+    String? name,
+    bool? enableEncryption,
+    List<String>? invite,
+    CreateRoomPreset preset = CreateRoomPreset.privateChat,
+    List<StateEvent>? initialState,
+    Visibility? visibility,
+    bool waitForSync = true,
+    bool groupCall = false,
+    Map<String, dynamic>? powerLevelContentOverride,
+    Map<String, dynamic>? creationContent,
+    List<Invite3pid>? invite3pid,
+    bool? isDirect = false,
+    String? roomAliasName,
+    String? roomVersion,
+    String? topic,
+  }) async {
+    creationContent ??= {};
+    initialState ??= [];
+
+    if (!creationContent.containsKey('type')) {
+      creationContent['type'] =
+          isCaseReference ? TimRoomType.caseReference.value : TimRoomType.defaultValue.value;
+
+      if (!initialState.any(
+        (element) =>
+            element.type == TimRoomStateEventType.caseReference.value ||
+            element.type == TimRoomStateEventType.defaultValue.value,
+      )) {
+        initialState.add(
+          isCaseReference
+              ? StateEvent(
+                  content: timCaseReferenceContentBlob,
+                  type: TimRoomStateEventType.caseReference.value,
+                )
+              : StateEvent(
+                  content: {},
+                  type: TimRoomStateEventType.defaultValue.value,
+                ),
+        );
+      }
+    }
+
+    enableEncryption ??= client.encryptionEnabled && preset != CreateRoomPreset.publicChat;
+    if (enableEncryption && !initialState.any((s) => s.type == EventTypes.Encryption)) {
+      initialState.add(
+        StateEvent(
+          content: {
+            'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
+          },
+          type: EventTypes.Encryption,
+        ),
+      );
+    }
+
+    if (groupCall) {
+      powerLevelContentOverride ??= {};
+      powerLevelContentOverride['events'] = <String, dynamic>{
+        EventTypes.GroupCallMemberPrefix: 0,
+        EventTypes.GroupCallPrefix: 0,
+      };
+    }
+
+    if (name != null &&
+        !initialState.any(
+          (element) => element.type == TimRoomStateEventType.roomName.value,
+        )) {
+      initialState.add(
+        StateEvent(content: {'name': name}, type: TimRoomStateEventType.roomName.value),
+      );
+    }
+
+    if (topic != null &&
+        !initialState.any(
+          (element) => element.type == TimRoomStateEventType.roomTopic.value,
+        )) {
+      initialState.add(
+        StateEvent(content: {'topic': topic}, type: TimRoomStateEventType.roomTopic.value),
+      );
+    }
+
+    final roomId = await client.createRoom(
+      invite: invite,
+      preset: preset,
+      name: "",
+      initialState: initialState,
+      visibility: visibility,
+      powerLevelContentOverride: powerLevelContentOverride,
+      creationContent: creationContent,
+      invite3pid: invite3pid,
+      isDirect: isDirect,
+      roomAliasName: roomAliasName,
+      roomVersion: roomVersion,
+      topic: "",
+    );
+
+    if (waitForSync && getRoomById(roomId) == null) {
+      // Wait for room actually appears in sync
+      await client.waitForRoomInSync(roomId, join: true);
+    }
+    return roomId;
   }
 }

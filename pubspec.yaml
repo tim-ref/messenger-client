@@ -1,7 +1,7 @@
 name: fluffychat
 description: Chat with your friends.
 publish_to: none
-version: 1.18.0+3360
+version: 1.19.0+3360
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -26,7 +26,6 @@ dependencies:
   device_info_plus: ^8.0.0
   dynamic_color: ^1.6.0
   emoji_picker_flutter: ^1.5.1
-  emoji_proposal: ^0.0.1
   emojis: ^0.9.9
   equatable: ^2.0.5
   file_picker: ^5.2.6
@@ -46,7 +45,6 @@ dependencies:
   flutter_local_notifications: ^12.0.2
   flutter_localizations:
     sdk: flutter
-  flutter_math_fork: ^0.7.1
   flutter_map: ^3.1.0
   flutter_olm: ^1.2.0
   flutter_openssl_crypto: ^0.1.0
@@ -86,7 +84,6 @@ dependencies:
   shared_preferences: 2.0.15 # Pinned because https://github.com/flutter/flutter/issues/118401
   slugify: ^2.0.0
   swipe_to_action: ^0.2.0
-  tor_detector_web: ^1.1.0
   tuple: ^2.0.1
   uni_links: ^0.5.1
   unifiedpush: ^4.0.3
@@ -134,7 +131,6 @@ flutter:
     - fonts/Roboto/LICENSE.txt
     - packages/cupertino_icons/assets/LICENSE.txt
     - packages/flutter_inappwebview/assets/LICENSE.txt
-    - packages/flutter_math_fork/lib/katex_fonts/LICENSE.txt
     - packages/wakelock_web/assets/LICENSE.txt
     - README.md
 
@@ -163,9 +159,10 @@ dependency_overrides:
       url: https://gitlab.com/TheOneWithTheBraid/flutter_secure_storage_windows.git
       ref: main
   geolocator_android:
-    hosted:
-      name: geolocator_android
-      url: https://hanntech-gmbh.gitlab.io/free2pass/flutter-geolocator-floss
+    git:
+      url: https://gitlab.com/hanntech-gmbh/free2pass/flutter-geolocator-floss.git
+      ref: 7.6.2
+      path: geolocator_android
   # waiting for null safety
   # Upstream pull request: https://github.com/AntoineMarcel/keyboard_shortcuts/pull/13
   keyboard_shortcuts:

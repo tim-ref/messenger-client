@@ -55,7 +55,7 @@ class FhirSearchService {
   }
 
   Future<List<HealthcareServiceSearchResult>> searchHealthcareService(
-      String query) async {
+      String query,) async {
     final entries = await _repository.search(
       ResourceType.HealthcareService,
       query,
@@ -73,14 +73,14 @@ class FhirSearchService {
         .where((hs) => _hasMatchingOrganization(hs, organizations))
         .where((hs) => _hasMatchingEndpoints(hs, endpoints))
         .map((HealthcareService hs) =>
-            _mapHealthcareServiceToSearchResult(hs, organizations, endpoints))
+            _mapHealthcareServiceToSearchResult(hs, organizations, endpoints),)
         .toList();
   }
 
   List<PractitionerRole> _getPractitionerRoles(List<Entry> entries) {
     return entries
         .where((entry) =>
-            _matchesResourceType(entry, ResourceType.PractitionerRole))
+            _matchesResourceType(entry, ResourceType.PractitionerRole),)
         .map((entry) => entry.resource as PractitionerRole)
         .toList()
         .where((pr) => pr.endpoint != null && pr.endpoint!.isNotEmpty)
@@ -92,7 +92,7 @@ class FhirSearchService {
   List<HealthcareService> _getHealthcareServices(List<Entry> entries) {
     return entries
         .where((entry) =>
-            _matchesResourceType(entry, ResourceType.HealthcareService))
+            _matchesResourceType(entry, ResourceType.HealthcareService),)
         .map((entry) => entry.resource as HealthcareService)
         .toList()
         .where((pr) => pr.endpoint != null && pr.endpoint!.isNotEmpty)
@@ -104,7 +104,7 @@ class FhirSearchService {
   List<Practitioner> _getPractitioners(List<Entry> entries) {
     return entries
         .where(
-            (entry) => _matchesResourceType(entry, ResourceType.Practitioner))
+            (entry) => _matchesResourceType(entry, ResourceType.Practitioner),)
         .map((entry) => entry.resource as Practitioner)
         .toList();
   }
@@ -112,7 +112,7 @@ class FhirSearchService {
   List<Organization> _getOrganizations(List<Entry> entries) {
     return entries
         .where(
-            (entry) => _matchesResourceType(entry, ResourceType.Organization))
+            (entry) => _matchesResourceType(entry, ResourceType.Organization),)
         .map((entry) => entry.resource as Organization)
         .toList();
   }
@@ -146,19 +146,19 @@ class FhirSearchService {
   }
 
   bool _hasMatchingPractitioner(
-      PractitionerRole pr, List<Practitioner> practitioners) {
+      PractitionerRole pr, List<Practitioner> practitioners,) {
     final practitionerId = _getResourceIdFromReference(pr.practitioner!);
     return practitioners.map((p) => p.id).contains(practitionerId);
   }
 
   bool _hasMatchingOrganization(
-      HealthcareService hs, List<Organization> organizations) {
+      HealthcareService hs, List<Organization> organizations,) {
     final organizationId = _getResourceIdFromReference(hs.providedBy);
     return organizations.map((o) => o.id).contains(organizationId);
   }
 
   bool _hasMatchingEndpoints(
-      EndpointReference endpointReference, List<Endpoint> endpoints) {
+      EndpointReference endpointReference, List<Endpoint> endpoints,) {
     final endpointIds =
         endpointReference.endpoint!.map((e) => _getResourceIdFromReference(e));
     return endpoints.where((e) => endpointIds.contains(e.id)).isNotEmpty;

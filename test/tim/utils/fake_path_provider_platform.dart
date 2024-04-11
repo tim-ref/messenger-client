@@ -46,7 +46,7 @@ class FakePathProviderPlatform
 
   @override
   Future<List<String>> getExternalStoragePaths(
-          {StorageDirectory? type}) async =>
+          {StorageDirectory? type,}) async =>
       [await getExternalStoragePath()];
 
   @override
@@ -70,5 +70,5 @@ final _allPaths = [
   _applicationDocumentsPath,
   _externalStoragePath,
   _externalCachePath,
-  _downloadsPath
+  _downloadsPath,
 ];

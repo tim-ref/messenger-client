@@ -32,17 +32,17 @@ class InviteSettings {
 
   static DateTime _startFromJson(int secondsSinceEpoch) =>
       DateTime.fromMillisecondsSinceEpoch(
-              _toMillisecondsSinceEpoch(secondsSinceEpoch))
+              _toMillisecondsSinceEpoch(secondsSinceEpoch),)
           .toUtc();
 
   static int _startToJson(DateTime time) =>
       _toSecondsSinceEpoch(time.toUtc().millisecondsSinceEpoch);
 
   static DateTime? _endFromJson(
-          int? secondsSinceEpoch) =>
+          int? secondsSinceEpoch,) =>
       secondsSinceEpoch != null
           ? DateTime.fromMillisecondsSinceEpoch(
-                  _toMillisecondsSinceEpoch(secondsSinceEpoch))
+                  _toMillisecondsSinceEpoch(secondsSinceEpoch),)
               .toUtc()
           : null;
 

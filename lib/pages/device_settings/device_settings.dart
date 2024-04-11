@@ -1,3 +1,14 @@
+/*
+ * Modified by akquinet GmbH on 10.04.2024
+ * Originally forked from https://github.com/krille-chan/fluffychat
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -76,15 +87,14 @@ class DevicesSettingsController extends State<DevicesSettings> {
       textFields: [
         DialogTextField(
           hintText: device.displayName,
-        )
+        ),
       ],
     );
     if (displayName == null) return;
     final success = await showFutureLoadingDialog(
       context: context,
-      future: () => Matrix.of(context)
-          .client
-          .updateDevice(device.deviceId, displayName: displayName.single),
+      future: () =>
+          Matrix.of(context).client.updateDevice(device.deviceId, displayName: displayName.single),
     );
     if (success.error == null) {
       reload();
@@ -98,8 +108,7 @@ class DevicesSettingsController extends State<DevicesSettings> {
         .deviceKeys[device.deviceId]!
         .startVerification();
     req.onUpdate = () {
-      if ({KeyVerificationState.error, KeyVerificationState.done}
-          .contains(req.state)) {
+      if ({KeyVerificationState.error, KeyVerificationState.done}.contains(req.state)) {
         setState(() {});
       }
     };
@@ -127,8 +136,7 @@ class DevicesSettingsController extends State<DevicesSettings> {
     setState(() {});
   }
 
-  bool _isOwnDevice(Device userDevice) =>
-      userDevice.deviceId == Matrix.of(context).client.deviceID;
+  bool _isOwnDevice(Device userDevice) => userDevice.deviceId == Matrix.of(context).client.deviceID;
 
   Device? get thisDevice => devices!.firstWhereOrNull(
         _isOwnDevice,

@@ -62,7 +62,7 @@ class _ContactApprovalViewState extends State<ContactApprovalView> {
             key: const ValueKey("reloadContactApprovalsButton"),
             onPressed: () => _reload(),
             icon: const Icon(Icons.refresh_outlined),
-          )
+          ),
         ],
       );
 

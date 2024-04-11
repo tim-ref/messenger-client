@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -40,8 +41,7 @@ class ChatDetailsController extends State<ChatDetails> {
   List<User>? members;
   bool displaySettings = false;
 
-  void toggleDisplaySettings() =>
-      setState(() => displaySettings = !displaySettings);
+  void toggleDisplaySettings() => setState(() => displaySettings = !displaySettings);
 
   String? get roomId => VRouter.of(context).pathParameters['roomid'];
 
@@ -55,18 +55,15 @@ class ChatDetailsController extends State<ChatDetails> {
       cancelLabel: L10n.of(context)!.cancel,
       textFields: [
         DialogTextField(
-          initialText: room.getLocalizedDisplayname(
-            MatrixLocals(
-              L10n.of(context)!,
-            ),
-          ),
-        )
+          initialText:
+              room.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(context)!)),
+        ),
       ],
     );
     if (input == null) return;
     final success = await showFutureLoadingDialog(
       context: context,
-      future: () => room.setName(input.single),
+      future: () => room.setDisplayName(input.single),
     );
     if (success.error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,11 +108,8 @@ class ChatDetailsController extends State<ChatDetails> {
       context: context,
       title: L10n.of(context)!.editRoomAliases,
       actions: [
-        if (adminMode)
-          AlertDialogAction(label: L10n.of(context)!.create, key: 'new'),
-        ...aliases.result!
-            .map((alias) => AlertDialogAction(key: alias, label: alias))
-            .toList(),
+        if (adminMode) AlertDialogAction(label: L10n.of(context)!.create, key: 'new'),
+        ...aliases.result!.map((alias) => AlertDialogAction(key: alias, label: alias)).toList(),
       ],
     );
     if (select == null) return;
@@ -191,14 +185,13 @@ class ChatDetailsController extends State<ChatDetails> {
           suffixText: domain,
           hintText: L10n.of(context)!.alias,
           initialText: room.canonicalAlias.localpart,
-        )
+        ),
       ],
     );
     if (input == null) return;
     await showFutureLoadingDialog(
       context: context,
-      future: () =>
-          room.client.setRoomAlias('#${input.single}:${domain!}', room.id),
+      future: () => room.client.setRoomAlias('#${input.single}:${domain!}', room.id),
     );
   }
 
@@ -213,16 +206,16 @@ class ChatDetailsController extends State<ChatDetails> {
       textFields: [
         DialogTextField(
           hintText: L10n.of(context)!.setGroupDescription,
-          initialText: room.topic,
+          initialText: room.displayTopic,
           minLines: 1,
           maxLines: 4,
-        )
+        ),
       ],
     );
     if (input == null) return;
     final success = await showFutureLoadingDialog(
       context: context,
-      future: () => room.setDescription(input.single),
+      future: () => room.setDisplayTopic(input.single),
     );
     if (success.error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -235,27 +228,18 @@ class ChatDetailsController extends State<ChatDetails> {
 
   void setGuestAccessAction(GuestAccess guestAccess) => showFutureLoadingDialog(
         context: context,
-        future: () => Matrix.of(context)
-            .client
-            .getRoomById(roomId!)!
-            .setGuestAccess(guestAccess),
+        future: () => Matrix.of(context).client.getRoomById(roomId!)!.setGuestAccess(guestAccess),
       );
 
-  void setHistoryVisibilityAction(HistoryVisibility historyVisibility) =>
-      showFutureLoadingDialog(
+  void setHistoryVisibilityAction(HistoryVisibility historyVisibility) => showFutureLoadingDialog(
         context: context,
-        future: () => Matrix.of(context)
-            .client
-            .getRoomById(roomId!)!
-            .setHistoryVisibility(historyVisibility),
+        future: () =>
+            Matrix.of(context).client.getRoomById(roomId!)!.setHistoryVisibility(historyVisibility),
       );
 
   void setJoinRulesAction(JoinRules joinRule) => showFutureLoadingDialog(
         context: context,
-        future: () => Matrix.of(context)
-            .client
-            .getRoomById(roomId!)!
-            .setJoinRules(joinRule),
+        future: () => Matrix.of(context).client.getRoomById(roomId!)!.setJoinRules(joinRule),
       );
 
   void setAvatarAction() async {
@@ -299,9 +283,7 @@ class ChatDetailsController extends State<ChatDetails> {
     MatrixFile file;
     if (PlatformInfos.isMobile) {
       final result = await ImagePicker().pickImage(
-        source: action == AvatarAction.camera
-            ? ImageSource.camera
-            : ImageSource.gallery,
+        source: action == AvatarAction.camera ? ImageSource.camera : ImageSource.gallery,
         imageQuality: 50,
       );
       if (result == null) return;
@@ -342,8 +324,7 @@ class ChatDetailsController extends State<ChatDetails> {
 
   @override
   Widget build(BuildContext context) {
-    members ??=
-        Matrix.of(context).client.getRoomById(roomId!)!.getParticipants();
+    members ??= Matrix.of(context).client.getRoomById(roomId!)!.getParticipants();
     return SizedBox(
       width: fixedWidth,
       child: ChatDetailsView(this),

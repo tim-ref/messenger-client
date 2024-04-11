@@ -16,7 +16,7 @@ import 'package:fluffychat/tim/feature/fhir/dto/resource_type.dart';
 
 class ResourceTypeLocalizationHelper {
   static String getAppBarTitleByResourceType(
-      BuildContext context, ResourceType resourceType) {
+      BuildContext context, ResourceType resourceType,) {
     switch (resourceType) {
       case ResourceType.PractitionerRole:
         return L10n.of(context)!.timFhirResourceTypePractitionerRole;

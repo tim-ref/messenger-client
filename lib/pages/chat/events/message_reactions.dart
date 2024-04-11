@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -26,20 +26,16 @@ class MessageReactions extends StatelessWidget {
   final Event event;
   final Timeline timeline;
 
-  const MessageReactions(this.event, this.timeline, {Key? key})
-      : super(key: key);
+  const MessageReactions(this.event, this.timeline, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final allReactionEvents =
-        event.aggregatedEvents(timeline, RelationshipTypes.reaction);
+    final allReactionEvents = event.aggregatedEvents(timeline, RelationshipTypes.reaction);
     final reactionMap = <String, _ReactionEntry>{};
     final client = Matrix.of(context).client;
 
     for (final e in allReactionEvents) {
-      final key = e.content
-          .tryGetMap<String, dynamic>('m.relates_to')
-          ?.tryGet<String>('key');
+      final key = e.content.tryGetMap<String, dynamic>('m.relates_to')?.tryGet<String>('key');
       if (key != null) {
         if (!reactionMap.containsKey(key)) {
           reactionMap[key] = _ReactionEntry(
@@ -127,9 +123,7 @@ class _Reaction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
+    final textColor = Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black;
     final color = Theme.of(context).scaffoldBackgroundColor;
     final fontSize = DefaultTextStyle.of(context).style.fontSize;
     Widget content;
@@ -233,7 +227,7 @@ class _AdaptableReactorsDialog extends StatelessWidget {
         runSpacing: 4.0,
         alignment: WrapAlignment.center,
         children: <Widget>[
-          for (var reactor in reactionEntry!.reactors!)
+          for (final reactor in reactionEntry!.reactors!)
             Chip(
               avatar: Avatar(
                 mxContent: reactor.avatarUrl,

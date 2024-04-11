@@ -65,5 +65,5 @@ final Map<L10nValue, String> practitionerQualificationMapping = {
   L10nValue((t) => t.practitionerRoleSpeechTherapist, 33): '1.2.276.0.76.4.275',
   L10nValue((t) => t.practitionerRolePodiatrist, 34): '1.2.276.0.76.4.276',
   L10nValue((t) => t.practitionerRoleNutritionalTherapist, 35):
-      '1.2.276.0.76.4.277'
+      '1.2.276.0.76.4.277',
 };

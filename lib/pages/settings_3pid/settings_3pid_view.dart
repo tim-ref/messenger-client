@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -35,7 +35,7 @@ class Settings3PidView extends StatelessWidget {
             icon: const Icon(Icons.add_outlined),
             onPressed: controller.add3PidAction,
             tooltip: L10n.of(context)!.addEmail,
-          )
+          ),
         ],
       ),
       body: MaxWidthBody(
@@ -64,19 +64,15 @@ class Settings3PidView extends StatelessWidget {
                 ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    foregroundColor:
-                        identifier.isEmpty ? Colors.orange : Colors.grey,
+                    foregroundColor: identifier.isEmpty ? Colors.orange : Colors.grey,
                     child: Icon(
-                      identifier.isEmpty
-                          ? Icons.warning_outlined
-                          : Icons.info_outlined,
+                      identifier.isEmpty ? Icons.warning_outlined : Icons.info_outlined,
                     ),
                   ),
                   title: Text(
                     identifier.isEmpty
                         ? L10n.of(context)!.noPasswordRecoveryDescription
-                        : L10n.of(context)!
-                            .withTheseAddressesRecoveryDescription,
+                        : L10n.of(context)!.withTheseAddressesRecoveryDescription,
                   ),
                 ),
                 const Divider(height: 1),
@@ -85,8 +81,7 @@ class Settings3PidView extends StatelessWidget {
                     itemCount: identifier.length,
                     itemBuilder: (BuildContext context, int i) => ListTile(
                       leading: CircleAvatar(
-                        backgroundColor:
-                            Theme.of(context).scaffoldBackgroundColor,
+                        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                         foregroundColor: Colors.grey,
                         child: Icon(identifier[i].iconData),
                       ),

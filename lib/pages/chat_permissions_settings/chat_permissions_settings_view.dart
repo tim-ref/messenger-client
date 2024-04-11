@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -23,8 +23,7 @@ import 'package:fluffychat/widgets/matrix.dart';
 class ChatPermissionsSettingsView extends StatelessWidget {
   final ChatPermissionsSettingsController controller;
 
-  const ChatPermissionsSettingsView(this.controller, {Key? key})
-      : super(key: key);
+  const ChatPermissionsSettingsView(this.controller, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +33,7 @@ class ChatPermissionsSettingsView extends StatelessWidget {
             ? null
             : IconButton(
                 icon: const Icon(Icons.close_outlined),
-                onPressed: () => VRouter.of(context)
-                    .toSegments(['rooms', controller.roomId!]),
+                onPressed: () => VRouter.of(context).toSegments(['rooms', controller.roomId!]),
               ),
         title: Text(L10n.of(context)!.editChatPermissions),
       ),
@@ -45,9 +43,7 @@ class ChatPermissionsSettingsView extends StatelessWidget {
           stream: controller.onChanged,
           builder: (context, _) {
             final roomId = controller.roomId;
-            final room = roomId == null
-                ? null
-                : Matrix.of(context).client.getRoomById(roomId);
+            final room = roomId == null ? null : Matrix.of(context).client.getRoomById(roomId);
             if (room == null) {
               return Center(child: Text(L10n.of(context)!.noRoomsFound));
             }
@@ -56,15 +52,14 @@ class ChatPermissionsSettingsView extends StatelessWidget {
             );
             final powerLevels = Map<String, dynamic>.from(powerLevelsContent)
               ..removeWhere((k, v) => v is! int);
-            final eventsPowerLevels =
-                Map<String, dynamic>.from(powerLevelsContent['events'] ?? {})
-                  ..removeWhere((k, v) => v is! int);
+            final eventsPowerLevels = Map<String, dynamic>.from(powerLevelsContent['events'] ?? {})
+              ..removeWhere((k, v) => v is! int);
             return Column(
               children: [
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    for (var entry in powerLevels.entries)
+                    for (final entry in powerLevels.entries)
                       PermissionsListTile(
                         permissionKey: entry.key,
                         permission: entry.value,
@@ -87,8 +82,7 @@ class ChatPermissionsSettingsView extends StatelessWidget {
                     Builder(
                       builder: (context) {
                         const key = 'rooms';
-                        final int value = powerLevelsContent
-                                .containsKey('notifications')
+                        final int value = powerLevelsContent.containsKey('notifications')
                             ? powerLevelsContent['notifications']['rooms'] ?? 0
                             : 0;
                         return PermissionsListTile(
@@ -114,7 +108,7 @@ class ChatPermissionsSettingsView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    for (var entry in eventsPowerLevels.entries)
+                    for (final entry in eventsPowerLevels.entries)
                       PermissionsListTile(
                         permissionKey: entry.key,
                         category: 'events',
@@ -138,17 +132,14 @@ class ChatPermissionsSettingsView extends StatelessWidget {
                               ),
                             );
                           }
-                          final String roomVersion = room
-                                  .getState(EventTypes.RoomCreate)!
-                                  .content['room_version'] ??
-                              '1';
+                          final String roomVersion =
+                              room.getState(EventTypes.RoomCreate)!.content['room_version'] ?? '1';
 
                           return ListTile(
                             title: Text(
                               '${L10n.of(context)!.roomVersion}: $roomVersion',
                             ),
-                            onTap: () =>
-                                controller.updateRoomAction(snapshot.data!),
+                            onTap: () => controller.updateRoomAction(snapshot.data!),
                           );
                         },
                       ),

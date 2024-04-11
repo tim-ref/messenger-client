@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -31,14 +31,13 @@ class NewPrivateChatView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final qrCodeSize =
-        min(MediaQuery.of(context).size.width - 16, 256).toDouble();
+    final qrCodeSize = min(MediaQuery.of(context).size.width - 16, 256).toDouble();
     return Scaffold(
       appBar: AppBar(
         leading: Semantics(
           label: "backButton",
           container: true,
-          child:const BackButton(),
+          child: const BackButton(),
         ),
         title: Text(L10n.of(context)!.newChat),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -52,12 +51,11 @@ class NewPrivateChatView extends StatelessWidget {
                 onPressed: () => VRouter.of(context).to('/newgroup'),
                 child: Text(
                   L10n.of(context)!.createNewGroup,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
       body: Column(
@@ -79,15 +77,13 @@ class NewPrivateChatView extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       QrImage(
-                        data:
-                            'https://matrix.to/#/${Matrix.of(context).client.userID}',
+                        data: 'https://matrix.to/#/${Matrix.of(context).client.userID}',
                         version: QrVersions.auto,
                         size: qrCodeSize,
                       ),
                       TextButton.icon(
                         style: TextButton.styleFrom(
-                          fixedSize:
-                              Size.fromWidth(qrCodeSize - (2 * _qrCodePadding)),
+                          fixedSize: Size.fromWidth(qrCodeSize - (2 * _qrCodePadding)),
                           foregroundColor: Colors.black,
                         ),
                         icon: Icon(Icons.adaptive.share_outlined),
@@ -98,8 +94,7 @@ class NewPrivateChatView extends StatelessWidget {
                       if (PlatformInfos.isMobile) ...[
                         OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
+                            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                             fixedSize: Size.fromWidth(
                               qrCodeSize - (2 * _qrCodePadding),
                             ),

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,16 +11,14 @@
 
 import 'dart:ui';
 
-import 'package:matrix/matrix.dart';
-
 abstract class AppConfig {
-  static String _applicationName = 'FluffyChat';
+  static const String _applicationName = 'FluffyChat';
 
   static String get applicationName => _applicationName;
   static String? _applicationWelcomeMessage;
 
   static String? get applicationWelcomeMessage => _applicationWelcomeMessage;
-  static String _defaultHomeserver = '';
+  static const String _defaultHomeserver = '';
 
   static String get defaultHomeserver => _defaultHomeserver;
   static double bubbleSizeFactor = 1;
@@ -33,7 +31,7 @@ abstract class AppConfig {
   static const Color primaryColor = Color(0xFFADD52C);
   static const Color primaryColorLight = Color(0xFFC8F249);
   static const Color secondaryColor = Color(0xFF5B6147);
-  static String _privacyUrl = 'https://www.gematik.de/datenschutz';
+  static const String _privacyUrl = 'https://www.gematik.de/datenschutz';
 
   static String get privacyUrl => _privacyUrl;
   static const String enablePushTutorial =
@@ -41,7 +39,7 @@ abstract class AppConfig {
   static const String encryptionTutorial =
       'https://gitlab.com/famedly/fluffychat/-/wikis/How-to-use-end-to-end-encryption-in-FluffyChat';
   static const String appOpenUrlScheme = 'im.fluffychat';
-  static String _webBaseUrl = 'https://fluffychat.im/web';
+  static const String _webBaseUrl = 'https://fluffychat.im/web';
 
   static String get webBaseUrl => _webBaseUrl;
   static const String sourceCodeUrl = 'https://gitlab.com/famedly/fluffychat';

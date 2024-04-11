@@ -28,7 +28,7 @@ void main() {
       return Response(
           """{"access_token":"token","token_type":"bearer","expires_in":86400}""",
           200,
-          headers: {'content-type': 'application/json'});
+          headers: {'content-type': 'application/json'},);
     });
 
     final sut = HbaTokenDispenserAuthentication(mockClient);
@@ -89,5 +89,5 @@ void main() {
     );
 
     await expectLater(sut.getHbaToken(), throwsA(isA<TimeoutException>()));
-  }, timeout: const Timeout(Duration(seconds: 30)));
+  }, timeout: const Timeout(Duration(seconds: 30)),);
 }

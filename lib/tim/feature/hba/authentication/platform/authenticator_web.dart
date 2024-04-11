@@ -24,7 +24,7 @@ class AuthenticatorImpl extends AuthenticatorApi {
     Logs().i('Open authenticator app');
 
     html.window.open(
-        'authenticator://?challenge_path=$challengePath&callback=tim', 'todo');
+        'authenticator://?challenge_path=$challengePath&callback=tim', 'todo',);
 
     Logs().i('Opened authenticator app');
   }

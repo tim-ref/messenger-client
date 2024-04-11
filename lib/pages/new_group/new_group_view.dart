@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -34,20 +34,20 @@ class NewGroupView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Semantics(
-              label: "groupNameField",
-              container: true,
-              textField: true,
-              child: TextField(
-                controller: controller.controller,
-                autofocus: true,
-                autocorrect: false,
-                textInputAction: TextInputAction.go,
-                onSubmitted: controller.submitAction,
-                decoration: InputDecoration(
-                  labelText: L10n.of(context)!.optionalGroupName,
-                  prefixIcon: const Icon(Icons.people_outlined),
-                  hintText: L10n.of(context)!.enterAGroupName,
-                ),
+                label: "groupNameField",
+                container: true,
+                textField: true,
+                child: TextField(
+                  controller: controller.controller,
+                  autofocus: true,
+                  autocorrect: false,
+                  textInputAction: TextInputAction.go,
+                  onSubmitted: controller.submitAction,
+                  decoration: InputDecoration(
+                    labelText: L10n.of(context)!.optionalGroupName,
+                    prefixIcon: const Icon(Icons.people_outlined),
+                    hintText: L10n.of(context)!.enterAGroupName,
+                  ),
                 ),
               ),
             ),
@@ -67,6 +67,15 @@ class NewGroupView extends StatelessWidget {
               value: !controller.publicGroup,
               onChanged: null,
             ),
+            Semantics(
+              label: "groupTimCaseReferenceRoomTypeToggle",
+              container: true,
+              child: SwitchListTile.adaptive(
+                title: Text(L10n.of(context)!.createRoomWithCaseReference),
+                value: controller.isCaseReference,
+                onChanged: controller.setCaseReference,
+              ),
+            ),
           ],
         ),
       ),
@@ -76,7 +85,7 @@ class NewGroupView extends StatelessWidget {
           label: "createGroupButton",
           container: true,
           child: const Icon(Icons.arrow_forward_outlined),
-        )
+        ),
       ),
     );
   }

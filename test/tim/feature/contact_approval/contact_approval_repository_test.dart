@@ -102,7 +102,7 @@ void main() {
     final internalServerErrorMatcher = isA<HttpException>().having(
         (e) => e.message,
         "message",
-        contains("Unexpected status 500 for call to URI: $expectedUri"));
+        contains("Unexpected status 500 for call to URI: $expectedUri"),);
     expectLater(repo.listApprovals(), throwsA(internalServerErrorMatcher));
   });
 
@@ -165,7 +165,7 @@ void main() {
     final notFoundMatcher = isA<HttpException>().having(
         (e) => e.message,
         "message",
-        contains("Unexpected status 404 for call to URI: $expectedUri"));
+        contains("Unexpected status 404 for call to URI: $expectedUri"),);
     expectLater(repo.getApproval(mxid), throwsA(notFoundMatcher));
   });
 
@@ -228,9 +228,9 @@ void main() {
     final badRequestMatcher = isA<HttpException>().having(
         (e) => e.message,
         "message",
-        contains("Unexpected status 400 for call to URI: $expectedUri"));
+        contains("Unexpected status 400 for call to URI: $expectedUri"),);
     expectLater(
-        repo.updateApproval(_expectedApproval()), throwsA(badRequestMatcher));
+        repo.updateApproval(_expectedApproval()), throwsA(badRequestMatcher),);
   });
 
   test('constructs correct api call for add contact', () async {
@@ -290,10 +290,10 @@ void main() {
     final internalServerErrorMatcher = isA<HttpException>().having(
         (e) => e.message,
         "message",
-        contains("Unexpected status 500 for call to URI: $expectedUri"));
+        contains("Unexpected status 500 for call to URI: $expectedUri"),);
     expectLater(repo.addApproval(_expectedApproval()),
-        throwsA(internalServerErrorMatcher));
-  }, timeout: const Timeout(Duration(seconds: 30)));
+        throwsA(internalServerErrorMatcher),);
+  }, timeout: const Timeout(Duration(seconds: 30)),);
 
   test('constructs correct api call for delete contact', () async {
     // given
@@ -352,7 +352,7 @@ void main() {
     final forbiddenMatcher = isA<HttpException>().having(
         (e) => e.message,
         "message",
-        contains("Unexpected status 403 for call to URI: $expectedUri"));
+        contains("Unexpected status 403 for call to URI: $expectedUri"),);
     expectLater(repo.deleteApproval(mxid), throwsA(forbiddenMatcher));
   });
 
@@ -368,8 +368,8 @@ void main() {
 
     // expect
     expectLater(repo.addApproval(_expectedApproval()),
-        throwsA(isA<TimBadStateException>()));
-  }, timeout: const Timeout(Duration(seconds: 30)));
+        throwsA(isA<TimBadStateException>()),);
+  }, timeout: const Timeout(Duration(seconds: 30)),);
 }
 
 Map<String, String> _expectedHeaders() {
@@ -377,7 +377,7 @@ Map<String, String> _expectedHeaders() {
     HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
     HttpHeaders.authorizationHeader:
         'Bearer ${_defaultOpenIdToken().accessToken}',
-    'mxid': userId
+    'mxid': userId,
   };
 }
 

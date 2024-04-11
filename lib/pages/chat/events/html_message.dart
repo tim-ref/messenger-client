@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -16,7 +17,6 @@ import 'package:flutter_highlighter/flutter_highlighter.dart';
 import 'package:flutter_highlighter/themes/shades-of-purple.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html_table/flutter_html_table.dart';
-import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:linkify/linkify.dart';
 import 'package:matrix/matrix.dart';
 
@@ -148,9 +148,6 @@ class HtmlMessage extends StatelessWidget {
       extensions: [
         RoomPillExtension(context, room),
         CodeExtension(fontSize: fontSize),
-        MatrixMathExtension(
-          style: TextStyle(fontSize: fontSize, color: textColor),
-        ),
         const TableHtmlExtension(),
         SpoilerExtension(textColor: textColor),
         const ImageExtension(),
@@ -306,8 +303,7 @@ class SpoilerExtension extends HtmlExtension {
   @override
   bool matches(ExtensionContext context) {
     if (context.elementName != 'span') return false;
-    return context.element?.attributes.containsKey(customDataAttribute) ??
-        false;
+    return context.element?.attributes.containsKey(customDataAttribute) ?? false;
   }
 
   @override
@@ -327,39 +323,6 @@ class SpoilerExtension extends HtmlExtension {
                 children: children,
               ),
             ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class MatrixMathExtension extends HtmlExtension {
-  final TextStyle? style;
-
-  MatrixMathExtension({this.style});
-  @override
-  Set<String> get supportedTags => {'div'};
-
-  @override
-  bool matches(ExtensionContext context) {
-    if (context.elementName != 'div') return false;
-    final mathData = context.element?.attributes['data-mx-maths'];
-    return mathData != null;
-  }
-
-  @override
-  InlineSpan build(ExtensionContext context) {
-    final data = context.element?.attributes['data-mx-maths'] ?? '';
-    return WidgetSpan(
-      child: Math.tex(
-        data,
-        textStyle: style,
-        onErrorFallback: (e) {
-          Logs().d('Flutter math parse error', e);
-          return Text(
-            data,
-            style: style,
           );
         },
       ),
@@ -414,9 +377,8 @@ class RoomPillExtension extends HtmlExtension {
   @override
   bool matches(ExtensionContext context) {
     if (context.elementName != 'a') return false;
-    final userId = context.element?.attributes['href']
-        ?.parseIdentifierIntoParts()
-        ?.primaryIdentifier;
+    final userId =
+        context.element?.attributes['href']?.parseIdentifierIntoParts()?.primaryIdentifier;
     return userId != null;
   }
 
@@ -455,7 +417,7 @@ class RoomPillExtension extends HtmlExtension {
       if (room != null) {
         return WidgetSpan(
           child: MatrixPill(
-            name: room.getLocalizedDisplayname(),
+            name: room.getLocalizedDisplaynameFromCustomNameEvent(),
             avatar: room.avatar,
             uri: href,
             outerContext: this.context,

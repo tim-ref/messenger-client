@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -38,11 +38,11 @@ class MessageContent extends StatelessWidget {
   final void Function(Event)? onInfoTab;
 
   const MessageContent(
-      this.event, {
-        this.onInfoTab,
-        Key? key,
-        required this.textColor,
-      }) : super(key: key);
+    this.event, {
+    this.onInfoTab,
+    Key? key,
+    required this.textColor,
+  }) : super(key: key);
 
   void _verifyOrRequestKey(BuildContext context) async {
     final l10n = L10n.of(context)!;
@@ -53,8 +53,8 @@ class MessageContent extends StatelessWidget {
             event.type == EventTypes.Encrypted
                 ? l10n.needPantalaimonWarning
                 : event.calcLocalizedBodyFallback(
-              MatrixLocals(l10n),
-            ),
+                    MatrixLocals(l10n),
+                  ),
           ),
         ),
       );
@@ -95,7 +95,7 @@ class MessageContent extends StatelessWidget {
                 event.calcLocalizedBodyFallback(
                   MatrixLocals(l10n),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -106,8 +106,7 @@ class MessageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = AppConfig.messageFontSize * AppConfig.fontSizeFactor;
-    final buttonTextColor =
-    event.senderId == Matrix.of(context).client.userID ? textColor : null;
+    final buttonTextColor = event.senderId == Matrix.of(context).client.userID ? textColor : null;
     switch (event.type) {
       case EventTypes.Message:
       case EventTypes.Encrypted:
@@ -126,13 +125,11 @@ class MessageContent extends StatelessWidget {
           case CuteEventContent.eventType:
             return CuteContent(event);
           case MessageTypes.Audio:
-            if (PlatformInfos.isMobile ||
-                PlatformInfos.isMacOS ||
-                PlatformInfos.isWeb
-            // Disabled until https://github.com/bleonard252/just_audio_mpv/issues/3
-            // is fixed
-            //   || PlatformInfos.isLinux
-            ) {
+            if (PlatformInfos.isMobile || PlatformInfos.isMacOS || PlatformInfos.isWeb
+                // Disabled until https://github.com/bleonard252/just_audio_mpv/issues/3
+                // is fixed
+                //   || PlatformInfos.isLinux
+                ) {
               return AudioPlayerWidget(
                 event,
                 color: textColor,
@@ -150,9 +147,7 @@ class MessageContent extends StatelessWidget {
           case MessageTypes.Text:
           case MessageTypes.Notice:
           case MessageTypes.Emote:
-            if (AppConfig.renderHtml &&
-                !event.redacted &&
-                event.isRichMessage) {
+            if (AppConfig.renderHtml && !event.redacted && event.isRichMessage) {
               var html = event.formattedText;
               if (event.messageType == MessageTypes.Emote) {
                 html = '* $html';
@@ -174,18 +169,11 @@ class MessageContent extends StatelessWidget {
               label: L10n.of(context)!.encrypted,
             );
           case MessageTypes.Location:
-            final geoUri =
-            Uri.tryParse(event.content.tryGet<String>('geo_uri')!);
+            final geoUri = Uri.tryParse(event.content.tryGet<String>('geo_uri')!);
             if (geoUri != null && geoUri.scheme == 'geo') {
-              final latlong = geoUri.path
-                  .split(';')
-                  .first
-                  .split(',')
-                  .map((s) => double.tryParse(s))
-                  .toList();
-              if (latlong.length == 2 &&
-                  latlong.first != null &&
-                  latlong.last != null) {
+              final latlong =
+                  geoUri.path.split(';').first.split(',').map((s) => double.tryParse(s)).toList();
+              if (latlong.length == 2 && latlong.first != null && latlong.last != null) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -196,8 +184,7 @@ class MessageContent extends StatelessWidget {
                     const SizedBox(height: 6),
                     OutlinedButton.icon(
                       icon: Icon(Icons.location_on_outlined, color: textColor),
-                      onPressed:
-                      UrlLauncher(context, geoUri.toString()).launchUrl,
+                      onPressed: UrlLauncher(context, geoUri.toString()).launchUrl,
                       label: Text(
                         L10n.of(context)!.openInMaps,
                         style: TextStyle(color: textColor),
@@ -227,9 +214,8 @@ class MessageContent extends StatelessWidget {
                 },
               );
             }
-            final bigEmotes = event.onlyEmotes &&
-                event.numberEmotes > 0 &&
-                event.numberEmotes <= 10;
+            final bigEmotes =
+                event.onlyEmotes && event.numberEmotes > 0 && event.numberEmotes <= 10;
             return FutureBuilder<String>(
               future: event.calcLocalizedBody(
                 MatrixLocals(L10n.of(context)!),
@@ -245,8 +231,7 @@ class MessageContent extends StatelessWidget {
                   style: TextStyle(
                     color: textColor,
                     fontSize: bigEmotes ? fontSize * 3 : fontSize,
-                    decoration:
-                    event.redacted ? TextDecoration.lineThrough : null,
+                    decoration: event.redacted ? TextDecoration.lineThrough : null,
                   ),
                   options: const LinkifyOptions(humanize: false),
                   linkStyle: TextStyle(

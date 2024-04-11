@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 10.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -54,8 +54,7 @@ class BootstrapDialog extends StatefulWidget {
 }
 
 class BootstrapDialogState extends State<BootstrapDialog> {
-  final TextEditingController _recoveryKeyTextEditingController =
-      TextEditingController();
+  final TextEditingController _recoveryKeyTextEditingController = TextEditingController();
 
   late Bootstrap bootstrap;
 
@@ -72,11 +71,9 @@ class BootstrapDialogState extends State<BootstrapDialog> {
 
   bool? _wipe;
 
-  String get _secureStorageKey =>
-      'ssss_recovery_key_${bootstrap.client.userID}';
+  String get _secureStorageKey => 'ssss_recovery_key_${bootstrap.client.userID}';
 
-  bool get _supportsSecureStorage =>
-      PlatformInfos.isMobile || PlatformInfos.isDesktop;
+  bool get _supportsSecureStorage => PlatformInfos.isMobile || PlatformInfos.isDesktop;
 
   String _getSecureStorageLocalizedName() {
     if (PlatformInfos.isAndroid) {
@@ -98,8 +95,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
     _wipe = wipe;
     titleText = null;
     _recoveryKeyStored = false;
-    bootstrap =
-        widget.client.encryption!.bootstrap(onUpdate: (_) => setState(() {}));
+    bootstrap = widget.client.encryption!.bootstrap(onUpdate: (_) => setState(() {}));
     final key = await const FlutterSecureStorage().read(key: _secureStorageKey);
     if (key == null) return;
     _recoveryKeyTextEditingController.text = key;
@@ -114,8 +110,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
         : const LinearProgressIndicator();
     titleText = L10n.of(context)!.loadingPleaseWait;
 
-    if (bootstrap.newSsssKey?.recoveryKey != null &&
-        _recoveryKeyStored == false) {
+    if (bootstrap.newSsssKey?.recoveryKey != null && _recoveryKeyStored == false) {
       final key = bootstrap.newSsssKey!.recoveryKey;
       titleText = L10n.of(context)!.recoveryKey;
       return Scaffold(
@@ -129,8 +124,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
         ),
         body: Center(
           child: ConstrainedBox(
-            constraints:
-                const BoxConstraints(maxWidth: FluffyThemes.columnWidth * 1.5),
+            constraints: const BoxConstraints(maxWidth: FluffyThemes.columnWidth * 1.5),
             child: ListView(
               padding: const EdgeInsets.all(16.0),
               children: [
@@ -173,8 +167,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                       });
                     },
                     title: Text(_getSecureStorageLocalizedName()),
-                    subtitle:
-                        Text(L10n.of(context)!.storeInSecureStorageDescription),
+                    subtitle: Text(L10n.of(context)!.storeInSecureStorageDescription),
                   ),
                 const SizedBox(height: 16),
                 CheckboxListTile(
@@ -186,8 +179,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                     final box = context.findRenderObject() as RenderBox;
                     Share.share(
                       key!,
-                      sharePositionOrigin:
-                          box.localToGlobal(Offset.zero) & box.size,
+                      sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
                     );
                     setState(() => _recoveryKeyCopied = true);
                   },
@@ -199,18 +191,17 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                   key: const ValueKey("keyBackupNextButton"),
                   icon: const Icon(Icons.check_outlined),
                   label: Text(L10n.of(context)!.next),
-                  onPressed:
-                      (_recoveryKeyCopied || _storeInSecureStorage == true)
-                          ? () {
-                              if (_storeInSecureStorage == true) {
-                                const FlutterSecureStorage().write(
-                                  key: _secureStorageKey,
-                                  value: key,
-                                );
-                              }
-                              setState(() => _recoveryKeyStored = true);
-                            }
-                          : null,
+                  onPressed: (_recoveryKeyCopied || _storeInSecureStorage == true)
+                      ? () {
+                          if (_storeInSecureStorage == true) {
+                            const FlutterSecureStorage().write(
+                              key: _secureStorageKey,
+                              value: key,
+                            );
+                          }
+                          setState(() => _recoveryKeyStored = true);
+                        }
+                      : null,
                 ),
               ],
             ),
@@ -266,8 +257,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                   padding: const EdgeInsets.all(16.0),
                   children: [
                     ListTile(
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 8.0),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
                       trailing: Icon(
                         Icons.info_outlined,
                         color: Theme.of(context).colorScheme.primary,
@@ -283,16 +273,13 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                       maxLines: 2,
                       autocorrect: false,
                       readOnly: _recoveryKeyInputLoading,
-                      autofillHints: _recoveryKeyInputLoading
-                          ? null
-                          : [AutofillHints.password],
+                      autofillHints: _recoveryKeyInputLoading ? null : [AutofillHints.password],
                       controller: _recoveryKeyTextEditingController,
                       style: const TextStyle(fontFamily: 'RobotoMono'),
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.all(16),
                         hintStyle: TextStyle(
-                          fontFamily:
-                              Theme.of(context).textTheme.bodyLarge?.fontFamily,
+                          fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily,
                         ),
                         hintText: L10n.of(context)!.recoveryKey,
                         errorText: _recoveryKeyInputError,
@@ -302,8 +289,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                     ElevatedButton.icon(
                       key: const ValueKey("unlockMessagesButton"),
                       style: ElevatedButton.styleFrom(
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onPrimary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         backgroundColor: Theme.of(context).primaryColor,
                       ),
                       icon: _recoveryKeyInputLoading
@@ -318,14 +304,12 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                                 _recoveryKeyInputLoading = true;
                               });
                               try {
-                                final key =
-                                    _recoveryKeyTextEditingController.text;
+                                final key = _recoveryKeyTextEditingController.text;
                                 await bootstrap.newSsssKey!.unlock(
                                   keyOrPassphrase: key,
                                 );
                                 Logs().d('SSSS unlocked');
-                                await bootstrap.client.encryption!.crossSigning
-                                    .selfSign(
+                                await bootstrap.client.encryption!.crossSigning.selfSign(
                                   keyOrPassphrase: key,
                                 );
                                 Logs().d('Successful elfsigned');
@@ -363,13 +347,11 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                           : () async {
                               final req = await showFutureLoadingDialog(
                                 context: context,
-                                future: () => widget.client
-                                    .userDeviceKeys[widget.client.userID!]!
+                                future: () => widget.client.userDeviceKeys[widget.client.userID!]!
                                     .startVerification(),
                               );
                               if (req.error != null) return;
-                              await KeyVerificationDialog(request: req.result!)
-                                  .show(context);
+                              await KeyVerificationDialog(request: req.result!).show(context);
                               Navigator.of(context, rootNavigator: false).pop();
                             },
                     ),
@@ -396,7 +378,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                                 setState(() => _createBootstrap(true));
                               }
                             },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -433,8 +415,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
           buttons.add(
             AdaptiveFlatButton(
               label: L10n.of(context)!.close,
-              onPressed: () =>
-                  Navigator.of(context, rootNavigator: false).pop<bool>(false),
+              onPressed: () => Navigator.of(context, rootNavigator: false).pop<bool>(false),
             ),
           );
           break;
@@ -450,8 +431,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
           buttons.add(
             AdaptiveFlatButton(
               label: L10n.of(context)!.close,
-              onPressed: () =>
-                  Navigator.of(context, rootNavigator: false).pop<bool>(false),
+              onPressed: () => Navigator.of(context, rootNavigator: false).pop<bool>(false),
             ),
           );
           break;

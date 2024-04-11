@@ -40,14 +40,14 @@ class VzdClient {
     final decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
     if (decodedResponse["status"] != 302) {
       throw HttpException(
-          "unexpected proxy status ${decodedResponse["status"]}");
+          "unexpected proxy status ${decodedResponse["status"]}",);
     }
 
     return decodedResponse["location"];
   }
 
   Future<TimAuthToken> authCodeToToken(
-      String challengePath, String authCode, String state) async {
+      String challengePath, String authCode, String state,) async {
     final tokenUri = "$challengePath?code=$authCode&state=$state";
     final response = await _client.get(Uri.parse(tokenUri));
     if (response.statusCode != 200) {

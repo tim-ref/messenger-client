@@ -28,7 +28,7 @@ abstract class TimRestRepository {
     );
     if (response.statusCode >= 400) {
       throw HttpException(
-          "Unexpected status ${response.statusCode} for call to URI: $uri \n Response body was: ${response.body}");
+          "Unexpected status ${response.statusCode} for call to URI: $uri \n Response body was: ${response.body}",);
     }
     return response;
   }
@@ -45,7 +45,7 @@ abstract class TimRestRepository {
     );
     if (response.statusCode >= 400) {
       throw HttpException(
-          "Unexpected status ${response.statusCode} for call to URI: $uri \n Response body was: ${response.body}");
+          "Unexpected status ${response.statusCode} for call to URI: $uri \n Response body was: ${response.body}",);
     }
     return response;
   }
@@ -62,7 +62,7 @@ abstract class TimRestRepository {
     );
     if (response.statusCode >= 400) {
       throw HttpException(
-          "Unexpected status ${response.statusCode} for call to URI: $uri \n Response body was: ${response.body}");
+          "Unexpected status ${response.statusCode} for call to URI: $uri \n Response body was: ${response.body}",);
     }
     return response;
   }
@@ -79,7 +79,7 @@ abstract class TimRestRepository {
     );
     if (response.statusCode >= 400) {
       throw HttpException(
-          "Unexpected status ${response.statusCode} for call to URI: $uri \n Response body was: ${response.body}");
+          "Unexpected status ${response.statusCode} for call to URI: $uri \n Response body was: ${response.body}",);
     }
     return response;
   }

@@ -21,11 +21,14 @@ class RoomListDebugWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Event>(
-      stream: Matrix.of(context).client.onRoomState.stream,
+    return StreamBuilder<SyncUpdate>(
+      stream: Matrix.of(context).client.onSync.stream,
       builder: (context, snapshot) {
-        final List<RoomDebugDto> rooms =
-            Matrix.of(context).client.rooms.map((r) => RoomDebugDto.fromMatrixRoom(r)).toList();
+        final List<RoomDebugDto> rooms = Matrix.of(context).client.rooms.map((r) {
+          r.postLoad();
+
+          return RoomDebugDto.fromMatrixRoom(r);
+        }).toList();
 
         return Text(
           const JsonEncoder().convert(rooms),

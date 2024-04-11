@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 08.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -10,6 +10,8 @@
  */
 
 import 'package:fluffychat/pages/invitation_selection/invitation_selection.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -28,7 +30,8 @@ class InvitationSelectionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final room = Matrix.of(context).client.getRoomById(controller.roomId!)!;
-    final groupName = room.name.isEmpty ? L10n.of(context)!.group : room.name;
+    final groupName =
+        room.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(context)!));
     return Scaffold(
       appBar: AppBar(
         leading: VRouter.of(context).path.startsWith('/spaces/')
@@ -38,8 +41,7 @@ class InvitationSelectionView extends StatelessWidget {
                 container: true,
                 child: IconButton(
                   icon: const Icon(Icons.close_outlined),
-                  onPressed: () => VRouter.of(context)
-                      .toSegments(['rooms', controller.roomId!]),
+                  onPressed: () => VRouter.of(context).toSegments(['rooms', controller.roomId!]),
                 ),
               ),
         titleSpacing: 0,
@@ -81,8 +83,9 @@ class InvitationSelectionView extends StatelessWidget {
         child: Column(
           children: [
             TextButton(
-                onPressed: () => VRouter.of(context).to('fhir/search'),
-                child: Text(L10n.of(context)!.timFhirSearchContextLabel)),
+              onPressed: () => VRouter.of(context).to('fhir/search'),
+              child: Text(L10n.of(context)!.timFhirSearchContextLabel),
+            ),
             controller.foundProfiles.isNotEmpty
                 ? ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
@@ -111,7 +114,8 @@ class InvitationSelectionView extends StatelessWidget {
                       if (!snapshot.hasData) {
                         return const Center(
                           child: CircularProgressIndicator.adaptive(
-                              strokeWidth: 2),
+                            strokeWidth: 2,
+                          ),
                         );
                       }
                       final contacts = snapshot.data!;
@@ -134,8 +138,7 @@ class InvitationSelectionView extends StatelessWidget {
                               color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
-                          onTap: () =>
-                              controller.inviteAction(context, contacts[i].id),
+                          onTap: () => controller.inviteAction(context, contacts[i].id),
                         ),
                       );
                     },
