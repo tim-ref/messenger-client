@@ -12,8 +12,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart' as http;
-
 import 'package:fluffychat/tim/feature/fhir/dto/bundle.dart';
 import 'package:fluffychat/tim/feature/fhir/dto/entry.dart';
 import 'package:fluffychat/tim/feature/fhir/dto/link_relation.dart';
@@ -22,15 +20,18 @@ import 'package:fluffychat/tim/feature/fhir/fhir_config.dart';
 import 'package:fluffychat/tim/shared/tim_auth_repository.dart';
 import 'package:fluffychat/tim/shared/tim_auth_token.dart';
 import 'package:fluffychat/tim/shared/tim_rest_repository.dart';
+import 'package:http/http.dart' as http;
+
+/// A List of FHIR Entries and the JSON-formatted String from which they were parsed
+typedef ResourceSearchResult = ({List<Entry> entries, String response});
 
 class FhirRepository extends TimRestRepository {
   final FhirConfig _config;
   final TimAuthRepository _tokenService;
 
-  FhirRepository(http.Client httpClient, this._tokenService, this._config)
-      : super(httpClient);
+  FhirRepository(http.Client httpClient, this._tokenService, this._config) : super(httpClient);
 
-  Future<List<Entry>?> search(ResourceType resourceType, String query) async {
+  Future<ResourceSearchResult> search(ResourceType resourceType, String query) async {
     final buildUri = _buildUri(resourceType, query);
     final headers = await _buildHeaders();
     final response = await get(
@@ -48,7 +49,7 @@ class FhirRepository extends TimRestRepository {
         .where((bundle) => bundle.entry != null && bundle.entry!.isNotEmpty)
         .expand((bundle) => bundle.entry!)
         .toList();
-    return entries;
+    return (entries: entries, response: response.body);
   }
 
   Future<Map<String, dynamic>> ownerSearch(
@@ -74,8 +75,7 @@ class FhirRepository extends TimRestRepository {
     TimAuthToken token,
     String bodyJson,
   ) async {
-    final uri =
-        Uri.parse('${_config.host}${_config.ownerBase}/${resourceType.name}');
+    final uri = Uri.parse('${_config.host}${_config.ownerBase}/${resourceType.name}');
     final response = await post(
       uri,
       headers: <String, String>{
@@ -130,9 +130,7 @@ class FhirRepository extends TimRestRepository {
 
   bool _bundleHasNext(Bundle bundle) {
     return bundle.link != null &&
-        bundle.link!
-            .where((link) => link.relation == LinkRelation.next)
-            .isNotEmpty;
+        bundle.link!.where((link) => link.relation == LinkRelation.next).isNotEmpty;
   }
 
   Future<void> _loadNext(
@@ -153,10 +151,7 @@ class FhirRepository extends TimRestRepository {
   }
 
   Uri _getNextUrl(Bundle bundle) {
-    return bundle.link!
-        .where((element) => element.relation == LinkRelation.next)
-        .first
-        .url;
+    return bundle.link!.where((element) => element.relation == LinkRelation.next).first.url;
   }
 
   Uri _buildUri(ResourceType resourceType, String query) {

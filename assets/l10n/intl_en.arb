@@ -2497,5 +2497,6 @@
     "practitionerRoleNutritionalTherapist": "Ernährungstherapeut/-in",
     "filenameDialogSendFileError": "Datei konnte nicht gesendet werden!",
     "chatSettingsArchiveDownloadError": "Archiv konnte nicht geladen werden!",
-    "createRoomWithCaseReference": "Create room with case reference"
+    "createRoomWithCaseReference": "Create room with case reference",
+    "redactedTime": "Redacted at"
 }

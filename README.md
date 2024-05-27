@@ -105,6 +105,16 @@ the web client can be accessed under http://0.0.0.0:8989.
         * e.g. `sdk use java 11.0.18-zulu`
         * `flutter doctor --android-licenses`
 
+### Code generation
+
+Serialization is handled via [json_serializable](https://pub.dev/packages/json_serializable).
+After editing models with the annotation "@JsonSerializable", run the following command in the package directory:
+```shell 
+dart run build_runner build
+```
+
+The generated code can be found in the referenced `*.g.dart` files.
+
 ### Build (Android)
 
 * insert your own `google-services.json`-file into `android/app/` for the push notifications to work

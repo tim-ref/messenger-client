@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 30.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -468,6 +468,15 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     store
         .getItemBool(SettingKeys.sendOnEnter, AppConfig.sendOnEnter)
         .then((value) => AppConfig.sendOnEnter = value);
+    store
+        .getItemBool(SettingKeys.sendTypingNotifications, AppConfig.sendTypingNotifications)
+        .then((value) => AppConfig.sendTypingNotifications = value);
+    store
+        .getItemBool(SettingKeys.sendReadReceipts, AppConfig.sendReadReceipts)
+        .then((value) => AppConfig.sendReadReceipts = value);
+    store
+        .getItemBool(SettingKeys.sendPresenceUpdates, AppConfig.sendPresenceUpdates)
+        .then((value) => AppConfig.sendPresenceUpdates = value);
     store
         .getItemBool(SettingKeys.experimentalVoip, AppConfig.experimentalVoip)
         .then((value) => AppConfig.experimentalVoip = value);

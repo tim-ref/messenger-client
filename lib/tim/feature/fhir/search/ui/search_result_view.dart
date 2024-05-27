@@ -9,31 +9,32 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/l10n.dart';
-
-import 'package:matrix/matrix.dart';
-
+import 'package:fluffychat/tim/feature/fhir/search/fhir_search_result.dart';
+import 'package:fluffychat/tim/feature/fhir/search/fhir_search_service.dart';
 import 'package:fluffychat/tim/feature/fhir/search/healthcare_service_search_result.dart';
 import 'package:fluffychat/tim/feature/fhir/search/practitioner_search_result.dart';
-import 'package:fluffychat/tim/feature/fhir/search/fhir_search_result.dart';
 import 'package:fluffychat/tim/feature/fhir/search/ui/healthcare_service_search_result_list_tile.dart';
 import 'package:fluffychat/tim/feature/fhir/search/ui/practitioner_search_result_list_tile.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
+import 'package:fluffychat/tim/test_driver/test_driver_state_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:matrix/matrix.dart';
+
+final OptionalFhirSearchResultSet EMPTY_RESULT = (entries: [], response: '');
 
 class SearchResultView extends StatelessWidget {
-  final Future<List<FhirSearchResult>>? _searchResult;
+  final Future<FhirSearchResultSet>? _searchResult;
 
   const SearchResultView(this._searchResult, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final fhirSearchResults =
-        TimProvider.of(context).testDriverStateHelper()?.fhirSearchResults;
+    final fhirSearchResults = TimProvider.of(context).testDriverStateHelper()?.fhirSearchResults;
 
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: FutureBuilder<List<FhirSearchResult>>(
+      child: FutureBuilder<FhirSearchResultSet>(
         future: _searchResult,
         builder: (context, searchResultSnapshot) {
           switch (searchResultSnapshot.connectionState) {
@@ -51,14 +52,11 @@ class SearchResultView extends StatelessWidget {
                 );
                 return _buildSearchError(searchResultSnapshot);
               } else if (searchResultSnapshot.hasData &&
-                  searchResultSnapshot.data!.isNotEmpty) {
-                final results = searchResultSnapshot.data != null
-                    ? searchResultSnapshot.data!
-                    : List<FhirSearchResult>.empty();
-                fhirSearchResults?.add(results);
-                return _buildSearchResults(results);
+                  searchResultSnapshot.data!.entries.isNotEmpty) {
+                fhirSearchResults?.add(searchResultSnapshot.data!);
+                return _buildSearchResults(searchResultSnapshot.data!.entries);
               } else {
-                fhirSearchResults?.add([]);
+                fhirSearchResults?.add(EMPTY_RESULT);
                 return _buildSearchEmpty(context);
               }
           }
@@ -67,16 +65,14 @@ class SearchResultView extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchError(AsyncSnapshot<List<FhirSearchResult>> snapshot) =>
-      Center(
+  Widget _buildSearchError(AsyncSnapshot<FhirSearchResultSet> snapshot) => Center(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Text(snapshot.error.toString()),
         ),
       );
 
-  Widget _buildSearchResults(List<FhirSearchResult> results) =>
-      ListView.builder(
+  Widget _buildSearchResults(List<FhirSearchResult> results) => ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: results.length,
@@ -86,7 +82,8 @@ class SearchResultView extends StatelessWidget {
             return PractitionerSearchResultListTile(entry);
           }
           return HealthcareServiceSearchResultListTile(
-              entry as HealthcareServiceSearchResult,);
+            entry as HealthcareServiceSearchResult,
+          );
         },
       );
 

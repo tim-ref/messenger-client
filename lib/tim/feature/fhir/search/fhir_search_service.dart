@@ -23,64 +23,82 @@ import 'package:fluffychat/tim/feature/fhir/fhir_repository.dart';
 import 'package:fluffychat/tim/feature/fhir/search/healthcare_service_search_result.dart';
 import 'package:fluffychat/tim/feature/fhir/search/practitioner_search_result.dart';
 
+import 'fhir_search_result.dart';
+
+/// A List of practitioners and the JSON-formatted String from which they were parsed
+typedef PractitionerSearchResultSet = ({List<PractitionerSearchResult> entries, String response});
+
+/// A List of healthcare services and the JSON-formatted String from which they were parsed
+typedef HealthcareServiceSearchResultSet = ({
+  List<HealthcareServiceSearchResult> entries,
+  String response
+});
+
+/// A List of FHIR search result items and the JSON-formatted String from which they were parsed
+typedef FhirSearchResultSet = ({List<FhirSearchResult> entries, String response});
+
 class FhirSearchService {
   final FhirRepository _repository;
 
   FhirSearchService(this._repository);
 
-  Future<List<PractitionerSearchResult>> searchPractitionerRole(
-    String query,
-  ) async {
-    final entries = await _repository.search(
-      ResourceType.PractitionerRole,
-      query,
-    );
+  Future<PractitionerSearchResultSet> searchPractitionerRole(String query) async {
+    final (entries: entries, response: fullResult) =
+        await _repository.search(ResourceType.PractitionerRole, query);
 
     if (entries == null || entries.isEmpty) {
-      return [];
+      return (entries: <PractitionerSearchResult>[], response: fullResult);
     }
 
     final practitionerRoles = _getPractitionerRoles(entries);
     final practitioners = _getPractitioners(entries);
     final endpoints = _getEndpoints(entries);
 
-    return practitionerRoles
-        .where((pr) => _hasMatchingPractitioner(pr, practitioners))
-        .where((pr) => _hasMatchingEndpoints(pr, endpoints))
-        .map(
-          (PractitionerRole pr) =>
-              mapPractitionerRoleToSearchResult(pr, practitioners, endpoints),
-        )
-        .toList();
+    return (
+      entries: practitionerRoles
+          .where((pr) => _hasMatchingPractitioner(pr, practitioners))
+          .where((pr) => _hasMatchingEndpoints(pr, endpoints))
+          .map((PractitionerRole pr) =>
+              mapPractitionerRoleToSearchResult(pr, practitioners, endpoints))
+          .toList(),
+      response: fullResult
+    );
   }
 
-  Future<List<HealthcareServiceSearchResult>> searchHealthcareService(
-      String query,) async {
-    final entries = await _repository.search(
+  Future<HealthcareServiceSearchResultSet> searchHealthcareService(
+    String query,
+  ) async {
+    final (entries: entries, response: fullResponse) = await _repository.search(
       ResourceType.HealthcareService,
       query,
     );
 
     if (entries == null || entries.isEmpty) {
-      return [];
+      return (entries: <HealthcareServiceSearchResult>[], response: fullResponse);
     }
 
     final healthcareServices = _getHealthcareServices(entries);
     final organizations = _getOrganizations(entries);
     final endpoints = _getEndpoints(entries);
 
-    return healthcareServices
-        .where((hs) => _hasMatchingOrganization(hs, organizations))
-        .where((hs) => _hasMatchingEndpoints(hs, endpoints))
-        .map((HealthcareService hs) =>
-            _mapHealthcareServiceToSearchResult(hs, organizations, endpoints),)
-        .toList();
+    return (
+      entries: healthcareServices
+          .where((hs) => _hasMatchingOrganization(hs, organizations))
+          .where((hs) => _hasMatchingEndpoints(hs, endpoints))
+          .map(
+            (HealthcareService hs) =>
+                _mapHealthcareServiceToSearchResult(hs, organizations, endpoints),
+          )
+          .toList(),
+      response: fullResponse
+    );
   }
 
   List<PractitionerRole> _getPractitionerRoles(List<Entry> entries) {
     return entries
-        .where((entry) =>
-            _matchesResourceType(entry, ResourceType.PractitionerRole),)
+        .where(
+          (entry) => _matchesResourceType(entry, ResourceType.PractitionerRole),
+        )
         .map((entry) => entry.resource as PractitionerRole)
         .toList()
         .where((pr) => pr.endpoint != null && pr.endpoint!.isNotEmpty)
@@ -91,8 +109,7 @@ class FhirSearchService {
 
   List<HealthcareService> _getHealthcareServices(List<Entry> entries) {
     return entries
-        .where((entry) =>
-            _matchesResourceType(entry, ResourceType.HealthcareService),)
+        .where((entry) => _matchesResourceType(entry, ResourceType.HealthcareService))
         .map((entry) => entry.resource as HealthcareService)
         .toList()
         .where((pr) => pr.endpoint != null && pr.endpoint!.isNotEmpty)
@@ -103,16 +120,14 @@ class FhirSearchService {
 
   List<Practitioner> _getPractitioners(List<Entry> entries) {
     return entries
-        .where(
-            (entry) => _matchesResourceType(entry, ResourceType.Practitioner),)
+        .where((entry) => _matchesResourceType(entry, ResourceType.Practitioner))
         .map((entry) => entry.resource as Practitioner)
         .toList();
   }
 
   List<Organization> _getOrganizations(List<Entry> entries) {
     return entries
-        .where(
-            (entry) => _matchesResourceType(entry, ResourceType.Organization),)
+        .where((entry) => _matchesResourceType(entry, ResourceType.Organization))
         .map((entry) => entry.resource as Organization)
         .toList();
   }
@@ -145,22 +160,18 @@ class FhirSearchService {
     return reference.reference!.split('/')[1];
   }
 
-  bool _hasMatchingPractitioner(
-      PractitionerRole pr, List<Practitioner> practitioners,) {
+  bool _hasMatchingPractitioner(PractitionerRole pr, List<Practitioner> practitioners) {
     final practitionerId = _getResourceIdFromReference(pr.practitioner!);
     return practitioners.map((p) => p.id).contains(practitionerId);
   }
 
-  bool _hasMatchingOrganization(
-      HealthcareService hs, List<Organization> organizations,) {
+  bool _hasMatchingOrganization(HealthcareService hs, List<Organization> organizations) {
     final organizationId = _getResourceIdFromReference(hs.providedBy);
     return organizations.map((o) => o.id).contains(organizationId);
   }
 
-  bool _hasMatchingEndpoints(
-      EndpointReference endpointReference, List<Endpoint> endpoints,) {
-    final endpointIds =
-        endpointReference.endpoint!.map((e) => _getResourceIdFromReference(e));
+  bool _hasMatchingEndpoints(EndpointReference endpointReference, List<Endpoint> endpoints) {
+    final endpointIds = endpointReference.endpoint!.map((e) => _getResourceIdFromReference(e));
     return endpoints.where((e) => endpointIds.contains(e.id)).isNotEmpty;
   }
 
@@ -172,8 +183,7 @@ class FhirSearchService {
     final practitionerId = _getResourceIdFromReference(pr.practitioner!);
     final endpointIds = pr.endpoint!.map((e) => _getResourceIdFromReference(e));
 
-    final practitioner =
-        practitioners.where((element) => element.id == practitionerId).first;
+    final practitioner = practitioners.where((element) => element.id == practitionerId).first;
     final practitionerEndpoints =
         endpoints.where((element) => endpointIds.contains(element.id)).toList();
 
@@ -204,8 +214,7 @@ class FhirSearchService {
     final organizationId = _getResourceIdFromReference(hs.providedBy);
     final endpointIds = hs.endpoint!.map((e) => _getResourceIdFromReference(e));
 
-    final organization =
-        organizations.where((element) => element.id == organizationId).first;
+    final organization = organizations.where((element) => element.id == organizationId).first;
     final healthcareServiceEndpoints =
         endpoints.where((element) => endpointIds.contains(element.id)).toList();
 
@@ -217,10 +226,8 @@ class FhirSearchService {
       managingOrganization: organizationId,
       addressList: healthcareServiceEndpoints.map((e) => e.address).toList(),
       endpointIdList: healthcareServiceEndpoints.map((e) => e.id).toList(),
-      payloadTypeList:
-          healthcareServiceEndpoints.map((e) => e.payloadType).toList(),
-      connectionTypeList:
-          healthcareServiceEndpoints.map((e) => e.connectionType).toList(),
+      payloadTypeList: healthcareServiceEndpoints.map((e) => e.payloadType).toList(),
+      connectionTypeList: healthcareServiceEndpoints.map((e) => e.connectionType).toList(),
       statusList: healthcareServiceEndpoints.map((e) => e.status).toList(),
     );
   }

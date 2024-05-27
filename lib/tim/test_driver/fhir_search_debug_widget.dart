@@ -11,8 +11,8 @@
 
 import 'dart:convert';
 
-import 'package:fluffychat/tim/feature/fhir/search/fhir_search_result.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
+import 'package:fluffychat/tim/test_driver/test_driver_state_helper.dart';
 import 'package:flutter/material.dart';
 
 class FhirSearchDebugWidget extends StatelessWidget {
@@ -20,22 +20,20 @@ class FhirSearchDebugWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<FhirSearchResult>?>(
-      stream: TimProvider.of(context)
-          .testDriverStateHelper()!
-          .fhirSearchResults
-          .stream,
+    return StreamBuilder<OptionalFhirSearchResultSet>(
+      stream: TimProvider.of(context).testDriverStateHelper()!.fhirSearchResults.stream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text(
-            snapshot.error.toString(),
-            key: const ValueKey("fhirSearchResultsError"),
-          );
+          return Text(snapshot.error.toString(), key: const ValueKey("fhirSearchResultsError"));
         }
         if (snapshot.hasData) {
-          return Text(
-            jsonEncode(snapshot.requireData?.map((e) => e.toJson()).toList()),
-            key: const ValueKey("fhirSearchResults"),
+          final (entries: resultList, response: fullResponse) = snapshot.requireData;
+          final data = jsonEncode(resultList?.map((e) => e.toJson()).toList());
+          return Column(
+            children: [
+              Text(data, key: const ValueKey("fhirSearchResults")),
+              Text(fullResponse ?? '', key: const ValueKey("fhirSearchResultsFullResult")),
+            ],
           );
         }
         return const Text("no search results yet");

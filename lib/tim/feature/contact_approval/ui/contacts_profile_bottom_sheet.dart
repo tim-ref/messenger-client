@@ -157,11 +157,12 @@ class _ContactsProfileBottomSheetState extends State<ContactsProfileBottomSheet>
               Text(L10n.of(context)!.timApproveContact),
             ],
           ),
-        SwitchListTile(
-          title: Text(L10n.of(context)!.createRoomWithCaseReference),
-          value: _isCaseReference,
-          onChanged: (value) => isCaseReference = value,
-        ),
+        if (!isNewContactMode)
+          SwitchListTile(
+            title: Text(L10n.of(context)!.createRoomWithCaseReference),
+            value: _isCaseReference,
+            onChanged: (value) => isCaseReference = value,
+          ),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),

@@ -9,19 +9,19 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/l10n.dart';
-
-import 'package:rxdart/rxdart.dart';
-import 'package:vrouter/vrouter.dart';
-
 import 'package:fluffychat/tim/feature/fhir/dto/resource_type.dart';
 import 'package:fluffychat/tim/feature/fhir/search/fhir_search_service.dart';
-import 'package:fluffychat/tim/feature/fhir/search/fhir_search_result.dart';
 import 'package:fluffychat/tim/feature/fhir/search/ui/search_form.dart';
 import 'package:fluffychat/tim/feature/fhir/search/ui/search_result_view.dart';
 import 'package:fluffychat/tim/feature/fhir/search/ui/search_title.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
+import 'package:fluffychat/tim/test_driver/test_driver_state_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:vrouter/vrouter.dart';
+
+const OptionalFhirSearchResultSet EMPTY_RESULT = (entries: null, response: '');
 
 class FhirSearchView extends StatefulWidget {
   const FhirSearchView({Key? key}) : super(key: key);
@@ -36,16 +36,15 @@ class _FhirSearchViewState extends State<FhirSearchView> {
   final BehaviorSubject<String> _searchQuery = BehaviorSubject.seeded('');
 
   late FhirSearchService _searchService;
-  late final PublishSubject<List<FhirSearchResult>?>? _fhirSearchResults;
+  late final PublishSubject<OptionalFhirSearchResultSet>? _fhirSearchResults;
 
-  Future<List<FhirSearchResult>>? _searchResults;
+  Future<FhirSearchResultSet>? _searchResults;
   String? roomId;
 
   @override
   void initState() {
     _searchService = TimProvider.of(context).fhirSearchService();
-    _fhirSearchResults =
-        TimProvider.of(context).testDriverStateHelper()?.fhirSearchResults;
+    _fhirSearchResults = TimProvider.of(context).testDriverStateHelper()?.fhirSearchResults;
     _selectedSearchType.distinct().listen((resourceType) {
       _resetSearchQuery();
     });
@@ -81,8 +80,7 @@ class _FhirSearchViewState extends State<FhirSearchView> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       );
 
-  Widget _buildSearchLoadingIndicator() =>
-      const Center(child: CircularProgressIndicator());
+  Widget _buildSearchLoadingIndicator() => const Center(child: CircularProgressIndicator());
 
   Widget _buildSearchAndResultsView() => ListView(
         shrinkWrap: true,
@@ -92,11 +90,10 @@ class _FhirSearchViewState extends State<FhirSearchView> {
             selectedSearchType: _selectedSearchType,
             searchQuery: _searchQuery,
           ),
-          FutureBuilder<List<FhirSearchResult>>(
+          FutureBuilder<FhirSearchResultSet>(
             future: _searchResults,
             builder: (context, searchResultSnapshot) {
-              if (searchResultSnapshot.hasData &&
-                  searchResultSnapshot.data!.isNotEmpty) {
+              if (searchResultSnapshot.hasData && searchResultSnapshot.data!.entries.isNotEmpty) {
                 return const Divider();
               } else {
                 return Container();
@@ -117,7 +114,7 @@ class _FhirSearchViewState extends State<FhirSearchView> {
     if (_searchQuery.value.isEmpty) {
       return;
     }
-    _fhirSearchResults?.add(null);
+    _fhirSearchResults?.add(EMPTY_RESULT);
     final query = _searchQuery.value;
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {

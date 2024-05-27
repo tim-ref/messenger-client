@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 15.04.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -23,15 +23,15 @@ import '../../widgets/user_avatar.dart';
 extension EventInfoDialogExtension on Event {
   void showInfoDialog(BuildContext context) => showAdaptiveBottomSheet(
         context: context,
-        builder: (context) =>
-            EventInfoDialog(l10n: L10n.of(context)!, event: this),
+        builder: (context) => EventInfoDialog(l10n: L10n.of(context)!, event: this),
       );
 }
 
 class EventInfoDialog extends StatelessWidget {
   final Event event;
   final L10n l10n;
-  const EventInfoDialog({
+
+  EventInfoDialog({
     required this.event,
     required this.l10n,
     Key? key,
@@ -46,6 +46,14 @@ class EventInfoDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? redactedEventTime;
+    try {
+      redactedEventTime = DateTime.fromMillisecondsSinceEpoch(
+        (event.unsigned!['redacted_because']['origin_server_ts']),
+      ).localizedTime(context);
+    } catch (e) {
+      redactedEventTime = null;
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(L10n.of(context)!.messageInfo),
@@ -68,6 +76,11 @@ class EventInfoDialog extends StatelessWidget {
             title: Text(L10n.of(context)!.time),
             subtitle: Text(event.originServerTs.localizedTime(context)),
           ),
+          if (redactedEventTime != null)
+            ListTile(
+              title: Text(L10n.of(context)!.redactedTime),
+              subtitle: Text(redactedEventTime),
+            ),
           ListTile(
             title: Text(L10n.of(context)!.messageType),
             subtitle: Text(event.humanreadableType),
