@@ -9,39 +9,13 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:json_annotation/json_annotation.dart';
-
-part 'user_agent.g.dart';
-
-@JsonSerializable(createFactory: false)
 class UserAgent {
-  @JsonKey(name: 'Produktversion')
-  final String? productVersion;
-  @JsonKey(name: 'Produkttypversion')
-  final String? productTypeVersion;
-  @JsonKey(name: 'Auspraegung')
-  final String? specification;
-  @JsonKey(name: 'Plattform')
-  final String? platform;
-  @JsonKey(name: 'OS')
-  final String? operatingSystem;
-  @JsonKey(name: 'OS-Version')
-  final String? operatingSystemVersion;
-  @JsonKey(name: 'client_id')
-  final String? clientId;
-  @JsonKey(name: 'Matrix-Domain')
-  final String? matrixDomain;
+  final String operatingSystemVersion;
+  final String clientId;
 
-  UserAgent({
-    this.productVersion,
-    this.productTypeVersion,
-    this.specification,
-    this.platform,
-    this.operatingSystem,
-    this.operatingSystemVersion,
-    this.clientId,
-    this.matrixDomain,
-  });
+  const UserAgent({required this.operatingSystemVersion, required this.clientId});
 
-  Map<String, dynamic> toJson() => _$UserAgentToJson(this);
+  List<String> toList() => [clientId, operatingSystemVersion];
+
+  String toCommaSeparatedStringList() => toList().join(', ');
 }

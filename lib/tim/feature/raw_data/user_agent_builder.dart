@@ -12,37 +12,20 @@
 import 'dart:io';
 
 import 'package:fluffychat/tim/feature/raw_data/user_agent.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:flutter/foundation.dart';
+
+const String defaultClientId = 'TIMRefMessengerClient';
+const String userAgentHeaderName = 'X-TIM-User-Agent';
 
 class UserAgentBuilder {
   UserAgent buildUserAgent() {
     return UserAgent(
-      productVersion:
-          '1.9.0', // TODO: should be derived from project settings!
-      specification: 'Messenger-Client', // TODO: this probably, too.
-      platform: _getPlatform(),
-      operatingSystem: _getOperatingSystem(),
       operatingSystemVersion: _getOperatingSystemVersion(),
+      clientId: defaultClientId,
     );
   }
 
-  String? _getPlatform() {
-    if (PlatformInfos.isWeb) {
-      return 'web';
-    } else if (PlatformInfos.isDesktop) {
-      return 'stationaer';
-    } else if (PlatformInfos.isMobile) {
-      return 'mobil';
-    }
-    return 'unknown';
-  }
-
-  String? _getOperatingSystem() {
-    return kIsWeb ? 'web' : Platform.operatingSystem;
-  }
-
-  String? _getOperatingSystemVersion() {
+  String _getOperatingSystemVersion() {
     return kIsWeb ? 'web' : Platform.operatingSystemVersion;
   }
 }

@@ -8,9 +8,6 @@
  *
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import 'dart:convert';
-
 import 'package:fluffychat/tim/feature/raw_data/raw_data_delegating_client.dart';
 import 'package:fluffychat/tim/feature/raw_data/user_agent.dart';
 import 'package:fluffychat/tim/feature/raw_data/user_agent_builder.dart';
@@ -36,26 +33,23 @@ void main() {
     // given
     final testClient = RawDataDelegatingClient(client, userAgentBuilder);
     final request = Request('PUT', Uri.parse('http://localhost:8080/foo/bar'));
-    final userAgent = UserAgent(
-      productVersion: 'productVersion',
-      productTypeVersion: 'productTypeVersion',
-      specification: 'specification',
-      platform: 'platform',
-      operatingSystem: 'operatingSystem',
+    const userAgent = UserAgent(
       operatingSystemVersion: 'operatingSystemVersion',
-      clientId: 'clientId',
-      matrixDomain: 'matrixDomain',
+      clientId: defaultClientId,
     );
     when(userAgentBuilder.buildUserAgent()).thenReturn(userAgent);
     when(client.send(request)).thenAnswer(
-        (_) async => StreamedResponse(Stream.value([1, 3, 3, 7]), 200),);
+      (_) async => StreamedResponse(Stream.value([1, 3, 3, 7]), 200),
+    );
 
     // when
     testClient.send(request);
 
     // expect
     expect(
-        request.headers['Useragent'], equals(jsonEncode(userAgent.toJson())),);
+      request.headers[userAgentHeaderName],
+      equals(userAgent.toCommaSeparatedStringList()),
+    );
     verify(client.send(request)).called(1);
   });
 }

@@ -8,12 +8,8 @@
  *
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
-
 import 'package:fluffychat/tim/feature/raw_data/user_agent_builder.dart';
 
 class RawDataDelegatingIOClient extends IOClient {
@@ -25,8 +21,7 @@ class RawDataDelegatingIOClient extends IOClient {
   @override
   Future<IOStreamedResponse> send(http.BaseRequest request) {
     final userAgent = _userAgentBuilder.buildUserAgent();
-    request.headers
-        .putIfAbsent('Useragent', () => jsonEncode(userAgent.toJson()));
+    request.headers.putIfAbsent(userAgentHeaderName, userAgent.toCommaSeparatedStringList);
     return _client.send(request);
   }
 }

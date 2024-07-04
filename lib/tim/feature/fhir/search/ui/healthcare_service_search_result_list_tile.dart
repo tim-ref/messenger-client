@@ -22,6 +22,7 @@ import 'package:fluffychat/tim/feature/fhir/search/healthcare_service_search_res
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
 import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import '../../fhir_endpoint_address_converter.dart';
 
 class HealthcareServiceSearchResultListTile extends StatelessWidget {
   final HealthcareServiceSearchResult _searchResult;
@@ -80,10 +81,12 @@ class HealthcareServiceSearchResultListTile extends StatelessWidget {
         return GestureDetector(
           onTap: () async {
             final roomId = context.vRouter.pathParameters['roomid'];
+            final mxIdUri = _searchResult.addressList[index];
+            final mxId = convertUriToSigil(mxIdUri);
             if (roomId != null) {
-              _inviteToGroup(context, roomId, _searchResult.addressList[index]);
+              _inviteToGroup(context, roomId, mxId);
             } else {
-              _showUserProfile(context, _searchResult.addressList[index]);
+              _showUserProfile(context, mxId);
             }
           },
           child: Text(
