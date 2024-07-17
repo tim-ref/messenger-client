@@ -167,11 +167,11 @@ String timelineToMessageJsonString(Timeline t) {
         (e) => MessageDebugDto(
           e.eventId,
           e.originServerTs.toUtc().toIso8601String(),
-          e.content["msgtype"] == "m.text" ? e.text : e.content["fileName"] ?? "",
+          e.messageType == "m.text" ? e.text : e.content["fileName"] ?? e.text,
           e.senderId,
-          e.content["msgtype"] ?? "",
+          e.messageType,
           const JsonEncoder().convert(e),
-          e.content["fileId"],
+          e.messageType == "m.text" ? null : (e.content["fileId"] ?? e.text),
         ),
       )
       .toList();

@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
@@ -32,19 +33,19 @@ class FilenameDialog extends StatefulWidget {
 }
 
 class FilenameDialogState extends State<FilenameDialog> {
-  TextEditingController? _matrixFilenameTextEditingController;
+  TextEditingController? _messageBodyTextEditingController;
   TextEditingController? _absolutePathTextEditingController;
 
   @override
   void initState() {
-    _matrixFilenameTextEditingController = TextEditingController();
+    _messageBodyTextEditingController = TextEditingController();
     _absolutePathTextEditingController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
-    _matrixFilenameTextEditingController?.dispose();
+    _messageBodyTextEditingController?.dispose();
     _absolutePathTextEditingController?.dispose();
     super.dispose();
   }
@@ -54,12 +55,12 @@ class FilenameDialogState extends State<FilenameDialog> {
     Widget contentWidget() => Column(
           children: [
             TextField(
-              controller: _matrixFilenameTextEditingController,
+              controller: _messageBodyTextEditingController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'matrix filename',
+                labelText: 'message body text field',
               ),
-              key: const ValueKey("matrixFilenameTextfield"),
+              key: const ValueKey("messageBodyTextField"),
             ),
             TextField(
               controller: _absolutePathTextEditingController,
@@ -67,7 +68,7 @@ class FilenameDialogState extends State<FilenameDialog> {
                 border: OutlineInputBorder(),
                 labelText: 'absolute path',
               ),
-              key: const ValueKey("absolutePathTextfield"),
+              key: const ValueKey("absolutePathTextField"),
             ),
           ],
         );
@@ -93,23 +94,22 @@ class FilenameDialogState extends State<FilenameDialog> {
 
   Future<void> _send() async {
     final String filepath = _absolutePathTextEditingController!.text;
-    final String matrixFilename = _matrixFilenameTextEditingController!.text;
+    final String messageBody = _messageBodyTextEditingController!.text;
     final File file = File(filepath);
     try {
       if (await _requestFilePermission()) {
         final fileName = filepath.substring(filepath.lastIndexOf("/") + 1);
-        final fileId = fileName.substring(0, fileName.indexOf("."));
-        final fileExtension = matrixFilename.substring(matrixFilename.indexOf(".") + 1);
+        final fileId = fileName.split(".").first;
         final matrixFile = MatrixFile(
-          bytes: file.readAsBytesSync(),
-          name: "$fileId.$fileExtension",
+            bytes: file.readAsBytesSync(),
+            name: fileId,
         ).detectFileType;
-        widget.room.sendFileEvent(matrixFile, extraContent: {
+        widget.room.sendFileEventWithMessageBody(matrixFile, messageBody: messageBody, extraContent: {
           "fileId": fileId,
-          "fileName": matrixFilename,
+          "fileName": messageBody,
         },);
       } else {
-        throw Exception("No permission to send matrix file $matrixFilename");
+        throw Exception("No permission to send matrix file $messageBody");
       }
       Navigator.of(context, rootNavigator: false).pop();
     } on Exception catch (e) {
