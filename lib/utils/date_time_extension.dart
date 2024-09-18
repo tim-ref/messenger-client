@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 19.08.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -64,8 +64,7 @@ extension DateTimeExtension on DateTime {
 
     final sameWeek = sameYear &&
         !sameDay &&
-        now.millisecondsSinceEpoch - millisecondsSinceEpoch <
-            1000 * 60 * 60 * 24 * 7;
+        now.millisecondsSinceEpoch - millisecondsSinceEpoch < 1000 * 60 * 60 * 24 * 7;
 
     if (sameDay) {
       return localizedTimeOfDay(context);
@@ -92,11 +91,7 @@ extension DateTimeExtension on DateTime {
         day.toString().padLeft(2, '0'),
       );
     }
-    return L10n.of(context)!.dateWithYear(
-      year.toString(),
-      month.toString().padLeft(2, '0'),
-      day.toString().padLeft(2, '0'),
-    );
+    return localizedDate(context);
   }
 
   /// If the DateTime is today, this returns [localizedTimeOfDay()], if not it also
@@ -109,10 +104,28 @@ extension DateTimeExtension on DateTime {
 
     final sameDay = sameYear && now.month == month && now.day == day;
 
-    if (sameDay) return localizedTimeOfDay(context);
+    return sameDay
+        ? localizedTimeOfDay(context)
+        : L10n.of(context)!.dateAndTimeOfDay(
+            localizedTimeShort(context),
+            localizedTimeOfDay(context),
+          );
+  }
+
+  /// Return a combination of localized date and time String
+  String localizedDateTime(BuildContext context) {
     return L10n.of(context)!.dateAndTimeOfDay(
-      localizedTimeShort(context),
+      localizedDate(context),
       localizedTimeOfDay(context),
+    );
+  }
+
+  /// Return a localized Date String
+  String localizedDate(BuildContext context) {
+    return L10n.of(context)!.dateWithYear(
+      year.toString(),
+      month.toString().padLeft(2, '0'),
+      day.toString().padLeft(2, '0'),
     );
   }
 
