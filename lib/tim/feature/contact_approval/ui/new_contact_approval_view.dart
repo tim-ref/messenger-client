@@ -11,11 +11,9 @@
 
 import 'dart:math';
 
+import 'package:fluffychat/widgets/new_contact_qr_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-
-import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/tim/feature/contact_approval/ui/new_contact_approval.dart';
@@ -62,11 +60,8 @@ class NewContactApprovalView extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  QrImage(
-                    data:
-                        'https://matrix.to/#/${Matrix.of(context).client.userID}',
-                    version: QrVersions.auto,
-                    size: min(MediaQuery.of(context).size.width - 16, 200),
+                  NewContactQrImage(
+                    size: min(MediaQuery.sizeOf(context).width - 16, 200),
                   ),
                   TextButton.icon(
                     icon: Icon(Icons.adaptive.share_outlined),

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 13.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -60,17 +60,10 @@ class UrlLauncher {
       // just launch non-https / non-http uris directly
 
       // we need to transmute geo URIs on desktop and on iOS
-      if ((!PlatformInfos.isMobile || PlatformInfos.isIOS) &&
-          uri.scheme == 'geo') {
-        final latlong = uri.path
-            .split(';')
-            .first
-            .split(',')
-            .map((s) => double.tryParse(s))
-            .toList();
-        if (latlong.length == 2 &&
-            latlong.first != null &&
-            latlong.last != null) {
+      if ((!PlatformInfos.isMobile || PlatformInfos.isIOS) && uri.scheme == 'geo') {
+        final latlong =
+            uri.path.split(';').first.split(',').map((s) => double.tryParse(s)).toList();
+        if (latlong.length == 2 && latlong.first != null && latlong.last != null) {
           if (PlatformInfos.isIOS) {
             // iOS is great at not following standards, so we need to transmute the geo URI
             // to an apple maps thingy
@@ -102,9 +95,7 @@ class UrlLauncher {
     final newHost = uri.host.split('.').map((hostPartEncoded) {
       final hostPart = Uri.decodeComponent(hostPartEncoded);
       final hostPartPunycode = punycodeEncode(hostPart);
-      return hostPartPunycode != '$hostPart-'
-          ? 'xn--$hostPartPunycode'
-          : hostPart;
+      return hostPartPunycode != '$hostPart-' ? 'xn--$hostPartPunycode' : hostPart;
     }).join('.');
     // Force LaunchMode.externalApplication, otherwise url_launcher will default
     // to opening links in a webview on mobile platforms.
@@ -126,11 +117,13 @@ class UrlLauncher {
     // All this needs parsing.
     final identityParts = url.parseIdentifierIntoParts() ??
         Uri.tryParse(url)?.host.parseIdentifierIntoParts() ??
-        Uri.tryParse(url)
-            ?.pathSegments
-            .lastWhereOrNull((_) => true)
-            ?.parseIdentifierIntoParts();
+        Uri.tryParse(url)?.pathSegments.lastWhereOrNull((_) => true)?.parseIdentifierIntoParts();
     if (identityParts == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.urlLauncherOpenMatrixToUrlMissingIdentityPartsError),
+        ),
+      );
       return; // no match, nothing to do
     }
     if (identityParts.primaryIdentifier.sigil == '#' ||
@@ -138,8 +131,8 @@ class UrlLauncher {
       // we got a room! Let's open that one
       final roomIdOrAlias = identityParts.primaryIdentifier;
       final event = identityParts.secondaryIdentifier;
-      var room = matrix.client.getRoomByAlias(roomIdOrAlias) ??
-          matrix.client.getRoomById(roomIdOrAlias);
+      var room =
+          matrix.client.getRoomByAlias(roomIdOrAlias) ?? matrix.client.getRoomById(roomIdOrAlias);
       var roomId = room?.id;
       // we make the servers a set and later on convert to a list, so that we can easily
       // deduplicate servers added via alias lookup and query parameter
@@ -223,5 +216,10 @@ class UrlLauncher {
         ),
       );
     }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(L10n.of(context)!.urlLauncherOpenMatricToUrlNotHandledError),
+      ),
+    );
   }
 }

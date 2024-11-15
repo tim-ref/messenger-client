@@ -1,9 +1,23 @@
+/*
+ * Modified by akquinet GmbH on 08.11.2024
+ * Originally forked from https://github.com/krille-chan/fluffychat
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import 'dart:async';
 import 'dart:io';
 
+import 'package:fluffychat/utils/matrix_uri_validation.dart';
+import 'package:fluffychat/utils/vcard.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:matrix/matrix.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:fluffychat/utils/url_launcher.dart';
@@ -69,8 +83,35 @@ class QrScannerModalState extends State<QrScannerModal> {
     sub = controller.scannedDataStream.listen((scanData) {
       sub.cancel();
       Navigator.of(context).pop();
-      UrlLauncher(context, scanData.code).openMatrixToUrl();
+      _handleScanData(scanData);
     });
+  }
+
+  // AFO 5.4.13 2D-Barcode scannen und weiterverarbeiten
+  void _handleScanData(Barcode scanData) {
+    final data = scanData.code;
+    Logs().d('found barcode data: $data');
+
+    if (data == null || data.isEmpty) return;
+
+    String? matrixUri;
+
+    if (RegExp(vCardBegin).hasMatch(data)) {
+      try {
+        final vCard = VCard.fromString(data);
+        if (vCard.impps.isNotEmpty && vCard.impps.any((e) => checkExpectedMatrixUriIsValid(e))) {
+          matrixUri = vCard.impps.firstWhere((e) => checkExpectedMatrixUriIsValid(e));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(L10n.of(context)!.qrScannerModalMatrixUriIsMissingError),
+          ));
+        }
+      } on VCardBaseException catch (e) {
+        Logs().e(e.toString());
+      }
+    }
+
+    UrlLauncher(context, matrixUri ?? data).openMatrixToUrl();
   }
 
   @override

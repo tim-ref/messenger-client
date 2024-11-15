@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 07.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,16 +11,15 @@
 
 import 'dart:math';
 
+import 'package:fluffychat/widgets/new_contact_qr_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:vrouter/vrouter.dart';
 
 import 'package:fluffychat/pages/new_private_chat/new_private_chat.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
-import 'package:fluffychat/widgets/matrix.dart';
 
 class NewPrivateChatView extends StatelessWidget {
   final NewPrivateChatController controller;
@@ -32,6 +31,7 @@ class NewPrivateChatView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final qrCodeSize = min(MediaQuery.of(context).size.width - 16, 256).toDouble();
+
     return Scaffold(
       appBar: AppBar(
         leading: Semantics(
@@ -76,9 +76,7 @@ class NewPrivateChatView extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      QrImage(
-                        data: 'https://matrix.to/#/${Matrix.of(context).client.userID}',
-                        version: QrVersions.auto,
+                      NewContactQrImage(
                         size: qrCodeSize,
                       ),
                       TextButton.icon(

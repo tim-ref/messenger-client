@@ -2498,5 +2498,10 @@
     "filenameDialogSendFileError": "Datei konnte nicht gesendet werden!",
     "chatSettingsArchiveDownloadError": "Archiv konnte nicht geladen werden!",
     "createRoomWithCaseReference": "Create room with case reference",
-    "redactedTime": "Redacted at"
+    "redactedTime": "Redacted at",
+    "newContactQrImageNoMxIdFoundError": "Error: No Matrix ID was found",
+    "newContactQrImageInvalidMxIdError": "Error: {mxId} is not a valid Matrix ID",
+    "qrScannerModalMatrixUriIsMissingError": "VCard is missing Matrix URI.",
+    "urlLauncherOpenMatrixToUrlMissingIdentityPartsError": "Matrix URI identifier is missing.",
+    "urlLauncherOpenMatricToUrlNotHandledError": "Unsupported URI"
 }
