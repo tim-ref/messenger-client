@@ -16,6 +16,8 @@ import 'package:fluffychat/tim/test_driver/fhir_search_debug_widget.dart';
 import 'package:fluffychat/tim/test_driver/mxid_debug_widget.dart';
 import 'package:fluffychat/tim/test_driver/room_debug_widget.dart';
 import 'package:fluffychat/tim/test_driver/test_driver_state_helper.dart';
+import 'package:fluffychat/tim/test_driver/tim_auth_debug_widget.dart';
+import 'package:fluffychat/tim/test_driver/tim_version_debug_widget.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
@@ -54,54 +56,31 @@ class _DebugWidgetState extends State<DebugWidget> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   StreamBuilder<LoginState?>(
-                    stream:
-                        Matrix.of(context).client.onLoginStateChanged.stream,
+                    stream: Matrix.of(context).client.onLoginStateChanged.stream,
                     builder: (context, snapshot) {
                       return Column(
                         key: ValueKey(snapshot.data),
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              snapshot.data?.toString() ?? "LoginState unknown",
-                              key: const ValueKey("loginState"),
-                            ),
+                          Text(
+                            snapshot.data?.toString() ?? "LoginState unknown",
+                            key: const ValueKey("loginState"),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: MxIdDebugWidget(
-                              key: ValueKey("mxDebugWidget"),
-                            ),
+                          const MxIdDebugWidget(
+                            key: ValueKey("mxDebugWidget"),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: DisplaynameDebugWidget(
-                              key: ValueKey("displaynameDebugWidget"),
-                            ),
+                          const DisplaynameDebugWidget(
+                            key: ValueKey("displaynameDebugWidget"),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: RoomDebugWidget(),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: RoomListDebugWidget(),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: MessagesDebugWidget(),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: ContactDebugWidget(),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: FhirSearchDebugWidget(),
-                          ),
-                        ],
+                          const RoomDebugWidget(),
+                          const RoomListDebugWidget(),
+                          const MessagesDebugWidget(),
+                          const ContactDebugWidget(),
+                          const FhirSearchDebugWidget(),
+                          const TimVersionDebugWidget(),
+                          const TimAuthConceptDebugWidget(),
+                        ].map(_wrapInPadding).toList(),
                       );
                     },
                   ),
@@ -114,3 +93,8 @@ class _DebugWidgetState extends State<DebugWidget> {
     );
   }
 }
+
+Padding _wrapInPadding(Widget widget) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: widget,
+    );

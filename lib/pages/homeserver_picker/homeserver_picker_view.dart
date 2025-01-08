@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 01.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,6 +11,7 @@
 
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/pages/homeserver_picker/homeserver_picker.dart';
+import 'package:fluffychat/tim/feature/tim_version/tim_version_switcher.dart';
 import 'package:fluffychat/widgets/layouts/login_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
@@ -96,9 +97,8 @@ class HomeserverPickerView extends StatelessWidget {
                         ),
                         onPressed: controller.isLoading ? null : controller.checkHomeserverAction,
                         icon: const Icon(Icons.start_outlined),
-                        label: controller.isLoading
-                            ? const LinearProgressIndicator()
-                            : Text(L10n.of(context)!.letsStart),
+                        label:
+                            controller.isLoading ? const LinearProgressIndicator() : Text(L10n.of(context)!.letsStart),
                       ),
                     ),
                   ),
@@ -106,6 +106,9 @@ class HomeserverPickerView extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: 32),
+          const Divider(),
+          const TimVersionSwitcher(),
         ],
       ),
     );

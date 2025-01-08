@@ -5,10 +5,8 @@ linter:
     - camel_case_types
     - avoid_print
     - constant_identifier_names
-    - package_api_docs
     - prefer_final_locals
     - prefer_final_in_for_each
-    - public_member_api_docs
     - sort_pub_dependencies
     - require_trailing_commas
 

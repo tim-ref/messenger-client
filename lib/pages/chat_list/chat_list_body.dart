@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.04.2024
+ * Modified by akquinet GmbH on 30.10.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -31,6 +31,7 @@ import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/tim/test_driver/search_result_debug_widget.dart';
 import 'package:fluffychat/widgets/connection_status_header.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:vrouter/vrouter.dart';
 import 'chat_list_header.dart';
 
 class ChatListViewBody extends StatelessWidget {
@@ -43,6 +44,7 @@ class ChatListViewBody extends StatelessWidget {
     final roomSearchResult = controller.roomSearchResult;
     final userSearchResult = controller.userSearchResult;
     final client = Matrix.of(context).client;
+    final showBlockAllBanner = controller.shouldShowBlockAllInvitesWithoutExceptionsWarning;
 
     final switcher = PageTransitionSwitcher(
       transitionBuilder: (
@@ -82,6 +84,41 @@ class ChatListViewBody extends StatelessWidget {
                 controller: controller.scrollController,
                 slivers: [
                   ChatListHeader(controller: controller),
+                  if (showBlockAllBanner) ...[
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          MaterialBanner(
+                            key: const ValueKey("blockAllWithoutExceptionsBanner"),
+                            leading: const Icon(Icons.admin_panel_settings_outlined),
+                            content:
+                                Text(L10n.of(context)!.blockAllInvitesWithoutExceptionsWarning),
+                            actions: [
+                              TextButton(
+                                key: const ValueKey(
+                                  "blockAllWithoutExceptionsWarningAddExceptionsButton",
+                                ),
+                                child: Text(L10n.of(context)!
+                                    .blockAllInvitesWithoutExceptionsAddExceptionsButtonLabel),
+                                onPressed: () {
+                                  VRouter.of(context).to('/settings/security/inviteRejection');
+                                },
+                              ),
+                              TextButton(
+                                key:
+                                    const ValueKey("blockAllWithoutExceptionsWarningDismissButton"),
+                                child: Text(L10n.of(context)!
+                                    .blockAllInvitesWithoutExceptionsDismissButtonLabel),
+                                onPressed: () {
+                                  controller.dismissBlockAllInvitesWithoutExceptionsWarning();
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   SliverList(
                     delegate: SliverChildListDelegate(
                       [

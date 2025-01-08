@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.02.2024
+ * Modified by akquinet GmbH on 13.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -184,6 +184,7 @@ class SettingsView extends StatelessWidget {
               trailing: const Icon(Icons.chevron_right_outlined),
             ),
             ListTile(
+              key: const ValueKey("securitySettings"),
               leading: const Icon(Icons.shield_outlined),
               title: Text(L10n.of(context)!.security),
               onTap: () => VRouter.of(context).to('/settings/security'),

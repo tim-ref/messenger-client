@@ -9,6 +9,8 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/tim/feature/automated_invite_rejection/invite_rejection_policy_repository.dart';
+import 'package:fluffychat/tim/feature/automated_invite_rejection/invite_rejection_service.dart';
 import 'package:fluffychat/tim/feature/contact_approval/contact_approval_repository.dart';
 import 'package:fluffychat/tim/feature/fhir/fhir_config.dart';
 import 'package:fluffychat/tim/feature/fhir/fhir_repository.dart';
@@ -18,6 +20,7 @@ import 'package:fluffychat/tim/feature/hba/authentication/hba_authentication.dar
 import 'package:fluffychat/tim/feature/hba/authentication/hba_authentication_factory.dart';
 import 'package:fluffychat/tim/feature/raw_data/raw_data_delegating_client.dart';
 import 'package:fluffychat/tim/feature/raw_data/user_agent_builder.dart';
+import 'package:fluffychat/tim/feature/tim_version/tim_version_repository.dart';
 import 'package:fluffychat/tim/shared/matrix/tim_matrix.dart';
 import 'package:fluffychat/tim/shared/tim_auth_repository.dart';
 import 'package:fluffychat/tim/shared/tim_auth_state.dart';
@@ -32,11 +35,12 @@ import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
 
+import '../../feature/tim_version/tim_version_service.dart';
+
 /// Provider for [TimServices].
 class TimProvider extends StatefulWidget {
   /// Access the [TimServices]. You can call this anywhere below [TimProvider].
-  static TimServices of(BuildContext context) =>
-      Provider.of<TimProviderState>(context, listen: false);
+  static TimServices of(BuildContext context) => Provider.of<TimServices>(context, listen: false);
 
   final TimMatrix matrix;
   final Widget? child;
@@ -56,13 +60,19 @@ class TimProviderState extends State<TimProvider> implements TimServices {
   final _debugWidgetEnabled = const bool.fromEnvironment(enableDebugWidget);
   final _debugWidgetVisible = const bool.fromEnvironment(debugWidgetVisible);
   TimAuthState? _authState;
+  late final _timVersionRepository = TimVersionRepository();
+
+  @override
+  late final timVersionService = TimVersionService(_timVersionRepository);
+
+  InviteRejectionService? _inviteRejectionService;
+  InviteRejectionPolicyRepository? _inviteRejectionPolicyRepository;
 
   @override
   TimMatrix matrix() => widget.matrix;
 
   @override
-  ContactApprovalRepository contactsApprovalRepository() =>
-      ContactApprovalRepository(
+  ContactApprovalRepository contactsApprovalRepository() => ContactApprovalRepository(
         _httpClient(),
         widget.matrix.client(),
         _timAuthRepository(),
@@ -93,17 +103,37 @@ class TimProviderState extends State<TimProvider> implements TimServices {
     return _authState!;
   }
 
+  // Use for Production system with existing instance that has configured the authorisation concept in the client
+  @override
+  InviteRejectionPolicyRepository inviteRejectionPolicyRepository() {
+    _initInviteRejectionPolicyRepository();
+    return _inviteRejectionPolicyRepository!;
+  }
+
+  // Use for local testing purposes without an existing instance that has configured the authorisation concept in the client.
+  /*  @override
+   InviteRejectionPolicyRepository inviteRejectionPolicyRepository() =>
+       InviteRejectionPolicyRepositoryFakeImpl(widget.matrix.client());
+*/
+  @override
+  InviteRejectionService inviteRejectionService() {
+    _initInviteRejectionService();
+    return _inviteRejectionService!;
+  }
+
   @override
   void initState() {
     if (_debugWidgetEnabled) {
       _tdh = testDriverStateHelper();
       _tdh!.initTestDriverSubjects();
     }
+    _initInviteRejectionPolicyRepository();
+    _initInviteRejectionService();
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context) => Provider(
+  Widget build(BuildContext context) => Provider<TimServices>(
         create: (_) => this,
         child: (_debugWidgetEnabled)
             ? Stack(fit: StackFit.expand, children: _getChildOrder())
@@ -113,6 +143,7 @@ class TimProviderState extends State<TimProvider> implements TimServices {
   @override
   void dispose() {
     _tdh?.disposeTestDriverSubjects();
+    _inviteRejectionService?.dispose();
     super.dispose();
   }
 
@@ -164,7 +195,29 @@ class TimProviderState extends State<TimProvider> implements TimServices {
     return config;
   }
 
+  // Stelle sicher, das der EventHandler von [InviteRejectionService] registriert ist
+  void _initInviteRejectionService() {
+    if (_inviteRejectionService == null) {
+      _inviteRejectionService = InviteRejectionService(
+        timVersionService: timVersionService,
+        inviteRejectionPolicyRepository: inviteRejectionPolicyRepository(),
+        client: widget.matrix.client(),
+      );
+      _inviteRejectionService!.initInviteRejectOnEventStream();
+    }
+  }
+
+  // Stelle sicher, das der EventHandler von [InviteRejectionService] registriert ist
+  void _initInviteRejectionPolicyRepository() {
+    if (_inviteRejectionPolicyRepository == null) {
+      _inviteRejectionPolicyRepository =
+          InviteRejectionPolicyRepositoryImpl(widget.matrix.client());
+      _inviteRejectionPolicyRepository!.listenToNewRejectionPolicy();
+    }
+  }
+
   http.Client _httpClient() => RawDataDelegatingClient(
-      FixedTimeoutHttpClient(http.Client(), const Duration(seconds: 180)),
-      UserAgentBuilder(),);
+        FixedTimeoutHttpClient(http.Client(), const Duration(seconds: 180)),
+        UserAgentBuilder(),
+      );
 }

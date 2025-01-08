@@ -12,6 +12,7 @@
 import 'package:fluffychat/tim/shared/errors/tim_bad_state_exception.dart';
 import 'package:fluffychat/tim/shared/matrix/tim_case_reference_content_blob.dart';
 import 'package:fluffychat/tim/tim_constants.dart';
+import 'package:matrix/src/utils/cached_stream_controller.dart';
 
 import 'package:matrix/matrix.dart';
 
@@ -22,6 +23,9 @@ abstract class TimMatrixClient {
   String get accessToken;
 
   Uri get homeserver;
+
+  /// Lauschen auf neue EventUpdates aus Matrix.Client
+  CachedStreamController<EventUpdate> get onEventUpdate;
 
   Future<String?> getDisplayName(String userId);
 
@@ -81,48 +85,56 @@ abstract class TimMatrixClient {
     String? roomVersion,
     String? topic,
   });
+
+  CachedStreamController<BasicEvent> onAccountDataChange();
+
+  Future<void> setAccountData(String userId, String type, Map<String, dynamic> content);
+
+  Future<Map<String, dynamic>> getAccountData(String userId, String type);
+
+  /// Verlasse Raum mit ID [roomId] (OPTIONAL: , aus folgenden Grund: [reason])
+  void leaveRoom(String roomId, {String? reason});
 }
 
 class TimMatrixClientImpl implements TimMatrixClient {
-  final Client client;
+  final Client _client;
 
-  TimMatrixClientImpl({required this.client});
+  TimMatrixClientImpl({required Client client}) : _client = client;
 
   @override
   String get userID {
-    if (client.userID == null || client.userID!.isEmpty) {
+    if (_client.userID == null || _client.userID!.isEmpty) {
       throw (TimBadStateException('client.userID must not be null or empty'));
     }
-    return client.userID!;
+    return _client.userID!;
   }
 
   @override
   String get accessToken {
-    if (client.accessToken == null || client.accessToken!.isEmpty) {
+    if (_client.accessToken == null || _client.accessToken!.isEmpty) {
       throw (TimBadStateException(
         'client.accessToken must not be null or empty',
       ));
     }
-    return client.accessToken!;
+    return _client.accessToken!;
   }
 
   @override
   Uri get homeserver {
-    if (client.homeserver == null) {
+    if (_client.homeserver == null) {
       throw (TimBadStateException('client.accessToken must not be null'));
     }
-    return client.homeserver!;
+    return _client.homeserver!;
   }
 
   @override
-  Future<String?> getDisplayName(String userId) {
-    return client.getDisplayName(userId);
-  }
+  CachedStreamController<EventUpdate> get onEventUpdate => _client.onEvent;
 
   @override
-  Room? getRoomById(String id) {
-    return client.getRoomById(id);
-  }
+  Future<String?> getDisplayName(String userId) => _client.getDisplayName(userId);
+
+  @override
+  Room? getRoomById(String id) => _client.getRoomById(id);
 
   @override
   Future<GetRoomEventsResponse> getRoomEvents(
@@ -133,7 +145,7 @@ class TimMatrixClientImpl implements TimMatrixClient {
     int? limit,
     String? filter,
   }) =>
-      client.getRoomEvents(
+      _client.getRoomEvents(
         roomId,
         dir,
         from: from,
@@ -150,16 +162,15 @@ class TimMatrixClientImpl implements TimMatrixClient {
     bool waitForSync = true,
     Map<String, dynamic>? powerLevelContentOverride,
     CreateRoomPreset? preset = CreateRoomPreset.trustedPrivateChat,
-  }) {
-    return client.startDirectChat(
-      mxid,
-      enableEncryption: enableEncryption,
-      initialState: initialState,
-      waitForSync: waitForSync,
-      powerLevelContentOverride: powerLevelContentOverride,
-      preset: preset,
-    );
-  }
+  }) =>
+      _client.startDirectChat(
+        mxid,
+        enableEncryption: enableEncryption,
+        initialState: initialState,
+        waitForSync: waitForSync,
+        powerLevelContentOverride: powerLevelContentOverride,
+        preset: preset,
+      );
 
   /// Returns an existing direct room ID with this user or creates a new one.
   /// By default encryption will be enabled if the client supports encryption
@@ -182,7 +193,7 @@ class TimMatrixClientImpl implements TimMatrixClient {
     CreateRoomPreset? preset = CreateRoomPreset.trustedPrivateChat,
   }) async {
     // Try to find an existing direct chat
-    final directChatRoomId = client.getDirectChatFromUserId(mxid);
+    final directChatRoomId = _client.getDirectChatFromUserId(mxid);
     if (directChatRoomId != null) return directChatRoomId;
 
     creationContent ??= {};
@@ -211,7 +222,7 @@ class TimMatrixClientImpl implements TimMatrixClient {
       }
     }
 
-    enableEncryption ??= client.encryptionEnabled && await client.userOwnsEncryptionKeys(mxid);
+    enableEncryption ??= _client.encryptionEnabled && await _client.userOwnsEncryptionKeys(mxid);
     if (enableEncryption) {
       if (!initialState.any((s) => s.type == EventTypes.Encryption)) {
         initialState.add(
@@ -244,7 +255,7 @@ class TimMatrixClientImpl implements TimMatrixClient {
     }
 
     // Start a new direct chat
-    final roomId = await client.createRoom(
+    final roomId = await _client.createRoom(
       isDirect: true,
       invite: [mxid],
       name: "",
@@ -261,10 +272,10 @@ class TimMatrixClientImpl implements TimMatrixClient {
 
     if (waitForSync && getRoomById(roomId) == null) {
       // Wait for room actually appears in sync
-      await client.waitForRoomInSync(roomId, join: true);
+      await _client.waitForRoomInSync(roomId, join: true);
     }
 
-    await Room(id: roomId, client: client).addToDirectChat(mxid);
+    await Room(id: roomId, client: _client).addToDirectChat(mxid);
 
     return roomId;
   }
@@ -317,7 +328,7 @@ class TimMatrixClientImpl implements TimMatrixClient {
       }
     }
 
-    enableEncryption ??= client.encryptionEnabled && preset != CreateRoomPreset.publicChat;
+    enableEncryption ??= _client.encryptionEnabled && preset != CreateRoomPreset.publicChat;
     if (enableEncryption && !initialState.any((s) => s.type == EventTypes.Encryption)) {
       initialState.add(
         StateEvent(
@@ -355,7 +366,7 @@ class TimMatrixClientImpl implements TimMatrixClient {
       );
     }
 
-    final roomId = await client.createRoom(
+    final roomId = await _client.createRoom(
       invite: invite,
       preset: preset,
       name: "",
@@ -372,8 +383,22 @@ class TimMatrixClientImpl implements TimMatrixClient {
 
     if (waitForSync && getRoomById(roomId) == null) {
       // Wait for room actually appears in sync
-      await client.waitForRoomInSync(roomId, join: true);
+      await _client.waitForRoomInSync(roomId, join: true);
     }
     return roomId;
   }
+
+  @override
+  void leaveRoom(String roomId, {String? reason}) => _client.leaveRoom(roomId, reason: reason);
+
+  @override
+  CachedStreamController<BasicEvent> onAccountDataChange() => _client.onAccountData;
+
+  @override
+  Future<void> setAccountData(String userId, String type, Map<String, dynamic> content) =>
+      _client.setAccountData(userId, type, content);
+
+  @override
+  Future<Map<String, dynamic>> getAccountData(String userId, String type) =>
+      _client.getAccountData(userId, type);
 }

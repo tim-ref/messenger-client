@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.04.2024
+ * Modified by akquinet GmbH on 26.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -24,7 +24,6 @@ import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/chat_settings_popup_menu.dart';
-import 'package:fluffychat/widgets/content_banner.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import '../../utils/url_launcher.dart';
@@ -87,11 +86,15 @@ class ChatDetailsView extends StatelessWidget {
                 ),
                 backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
                 flexibleSpace: FlexibleSpaceBar(
-                  background: ContentBanner(
+                  background: Container(),
+
+
+                //TODO: decide what to do with the banner, in a test it showed infinite spinner, prevented test success
+                /*  ContentBanner(
                     mxContent: room.avatar,
                     onEdit: room.canSendEvent('m.room.avatar') ? controller.setAvatarAction : null,
                     defaultIcon: Icons.group_outlined,
-                  ),
+                  ),*/
                 ),
               ),
             ],
@@ -363,6 +366,7 @@ class ChatDetailsView extends StatelessWidget {
                           ),
                           room.canInvite
                               ? ListTile(
+                                  key: const Key('inviteContact'),
                                   title: Text(L10n.of(context)!.inviteContact),
                                   leading: CircleAvatar(
                                     backgroundColor: Theme.of(context).primaryColor,

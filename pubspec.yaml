@@ -1,7 +1,7 @@
 name: fluffychat
 description: Chat with your friends.
 publish_to: none
-version: 1.23.0+3360
+version: 1.24.0+3360
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -65,6 +65,7 @@ dependencies:
   keyboard_shortcuts: ^0.1.4
   linkify: ^5.0.0
   latlong2: ^0.8.1
+  logger: ^2.4.0
   matrix: 0.18.0
   native_imaging: ^0.1.0
   package_info_plus: ^4.0.0
@@ -84,6 +85,7 @@ dependencies:
   shared_preferences: 2.0.15 # Pinned because https://github.com/flutter/flutter/issues/118401
   slugify: ^2.0.0
   swipe_to_action: ^0.2.0
+  test: ^1.24.0
   tuple: ^2.0.1
   uni_links: ^0.5.1
   unifiedpush: ^4.0.3
@@ -95,7 +97,6 @@ dependencies:
   vrouter: ^1.2.0+21
   wakelock: ^0.6.2
   webrtc_interface: ^1.0.10
-
 
 dev_dependencies:
   build_runner: ^2.4.5
@@ -176,3 +177,5 @@ dependency_overrides:
       url: https://github.com/chandrabezzo/wakelock.git
       ref: main
       path: wakelock_windows/
+
+# remove – added to trigger the pipeline

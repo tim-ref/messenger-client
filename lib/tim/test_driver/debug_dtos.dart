@@ -49,15 +49,22 @@ class RoomDebugDto {
 
   factory RoomDebugDto.fromJson(Map<String, dynamic> json) => _$RoomDebugDtoFromJson(json);
 
-  factory RoomDebugDto.fromMatrixRoom(Room r) {
+  static Future<RoomDebugDto> getDtoFromMatrixRoom(Room r, Client client) async {
     final roomStates = generateListFromStates(r.states);
     final creatorId = roomStates.firstWhere((e) => e.type == "m.room.create").content["creator"];
     final roomAccess = r.joinRules == JoinRules.public ? "public" : "private";
 
-    final members = r
-        .getParticipants()
-        .map((e) => MemberDebugDto(e.id, _getMemberState(e, creatorId)))
-        .toList();
+    final members =
+        r.getParticipants().map((e) => MemberDebugDto(e.id, getMemberState(e, creatorId))).toList();
+
+    for (int i = 0; i < members.length; i++) {
+      final dbUser = await client.database?.getUser(members[i].mxid, r);
+      if (dbUser != null) {
+        final userIndex = members.indexWhere((element) => element.mxid == dbUser.id);
+
+        members[userIndex] = MemberDebugDto(dbUser.id, getMemberState(dbUser, creatorId));
+      }
+    }
 
     // creator of room is invite which should be join
     if (members.any(
@@ -101,7 +108,7 @@ class RoomDebugDto {
 //
 // User.membership returns membership.join as default if missing =>
 // invited member is joined before join was triggered
-String _getMemberState(User e, String creatorId) {
+String getMemberState(User e, String creatorId) {
   if (e.content['membership'] != null) {
     return e.membership.toString();
   } else {

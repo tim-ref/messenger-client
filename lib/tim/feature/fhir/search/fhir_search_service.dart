@@ -46,7 +46,7 @@ class FhirSearchService {
     final (entries: entries, response: fullResult) =
         await _repository.search(ResourceType.PractitionerRole, query);
 
-    if (entries == null || entries.isEmpty) {
+    if (entries.isEmpty) {
       return (entries: <PractitionerSearchResult>[], response: fullResult);
     }
 
@@ -73,7 +73,7 @@ class FhirSearchService {
       query,
     );
 
-    if (entries == null || entries.isEmpty) {
+    if (entries.isEmpty) {
       return (entries: <HealthcareServiceSearchResult>[], response: fullResponse);
     }
 

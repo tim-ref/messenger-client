@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 30.10.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/tim/feature/automated_invite_rejection/ui/settings_invite_rejection_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:vrouter/vrouter.dart';
@@ -417,6 +418,11 @@ class AppRoutes {
           widget: const SettingsSecurity(),
           buildTransition: _dynamicTransition,
           stackedRoutes: [
+            VWidget(
+              path: 'inviteRejection',
+              widget: const SettingsInviteRejectionView(),
+              buildTransition: _dynamicTransition,
+            ),
             VWidget(
               path: 'ignorelist',
               widget: const SettingsIgnoreList(),

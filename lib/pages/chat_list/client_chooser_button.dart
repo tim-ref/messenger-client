@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 20.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -17,16 +17,40 @@ import 'package:flutter/services.dart';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:keyboard_shortcuts/keyboard_shortcuts.dart';
+import 'package:logger/logger.dart';
 import 'package:matrix/matrix.dart';
 import 'package:vrouter/vrouter.dart';
 
 import '../../utils/fluffy_share.dart';
 import 'chat_list.dart';
 
-class ClientChooserButton extends StatelessWidget {
+class ClientChooserButton extends StatefulWidget {
   final ChatListController controller;
 
   const ClientChooserButton(this.controller, {Key? key}) : super(key: key);
+
+  @override
+  State<ClientChooserButton> createState() => _ClientChooserButtonState();
+}
+
+class _ClientChooserButtonState extends State<ClientChooserButton> {
+  late final Future<Profile?>? _ownProfileFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    final matrix = Matrix.of(context);
+    _ownProfileFuture = fetchOwnProfileSafe(matrix);
+  }
+
+  Future<Profile?> fetchOwnProfileSafe(MatrixState matrix) async {
+    try {
+      return await matrix.client.fetchOwnProfile();
+    } catch (e) {
+      Logger().e('Could not fetch own Profile');
+      return null;
+    }
+  }
 
   List<PopupMenuEntry<Object>> _bundleMenuItems(BuildContext context) {
     final matrix = Matrix.of(context);
@@ -154,7 +178,7 @@ class ClientChooserButton extends StatelessWidget {
                       const SizedBox(width: 12),
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
-                        onPressed: () => controller.editBundlesForAccount(
+                        onPressed: () => widget.controller.editBundlesForAccount(
                           client.userID,
                           bundle,
                         ),
@@ -185,8 +209,8 @@ class ClientChooserButton extends StatelessWidget {
 
     int clientCount = 0;
     matrix.accountBundles.forEach((key, value) => clientCount += value.length);
-    return FutureBuilder<Profile>(
-      future: matrix.client.fetchOwnProfile(),
+    return FutureBuilder<Profile?>(
+      future: _ownProfileFuture,
       builder: (context, snapshot) => Stack(
         alignment: Alignment.center,
         children: [
@@ -252,9 +276,9 @@ class ClientChooserButton extends StatelessWidget {
     BuildContext context,
   ) async {
     if (object is Client) {
-      controller.setActiveClient(object);
+      widget.controller.setActiveClient(object);
     } else if (object is String) {
-      controller.setActiveBundle(object);
+      widget.controller.setActiveBundle(object);
     } else if (object is SettingsAction) {
       switch (object) {
         case SettingsAction.addAccount:

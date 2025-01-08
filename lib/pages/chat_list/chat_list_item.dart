@@ -343,7 +343,11 @@ class ChatListItem extends StatelessWidget {
                       : const SizedBox.shrink(),
                 ),
               ),
-              if (room.isCaseReferenceRoom) const Icon(Icons.attach_file,size: 16,),
+              if (room.isCaseReferenceRoom)
+                const Icon(
+                  Icons.attach_file,
+                  size: 16,
+                ),
             ],
           ),
           onTap: () => clickAction(context),

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.04.2024
+ * Modified by akquinet GmbH on 26.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,11 +11,25 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:fluffychat/config/app_config.dart';
+import 'package:fluffychat/config/themes.dart';
+import 'package:fluffychat/pages/chat_list/chat_list_view.dart';
+import 'package:fluffychat/tim/feature/automated_invite_rejection/invite_rejection_policy.dart';
+import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
+import 'package:fluffychat/tim/tim_constants.dart';
+import 'package:fluffychat/utils/account_bundles.dart';
+import 'package:fluffychat/utils/famedlysdk_store.dart';
+import 'package:fluffychat/utils/localized_exception_extension.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_file_extension.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/utils/url_launcher.dart';
+import 'package:fluffychat/utils/voip/callkeep_manager.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:matrix/matrix.dart';
@@ -23,19 +37,6 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:vrouter/vrouter.dart';
 
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/pages/chat_list/chat_list_view.dart';
-import 'package:fluffychat/utils/famedlysdk_store.dart';
-import 'package:fluffychat/utils/localized_exception_extension.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/utils/account_bundles.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_file_extension.dart';
-import 'package:fluffychat/utils/url_launcher.dart';
-import 'package:fluffychat/utils/voip/callkeep_manager.dart';
-import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
-import 'package:fluffychat/tim/tim_constants.dart';
 import '../../widgets/fluffy_chat_app.dart';
 import '../../widgets/matrix.dart';
 import '../bootstrap/bootstrap_dialog.dart';
@@ -82,6 +83,24 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
       !FluffyThemes.isColumnMode(context) && (spaces.isNotEmpty || AppConfig.separateChatTypes);
 
   String? activeSpaceId;
+
+  InviteRejectionPolicy? _inviteRejectionPolicy;
+
+  bool _disabledBlockAllInvitesWithoutExceptionsWarning = false;
+
+  bool get shouldShowBlockAllInvitesWithoutExceptionsWarning {
+    if (_disabledBlockAllInvitesWithoutExceptionsWarning) return false;
+    final policy = _inviteRejectionPolicy;
+    return policy is BlockAllInvites &&
+        policy.allowedUsers.isEmpty &&
+        policy.allowedDomains.isEmpty;
+  }
+
+  void dismissBlockAllInvitesWithoutExceptionsWarning() {
+    setState(() {
+      _disabledBlockAllInvitesWithoutExceptionsWarning = true;
+    });
+  }
 
   void resetActiveSpaceId() {
     setState(() {
@@ -144,12 +163,15 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
       case ActiveFilter.messages:
         return (room) => !room.isSpace && room.isDirectChat;
       case ActiveFilter.spaces:
-        return (r) => r.isSpace;
+        return (room) => room.isSpace;
     }
   }
 
-  List<Room> get filteredRooms =>
-      Matrix.of(context).client.rooms.where(getRoomFilterByActiveFilter(activeFilter)).toList();
+  List<Room> get filteredRooms => Matrix.of(context)
+        .client
+        .rooms
+        .where(getRoomFilterByActiveFilter(activeFilter))
+        .toList();
 
   bool isSearchMode = false;
   Future<QueryPublicRoomsResponse>? publicRoomsResponse;
@@ -352,7 +374,6 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
   @override
   void initState() {
     _initReceiveSharingIntent();
-
     scrollController.addListener(_onScroll);
     _waitForFirstSync();
     _hackyWebRTCFixForWeb();
@@ -513,7 +534,8 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
           .map(
             (space) => AlertDialogAction(
               key: space.id,
-              label: space.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(context)!)),
+              label:
+                  space.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(context)!)),
             ),
           )
           .toList(),
@@ -678,12 +700,19 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
 
   @override
   Widget build(BuildContext context) {
+    _loadInviteRejectionPolicy();
     Matrix.of(context).navigatorContext = context;
     return ChatListView(this);
   }
 
   void _hackyWebRTCFixForWeb() {
     ChatList.contextForVoip = context;
+  }
+
+  Future<void> _loadInviteRejectionPolicy() async {
+    _inviteRejectionPolicy =
+        await TimProvider.of(context).inviteRejectionPolicyRepository().getCurrentPolicy();
+    setState(() {});
   }
 }
 

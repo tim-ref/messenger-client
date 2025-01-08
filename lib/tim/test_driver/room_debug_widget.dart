@@ -25,18 +25,22 @@ class RoomDebugWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<SyncUpdate>(
-        stream: Matrix.of(context).client.onSync.stream.where((sync) => sync.rooms != null),
-        builder: (context, snapshot) {
-          return FutureBuilder<Text>(
-              future: buildWidget(context, snapshot),
-              builder: (c, s) {
-                return s.data ?? _noRoomInfoTextWidget();
-              },);
-        },);
+      stream: Matrix.of(context).client.onSync.stream.where((sync) => sync.rooms != null),
+      builder: (context, snapshot) {
+        return FutureBuilder<Text>(
+          future: buildWidget(context, snapshot),
+          builder: (c, s) {
+            return s.data ?? _noRoomInfoTextWidget();
+          },
+        );
+      },
+    );
   }
 
   Future<Text> buildWidget(
-      BuildContext context, AsyncSnapshot<SyncUpdate> snapshot,) async {
+    BuildContext context,
+    AsyncSnapshot<SyncUpdate> snapshot,
+  ) async {
     final String? roomId = context.vRouter.pathParameters['roomid'];
     if (roomId == null) {
       return _noRoomInfoTextWidget();
@@ -48,9 +52,12 @@ class RoomDebugWidget extends StatelessWidget {
       return _noRoomInfoTextWidget();
     }
 
-    final roomDebugDto = RoomDebugDto.fromMatrixRoom(room);
+    final roomDebugDto = await RoomDebugDto.getDtoFromMatrixRoom(room, Matrix.of(context).client);
 
     final userId = client.userID ?? "";
+
+    final event = room.getState(EventTypes.RoomMember);
+
 
     // Need to check if user is invited to update widget
     // Joined sync state is not synchronized by the member who joins, needs to load room history, to force state update
@@ -60,7 +67,8 @@ class RoomDebugWidget extends StatelessWidget {
       await room.requestHistory();
     }
 
-    final roomDebugDtoJSON = const JsonEncoder().convert(RoomDebugDto.fromMatrixRoom(room));
+
+    final roomDebugDtoJSON = const JsonEncoder().convert(roomDebugDto);
 
     return _debugTextWidget(roomDebugDtoJSON);
   }
@@ -92,9 +100,10 @@ class RoomDebugWidget extends StatelessWidget {
   }
 
   MemberDebugDto? _getCurrentMemberByUserId(
-      RoomDebugDto roomDebugDto, String userId,) {
-    return roomDebugDto.members
-        .firstWhereOrNull((member) => member.mxid == userId);
+    RoomDebugDto roomDebugDto,
+    String userId,
+  ) {
+    return roomDebugDto.members.firstWhereOrNull((member) => member.mxid == userId);
   }
 
   bool _isNotJoined(MemberDebugDto member) {

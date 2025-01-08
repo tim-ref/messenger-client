@@ -16,7 +16,10 @@ import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
+
+/// A JSON encoded list of available chat rooms, which is used with the test driver
 class RoomListDebugWidget extends StatelessWidget {
+  /// default constructor
   const RoomListDebugWidget({Key? key}) : super(key: key);
 
   @override
@@ -24,18 +27,48 @@ class RoomListDebugWidget extends StatelessWidget {
     return StreamBuilder<SyncUpdate>(
       stream: Matrix.of(context).client.onSync.stream,
       builder: (context, snapshot) {
-        final List<RoomDebugDto> rooms = Matrix.of(context).client.rooms.map((r) {
-          r.postLoad();
-
-          return RoomDebugDto.fromMatrixRoom(r);
-        }).toList();
-
-        return Text(
-          const JsonEncoder().convert(rooms),
-          overflow: TextOverflow.ellipsis,
-          key: const ValueKey("roomsListDebug"),
+        return FutureBuilder<Text>(
+          future: _buildWidget(context),
+          builder: (context, futureSnapshot) {
+            return futureSnapshot.data ??
+                const Text(
+                  "Loading room info...",
+                  overflow: TextOverflow.ellipsis,
+                  key: ValueKey("loadingRoomsListDebug"),
+                );
+          },
         );
       },
+    );
+  }
+
+  Future<Text> _buildWidget(BuildContext context) async {
+    final client = Matrix.of(context).client;
+    final rooms = client.rooms;
+
+    final List<RoomDebugDto> roomDebugDtos = [];
+    for (final room in rooms) {
+      room.postLoad();
+
+      final roomDebugDto = await RoomDebugDto.getDtoFromMatrixRoom(room, Matrix.of(context).client);
+      debugPrint(
+          '######################### current members ${roomDebugDto.members.map((e) => 'member: ${e.mxid} state: ${e.membershipState}')}');
+      debugPrint(
+          '######################### current state ${roomDebugDto.states.where((element) => element.type == 'm.room.members').map((e) => ': ${e.type} state: ${e.content} state key: ${e.stateKey}')}');
+
+
+      roomDebugDtos.add(roomDebugDto);
+    }
+
+    final roomDebugDtoJSON = const JsonEncoder().convert(roomDebugDtos);
+
+    debugPrint(
+        '######################### roomDebugDtoJSONe $roomDebugDtoJSON');
+
+    return Text(
+      roomDebugDtoJSON,
+      overflow: TextOverflow.ellipsis,
+      key: const ValueKey("roomsListDebug"),
     );
   }
 }

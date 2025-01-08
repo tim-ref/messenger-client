@@ -5,8 +5,10 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
-import 'package:fluffychat/tim/feature/hba/authentication/authenticator.dart' as _i3;
-import 'package:fluffychat/tim/feature/hba/authentication/vzd_client.dart' as _i5;
+import 'package:fluffychat/tim/feature/hba/authentication/authenticator.dart'
+    as _i3;
+import 'package:fluffychat/tim/feature/hba/authentication/vzd_client.dart'
+    as _i5;
 import 'package:fluffychat/tim/shared/tim_auth_token.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
