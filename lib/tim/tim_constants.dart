@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -13,7 +13,7 @@ const String enableTestDriver = "ENABLE_TEST_DRIVER";
 const String enableDebugWidget = "ENABLE_DEBUG_WIDGET";
 const String debugWidgetVisible = "DEBUG_WIDGET_VISIBLE";
 
-const String contactMgmtAPIPath = '/tim-contact-mgmt/contacts';
+const String contactMgmtAPIPath = '/tim-contact-mgmt';
 const String tokenDispenserUser = 'TOKEN_DISPENSER_USER';
 const String tokenDispenserPassword = 'TOKEN_DISPENSER_PASSWORD';
 

@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -9,20 +9,18 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 
 import 'package:future_loading_dialog/future_loading_dialog.dart';
-import 'package:http/http.dart';
 import 'package:matrix/matrix.dart';
+import 'package:tim_contact_management_api/api.dart';
 import 'package:vrouter/vrouter.dart';
 
 import 'package:fluffychat/config/themes.dart';
+import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/future_with_retries.dart';
-import 'package:fluffychat/tim/feature/contact_approval/dto/contact.dart';
-import 'package:fluffychat/tim/feature/contact_approval/dto/invite_settings.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
 import 'package:fluffychat/widgets/content_banner.dart';
@@ -233,12 +231,13 @@ class _ContactsProfileBottomSheetState extends State<ContactsProfileBottomSheet>
     final contact = Contact(
       mxid: profile!.userId,
       displayName: profile.displayName!,
-      inviteSettings: InviteSettings(start: DateTime.now()),
+      inviteSettings: ContactInviteSettings(start: DateTime.now().secondsSinceEpoch),
     );
-    await showFutureLoadingDialog<Response>(
+    await showFutureLoadingDialog<Contact?>(
       context: context,
       future: () => TimProvider.of(context).contactsApprovalRepository().addApproval(contact),
-      onError: (error) => error is HttpException ? error.message : error.toString(),
+      onError: (error) =>
+          error is ApiException && error.message != null ? error.message! : error.toString(),
     );
     if (VRouter.of(context).path == '/newcontact') {
       VRouter.of(context).to("/contacts");

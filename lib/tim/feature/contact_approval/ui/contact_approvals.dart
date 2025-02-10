@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -9,13 +9,15 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 
 import 'package:intl/intl.dart';
 
-import 'package:fluffychat/tim/feature/contact_approval/dto/contact.dart';
+import 'package:fluffychat/tim/feature/contact_approval/contact_approval_constants.dart';
 import 'package:fluffychat/tim/feature/contact_approval/ui/contact_approval_action_context_menu.dart';
+import 'package:tim_contact_management_api/api.dart';
 
 class ContactApprovals extends StatelessWidget {
   final List<Contact> contacts;
@@ -37,10 +39,9 @@ class ContactApprovals extends StatelessWidget {
         itemCount: contacts.length,
         itemBuilder: (BuildContext context, int index) {
           final contact = contacts[index];
-          final inviteStartDate =
-              DateFormat('dd.MM.yyyy').format(contact.inviteSettings.start);
+          final inviteStartDate = _formatDateFrom(contact.inviteSettings.start);
           final inviteEndDate = contact.inviteSettings.end != null
-              ? DateFormat('dd.MM.yyyy').format(contact.inviteSettings.end!)
+              ? _formatDateFrom(contact.inviteSettings.end!)
               : '';
           return ListTile(
             leading: const Icon(Icons.contact_page_outlined),
@@ -56,4 +57,14 @@ class ContactApprovals extends StatelessWidget {
           return const Divider();
         },
       );
+
+  String _formatDateFrom(int secondsSinceEpochUtc) {
+    final dateFormat = DateFormat(contactInviteSettingsDateFormatPattern);
+    return dateFormat.format(
+      DateTimeExtension.fromSecondsSinceEpoch(
+        secondsSinceEpochUtc,
+        isUtc: true,
+      ),
+    );
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 13.11.2024
+ * Modified by akquinet GmbH on 23.01.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -216,10 +216,5 @@ class UrlLauncher {
         ),
       );
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(L10n.of(context)!.urlLauncherOpenMatricToUrlNotHandledError),
-      ),
-    );
   }
 }

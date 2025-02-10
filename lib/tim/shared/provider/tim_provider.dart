@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -73,9 +73,9 @@ class TimProviderState extends State<TimProvider> implements TimServices {
 
   @override
   ContactApprovalRepository contactsApprovalRepository() => ContactApprovalRepository(
-        _httpClient(),
         widget.matrix.client(),
         _timAuthRepository(),
+        _httpClient(),
       );
 
   @override

@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -9,10 +9,10 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:fluffychat/tim/feature/contact_approval/dto/contact.dart';
 import 'package:fluffychat/tim/feature/fhir/search/fhir_search_result.dart';
 import 'package:matrix/matrix.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:tim_contact_management_api/api.dart';
 
 /// A List of FhirSearchResults and the original parsed JSON-formatted String
 typedef OptionalFhirSearchResultSet = ({List<FhirSearchResult>? entries, String? response});

@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -13,11 +13,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 
 import 'package:intl/intl.dart';
+import 'package:tim_contact_management_api/api.dart';
 import 'package:vrouter/vrouter.dart';
 
+import 'package:fluffychat/tim/feature/contact_approval/contact_approval_constants.dart';
 import 'package:fluffychat/tim/feature/contact_approval/contact_approval_repository.dart';
-import 'package:fluffychat/tim/feature/contact_approval/dto/contact.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
+import 'package:fluffychat/utils/date_time_extension.dart';
 
 class ContactApprovalDetails extends StatefulWidget {
   const ContactApprovalDetails({Key? key}) : super(key: key);
@@ -119,12 +121,15 @@ class _ContactApprovalDetailsState extends State<ContactApprovalDetails> {
 
     if (pickedDate != null) {
       final utcDate = DateTime.utc(pickedDate.year, pickedDate.month, pickedDate.day);
-      final formattedDate = DateFormat('dd.MM.yyyy').format(utcDate);
+      final formattedDate = DateFormat(contactInviteSettingsDateFormatPattern).format(utcDate);
       setState(() {
         _endDateController.text = formattedDate;
-        _updatedContact = _initialContact!.copyWith(
-          newInviteSettings: _initialContact!.inviteSettings.copyWith(
-            newEnd: utcDate,
+        _updatedContact = Contact(
+          displayName: _initialContact!.displayName,
+          mxid: _initialContact!.mxid,
+          inviteSettings: ContactInviteSettings(
+            start: _initialContact!.inviteSettings.start,
+            end: utcDate.secondsSinceEpoch,
           ),
         );
       });

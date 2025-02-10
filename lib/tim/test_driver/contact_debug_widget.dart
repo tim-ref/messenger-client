@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -11,9 +11,9 @@
 
 import 'dart:convert';
 
-import 'package:fluffychat/tim/feature/contact_approval/dto/contact.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:tim_contact_management_api/api.dart';
 
 class ContactDebugWidget extends StatelessWidget {
   const ContactDebugWidget({Key? key}) : super(key: key);
@@ -21,15 +21,11 @@ class ContactDebugWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Contact>?>(
-      stream: TimProvider.of(context)
-          .testDriverStateHelper()!
-          .contactApprovalListViewData
-          .stream,
+      stream: TimProvider.of(context).testDriverStateHelper()!.contactApprovalListViewData.stream,
       builder: (context, snapshot) {
         return snapshot.hasData
             ? Text(
-                jsonEncode(
-                    snapshot.requireData?.map((e) => e.toJson()).toList(),),
+                jsonEncode(snapshot.requireData),
                 key: const ValueKey("contactList"),
               )
             : const Text("no contact data yet");

@@ -107,6 +107,8 @@ the web client can be accessed under http://0.0.0.0:8989.
 
 ### Code generation
 
+#### Serialization
+
 Serialization is handled via [json_serializable](https://pub.dev/packages/json_serializable).
 After editing models with the annotation "@JsonSerializable", run the following command in the package directory:
 ```shell 
@@ -114,6 +116,43 @@ dart run build_runner build
 ```
 
 The generated code can be found in the referenced `*.g.dart` files.
+
+#### OpenApi Code generation
+
+This Flutter project utilizes the [openapi-generator](https://pub.dev/packages/openapi_generator) package to generate 
+API client code and the necessary data models from an OpenAPI specification.
+
+##### Conventions
+
+A custom generator class has been added to manage the code generation process. You can find it under the 
+[lib/feature/example_feature](lib/tim/feature/contact_approval/contact_open_api_generator.dart) folder. 
+This class is annotated with [openapi_generator_annotations](https://pub.dev/packages/openapi_generator_annotations) 
+for configuration.
+
+The OpenAPI specification file is located in the 
+[openapi/example_api_name/spec](openapi/tim_contact_management_api/spec) folder.
+
+##### Generate the code
+
+Run the following command to (re)generate the API client and models:
+
+```shell 
+dart run build_runner build
+```
+
+The generated files should be located to the [openapi/example_api_name](openapi/tim_contact_management_api) folder. 
+
+##### Using the Generated Code
+
+To integrate the generated API client into the project:
+
+Add the generated code as a dependency in your pubspec.yaml:
+```yaml
+  dependencies:
+    example_api_name:
+      path: openapi/example_api_name
+```
+Import the necessary classes and use the client as required in your implementation.
 
 ### Build (Android)
 

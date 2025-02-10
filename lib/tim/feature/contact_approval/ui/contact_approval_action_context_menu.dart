@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -11,28 +11,25 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:tim_contact_management_api/api.dart';
 
 import 'package:vrouter/vrouter.dart';
 
-import 'package:fluffychat/tim/feature/contact_approval/dto/contact.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
 
 class ContactApprovalActionContextMenu extends StatelessWidget {
   final Contact contact;
 
-  const ContactApprovalActionContextMenu({Key? key, required this.contact})
-      : super(key: key);
+  const ContactApprovalActionContextMenu({Key? key, required this.contact}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    PopupMenuItem<Object> itemContactName(BuildContext context) =>
-        PopupMenuItem(
+    PopupMenuItem<Object> itemContactName(BuildContext context) => PopupMenuItem(
           textStyle: Theme.of(context).textTheme.titleLarge,
           child: Text(contact.displayName),
         );
 
-    PopupMenuItem<Object> itemContactApprove(BuildContext context) =>
-        PopupMenuItem(
+    PopupMenuItem<Object> itemContactApprove(BuildContext context) => PopupMenuItem(
           child: Row(
             children: [
               const Padding(
@@ -47,8 +44,7 @@ class ContactApprovalActionContextMenu extends StatelessWidget {
           onTap: () => VRouter.of(context).to('/contacts/edit/${contact.mxid}'),
         );
 
-    PopupMenuItem<Object> itemContactReject(BuildContext context) =>
-        PopupMenuItem(
+    PopupMenuItem<Object> itemContactReject(BuildContext context) => PopupMenuItem(
           key: const ValueKey("deleteContactIcon"),
           child: Row(
             children: [
@@ -62,9 +58,8 @@ class ContactApprovalActionContextMenu extends StatelessWidget {
               Text(L10n.of(context)!.timDeleteContactApproval),
             ],
           ),
-          onTap: () => TimProvider.of(context)
-              .contactsApprovalRepository()
-              .deleteApproval(contact.mxid),
+          onTap: () =>
+              TimProvider.of(context).contactsApprovalRepository().deleteApproval(contact.mxid),
         );
 
     return PopupMenuButton<Object>(

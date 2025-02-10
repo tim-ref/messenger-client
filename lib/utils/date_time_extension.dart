@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 19.08.2024
+ * Modified by akquinet GmbH on 24.01.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -15,6 +15,32 @@ import 'package:flutter_gen/gen_l10n/l10n.dart';
 
 /// Provides extra functionality for formatting the time.
 extension DateTimeExtension on DateTime {
+  /// Constructs a new [DateTime] instance
+  /// with the given [secondsSinceEpoch].
+  ///
+  /// If [isUtc] is false then the date is in the local time zone.
+  ///
+  /// The constructed [DateTime] represents
+  /// 1970-01-01T00:00:00Z + [secondsSinceEpoch] s in the given
+  /// time zone (local or UTC).
+  /// ```dart
+  /// final newYearsDay =
+  ///     DateTime.fromSecondsSinceEpoch(1640979000, isUtc:true);
+  /// print(newYearsDay); // 2022-01-01 10:00:00.000Z
+  /// ```
+  static DateTime fromSecondsSinceEpoch(int secondsSinceEpoch, {isUtc}) =>
+      DateTime.fromMillisecondsSinceEpoch(secondsSinceEpoch * 1000, isUtc: isUtc);
+
+  /// The number of milliseconds since
+  /// the "Unix epoch" 1970-01-01T00:00:00Z (UTC).
+  ///
+  /// This value is independent of the time zone.
+  ///
+  /// This value is at most
+  /// 8,640,000,000,000s (100,000,000 days) from the Unix epoch.
+  /// In other words: `secondsSinceEpoch.abs() <= 8640000000000`.
+  int get secondsSinceEpoch => millisecondsSinceEpoch ~/ 1000;
+
   bool operator <(DateTime other) {
     return millisecondsSinceEpoch < other.millisecondsSinceEpoch;
   }

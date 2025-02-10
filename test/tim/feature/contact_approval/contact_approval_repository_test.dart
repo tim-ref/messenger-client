@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -10,46 +10,46 @@
  */
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:tim_contact_management_api/api.dart';
 
 import 'package:fluffychat/tim/feature/contact_approval/contact_approval_repository.dart';
-import 'package:fluffychat/tim/feature/contact_approval/dto/contact.dart';
-import 'package:fluffychat/tim/feature/contact_approval/dto/invite_settings.dart';
-import 'package:fluffychat/tim/shared/errors/tim_bad_state_exception.dart';
 import 'package:fluffychat/tim/shared/tim_auth_repository.dart';
 import 'package:fluffychat/tim/shared/tim_auth_token.dart';
 import 'package:fluffychat/tim/tim_constants.dart';
+import 'package:fluffychat/utils/date_time_extension.dart';
 
 import '../../share_room_archive_test.mocks.dart';
 import 'contact_approval_repository_test.mocks.dart';
 
 const host = 'https://localhost';
 const userId = '@user:mxid';
+const baseUrl = '$host$contactMgmtAPIPath/contacts';
 
 @GenerateMocks([http.Client, TimAuthRepository])
 void main() {
   late final MockClient httpClient;
   late final MockTimMatrixClient timClient;
   late final MockTimAuthRepository tokenRepo;
+  late final ContactApprovalRepository repo;
 
   setUpAll(() {
     httpClient = MockClient();
     timClient = MockTimMatrixClient();
     tokenRepo = MockTimAuthRepository();
-    when(tokenRepo.getOpenIdToken())
-        .thenAnswer((_) async => _defaultOpenIdToken());
+    when(tokenRepo.getOpenIdToken()).thenAnswer((_) async => _defaultOpenIdToken());
     when(timClient.userID).thenReturn(userId);
     when(timClient.homeserver).thenReturn(Uri.parse(host));
+    repo = ContactApprovalRepository(timClient, tokenRepo, httpClient);
   });
 
   test('returns the correct approvals', () async {
     // given
-    final expectedUri = Uri.parse('$host$contactMgmtAPIPath');
+    final expectedUri = Uri.parse(baseUrl);
     final expectedHeaders = _expectedHeaders();
     when(
       httpClient.get(
@@ -58,15 +58,9 @@ void main() {
       ),
     ).thenAnswer(
       (_) async => http.Response(
-        jsonEncode(_expectedApprovals().map((e) => e.toJson()).toList()),
+        jsonEncode(Contacts(contacts: _expectedApprovals())),
         200,
       ),
-    );
-
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
     );
 
     // when
@@ -78,7 +72,7 @@ void main() {
 
   test('handles rest error correctly for listApprovals()', () async {
     // given
-    final expectedUri = Uri.parse('$host$contactMgmtAPIPath');
+    final expectedUri = Uri.parse(baseUrl);
     final expectedHeaders = _expectedHeaders();
     when(
       httpClient.get(
@@ -87,30 +81,22 @@ void main() {
       ),
     ).thenAnswer(
       (_) async => http.Response(
-        '',
+        jsonEncode(Error(errorCode: "500", errorMessage: "Internal Server Error occured")),
         500,
       ),
     );
 
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
-    );
-
     // expect
-    final internalServerErrorMatcher = isA<HttpException>().having(
-        (e) => e.message,
-        "message",
-        contains("Unexpected status 500 for call to URI: $expectedUri"),);
+    final internalServerErrorMatcher = isA<ApiException>()
+        .having((e) => e.code, "code", 500)
+        .having((e) => e.message, "message", contains("Internal Server Error occured"));
     expectLater(repo.listApprovals(), throwsA(internalServerErrorMatcher));
   });
 
   test('returns the correct contact for given mxid', () async {
     // given
     const mxid = '@eins:localhost';
-    final expectedUri =
-        Uri.parse('$host$contactMgmtAPIPath/${Uri.encodeComponent(mxid)}');
+    final expectedUri = Uri.parse('$baseUrl/$mxid');
     final expectedHeaders = _expectedHeaders();
     when(
       httpClient.get(
@@ -119,15 +105,9 @@ void main() {
       ),
     ).thenAnswer(
       (_) async => http.Response(
-        jsonEncode(_expectedApproval().toJson()),
+        jsonEncode(_expectedApproval()),
         200,
       ),
-    );
-
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
     );
 
     // when
@@ -140,8 +120,7 @@ void main() {
   test('handles rest error correctly for getContact()', () async {
     // given
     const mxid = '@eins:localhost';
-    final expectedUri =
-        Uri.parse('$host$contactMgmtAPIPath/${Uri.encodeComponent(mxid)}');
+    final expectedUri = Uri.parse('$baseUrl/$mxid');
     final expectedHeaders = _expectedHeaders();
     when(
       httpClient.get(
@@ -150,30 +129,24 @@ void main() {
       ),
     ).thenAnswer(
       (_) async => http.Response(
-        '',
+        jsonEncode(Error(errorCode: "404", errorMessage: "Not Found")),
         404,
       ),
     );
 
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
-    );
-
     // expect
-    final notFoundMatcher = isA<HttpException>().having(
-        (e) => e.message,
-        "message",
-        contains("Unexpected status 404 for call to URI: $expectedUri"),);
+    final notFoundMatcher = isA<ApiException>()
+        .having((e) => e.code, "code", 404)
+        .having((e) => e.message, "message", contains("Not Found"));
     expectLater(repo.getApproval(mxid), throwsA(notFoundMatcher));
   });
 
   test('constructs correct api call for update contact', () async {
     // given
-    final expectedUri = Uri.parse('$host$contactMgmtAPIPath');
+    final expectedUri = Uri.parse(baseUrl);
     final expectedHeaders = _expectedHeaders();
-    final expectedBody = jsonEncode(_expectedApproval().toJson());
+    final expectedBody = jsonEncode(_expectedApproval());
+    expectedHeaders.putIfAbsent('Content-Type', () => 'application/json');
     when(
       httpClient.put(
         expectedUri,
@@ -182,15 +155,9 @@ void main() {
       ),
     ).thenAnswer(
       (_) async => http.Response(
-        '{}',
+        expectedBody,
         200,
       ),
-    );
-
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
     );
 
     // when
@@ -202,9 +169,10 @@ void main() {
 
   test('handles rest error correctly for updateContact()', () async {
     // given
-    final expectedUri = Uri.parse('$host$contactMgmtAPIPath');
+    final expectedUri = Uri.parse(baseUrl);
     final expectedHeaders = _expectedHeaders();
-    final expectedBody = jsonEncode(_expectedApproval().toJson());
+    final expectedBody = jsonEncode(_expectedApproval());
+    expectedHeaders.putIfAbsent('Content-Type', () => 'application/json');
     when(
       httpClient.put(
         expectedUri,
@@ -213,36 +181,25 @@ void main() {
       ),
     ).thenAnswer(
       (_) async => http.Response(
-        '',
+        jsonEncode(Error(errorCode: "400", errorMessage: "Bad Request")),
         400,
       ),
     );
 
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
-    );
-
     // expect
-    final badRequestMatcher = isA<HttpException>().having(
-        (e) => e.message,
-        "message",
-        contains("Unexpected status 400 for call to URI: $expectedUri"),);
-    expectLater(
-        repo.updateApproval(_expectedApproval()), throwsA(badRequestMatcher),);
+    final badRequestMatcher = isA<ApiException>()
+        .having((e) => e.code, "code", 400)
+        .having((e) => e.message, "message", contains("Bad Request"));
+
+    expectLater(repo.updateApproval(_expectedApproval()), throwsA(badRequestMatcher));
   });
 
   test('constructs correct api call for add contact', () async {
     // given
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
-    );
-    final expectedUri = Uri.parse('$host$contactMgmtAPIPath');
+    final expectedUri = Uri.parse(baseUrl);
     final expectedHeaders = _expectedHeaders();
-    final expectedBody = jsonEncode(_expectedApproval().toJson());
+    final expectedBody = jsonEncode(_expectedApproval());
+    expectedHeaders.putIfAbsent('Content-Type', () => 'application/json');
     when(
       httpClient.post(
         expectedUri,
@@ -251,7 +208,7 @@ void main() {
       ),
     ).thenAnswer(
       (_) async => http.Response(
-        '{}',
+        jsonEncode(_expectedApproval()),
         200,
       ),
     );
@@ -263,60 +220,46 @@ void main() {
     // implicitly verified through method stubs
   });
 
-  test('handles rest error correctly for addContact()', () async {
-    // given
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
-    );
-    final expectedUri = Uri.parse('$host$contactMgmtAPIPath');
-    final expectedHeaders = _expectedHeaders();
-    final expectedBody = jsonEncode(_expectedApproval().toJson());
-    when(
-      httpClient.post(
-        expectedUri,
-        headers: expectedHeaders,
-        body: expectedBody,
-      ),
-    ).thenAnswer(
-      (_) async => http.Response(
-        '{}',
-        500,
-      ),
-    );
+  test(
+    'handles rest error correctly for addContact()',
+    () async {
+      // given
+      final expectedUri = Uri.parse(baseUrl);
+      final expectedHeaders = _expectedHeaders();
+      final expectedBody = jsonEncode(_expectedApproval());
+      expectedHeaders.putIfAbsent('Content-Type', () => 'application/json');
+      when(
+        httpClient.post(
+          expectedUri,
+          headers: expectedHeaders,
+          body: expectedBody,
+        ),
+      ).thenAnswer(
+        (_) async => http.Response(
+          jsonEncode(Error(errorCode: "500", errorMessage: "Internal Server Error")),
+          500,
+        ),
+      );
 
-    // expect
-    final internalServerErrorMatcher = isA<HttpException>().having(
-        (e) => e.message,
-        "message",
-        contains("Unexpected status 500 for call to URI: $expectedUri"),);
-    expectLater(repo.addApproval(_expectedApproval()),
-        throwsA(internalServerErrorMatcher),);
-  }, timeout: const Timeout(Duration(seconds: 30)),);
+      // expect
+      final internalServerErrorMatcher = isA<ApiException>()
+          .having((e) => e.code, "code", 500)
+          .having((e) => e.message, "message", contains("Internal Server Error"));
+
+      expectLater(repo.addApproval(_expectedApproval()), throwsA(internalServerErrorMatcher));
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
 
   test('constructs correct api call for delete contact', () async {
     // given
     const mxid = '@eins:localhost';
-    final expectedUri =
-        Uri.parse('$host$contactMgmtAPIPath/${Uri.encodeComponent(mxid)}');
+    final expectedUri = Uri.parse('$baseUrl/$mxid');
     final expectedHeaders = _expectedHeaders();
     when(
-      httpClient.delete(
-        expectedUri,
-        headers: expectedHeaders,
-      ),
+      httpClient.delete(expectedUri, headers: expectedHeaders, body: ''),
     ).thenAnswer(
-      (_) async => http.Response(
-        '{}',
-        200,
-      ),
-    );
-
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
+      (_) async => http.Response('', 204),
     );
 
     // when
@@ -329,55 +272,33 @@ void main() {
   test('handles rest error correctly for deleteContact()', () async {
     // given
     const mxid = '@eins:localhost';
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
-    );
-    final expectedUri =
-        Uri.parse('$host$contactMgmtAPIPath/${Uri.encodeComponent(mxid)}');
+    final expectedUri = Uri.parse('$baseUrl/$mxid');
     when(
       httpClient.delete(
         expectedUri,
         headers: _expectedHeaders(),
+        body: '',
       ),
     ).thenAnswer(
       (_) async => http.Response(
-        '{}',
+        jsonEncode(Error(errorCode: "403", errorMessage: "Forbidden")),
         403,
       ),
     );
 
     // expect
-    final forbiddenMatcher = isA<HttpException>().having(
-        (e) => e.message,
-        "message",
-        contains("Unexpected status 403 for call to URI: $expectedUri"),);
+    final forbiddenMatcher = isA<ApiException>()
+        .having((e) => e.code, "code", 403)
+        .having((e) => e.message, "message", contains("Forbidden"));
+
     expectLater(repo.deleteApproval(mxid), throwsA(forbiddenMatcher));
   });
-
-  test('handles null homeserver correctly for addContact()', () async {
-    // given
-    final repo = ContactApprovalRepository(
-      httpClient,
-      timClient,
-      tokenRepo,
-    );
-    when(timClient.homeserver)
-        .thenThrow(TimBadStateException('homeServer is null'));
-
-    // expect
-    expectLater(repo.addApproval(_expectedApproval()),
-        throwsA(isA<TimBadStateException>()),);
-  }, timeout: const Timeout(Duration(seconds: 30)),);
 }
 
 Map<String, String> _expectedHeaders() {
   return <String, String>{
-    HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-    HttpHeaders.authorizationHeader:
-        'Bearer ${_defaultOpenIdToken().accessToken}',
-    'mxid': userId,
+    'Mxid': userId,
+    'Authorization': 'Bearer ${_defaultOpenIdToken().accessToken}',
   };
 }
 
@@ -394,8 +315,8 @@ Contact _expectedApproval() {
   return Contact(
     displayName: 'eins',
     mxid: '@eins:localhost',
-    inviteSettings: InviteSettings(
-      start: DateTime.utc(2023, 2, 8, 12, 12, 1),
+    inviteSettings: ContactInviteSettings(
+      start: DateTime.utc(2023, 2, 8, 12, 12, 1).secondsSinceEpoch,
     ),
   );
 }
@@ -405,23 +326,23 @@ List<Contact> _expectedApprovals() {
     Contact(
       displayName: 'eins',
       mxid: '@eins:localhost',
-      inviteSettings: InviteSettings(
-        start: DateTime.utc(2023, 2, 8, 12, 12, 1),
+      inviteSettings: ContactInviteSettings(
+        start: DateTime.utc(2023, 2, 8, 12, 12, 1).secondsSinceEpoch,
       ),
     ),
     Contact(
       displayName: 'zwei',
       mxid: '@zwei:localhost',
-      inviteSettings: InviteSettings(
-        start: DateTime.utc(2023, 2, 8, 12, 12, 1),
-        end: DateTime.utc(2023, 2, 10, 12, 12, 1),
+      inviteSettings: ContactInviteSettings(
+        start: DateTime.utc(2023, 2, 8, 12, 12, 1).secondsSinceEpoch,
+        end: DateTime.utc(2023, 2, 10, 12, 12, 1).secondsSinceEpoch,
       ),
     ),
     Contact(
       displayName: 'drei',
       mxid: '@drei:otherhost',
-      inviteSettings: InviteSettings(
-        start: DateTime.utc(2023, 2, 8, 12, 12, 1),
+      inviteSettings: ContactInviteSettings(
+        start: DateTime.utc(2023, 2, 8, 12, 12, 1).secondsSinceEpoch,
       ),
     ),
   ];

@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -11,11 +11,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:tim_contact_management_api/api.dart';
 
 import 'package:vrouter/vrouter.dart';
 
 import 'package:fluffychat/tim/feature/contact_approval/contact_approval_repository.dart';
-import 'package:fluffychat/tim/feature/contact_approval/dto/contact.dart';
+
 import 'package:fluffychat/tim/feature/contact_approval/ui/contact_approvals.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
 import 'package:fluffychat/tim/test_driver/test_driver_state_helper.dart';
