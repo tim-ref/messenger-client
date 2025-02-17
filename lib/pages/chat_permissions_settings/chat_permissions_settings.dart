@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,24 +11,21 @@
 
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:fluffychat/pages/chat_permissions_settings/chat_permissions_settings_view.dart';
+import 'package:fluffychat/widgets/matrix.dart';
+import 'package:fluffychat/widgets/permission_slider_dialog.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:matrix/matrix.dart';
 import 'package:vrouter/vrouter.dart';
 
-import 'package:fluffychat/pages/chat_permissions_settings/chat_permissions_settings_view.dart';
-import 'package:fluffychat/widgets/matrix.dart';
-import 'package:fluffychat/widgets/permission_slider_dialog.dart';
-
 class ChatPermissionsSettings extends StatefulWidget {
   const ChatPermissionsSettings({Key? key}) : super(key: key);
 
   @override
-  ChatPermissionsSettingsController createState() =>
-      ChatPermissionsSettingsController();
+  ChatPermissionsSettingsController createState() => ChatPermissionsSettingsController();
 }
 
 class ChatPermissionsSettingsController extends State<ChatPermissionsSettings> {
@@ -85,7 +82,7 @@ class ChatPermissionsSettingsController extends State<ChatPermissionsSettings> {
   void updateRoomAction(Capabilities capabilities) async {
     final room = Matrix.of(context).client.getRoomById(roomId!)!;
     final String roomVersion =
-        room.getState(EventTypes.RoomCreate)!.content['room_version'] ?? '1';
+        room.getState(EventTypes.RoomCreate)!.content.tryGet('room_version') ?? '1';
     final newVersion = await showConfirmationDialog<String>(
       context: context,
       title: L10n.of(context)!.replaceRoomWithNewerVersion,
@@ -94,8 +91,7 @@ class ChatPermissionsSettingsController extends State<ChatPermissionsSettings> {
           .map(
             (version) => AlertDialogAction(
               key: version.key,
-              label:
-                  '${version.key} (${version.value.toString().split('.').last})',
+              label: '${version.key} (${version.value.toString().split('.').last})',
             ),
           )
           .toList(),

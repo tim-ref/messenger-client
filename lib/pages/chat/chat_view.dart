@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 09.04.2024
+ * Modified by akquinet GmbH on 07.01.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -36,6 +36,7 @@ import '../../utils/stream_extension.dart';
 import '../../tim/feature/chat/case_reference_popup_widget.dart';
 import 'chat_emoji_picker.dart';
 import 'chat_input_row.dart';
+import 'revision_history_display.dart';
 
 enum _EventContextAction { info, report }
 
@@ -73,6 +74,9 @@ class ChatView extends StatelessWidget {
           onPressed: controller.pinEvent,
           tooltip: L10n.of(context)!.pinMessage,
         ),
+        // can only edit own messages and 1 at a time
+        if (controller.selectedEvents.length == 1 && controller.selectedEvents.first.senderId == controller.matrixClient.userID)
+          IconButton(onPressed: controller.editAction, icon: const Icon(Icons.edit)),
         if (controller.selectedEvents.length == 1)
           PopupMenuButton<_EventContextAction>(
             onSelected: (action) {
@@ -336,6 +340,7 @@ class ChatView extends StatelessWidget {
                                               children: [
                                                 const ConnectionStatusHeader(),
                                                 ReactionsPicker(controller),
+                                                RevisionHistoryDisplay(controller),
                                                 ReplyDisplay(controller),
                                                 ChatInputRow(controller),
                                                 ChatEmojiPicker(controller),

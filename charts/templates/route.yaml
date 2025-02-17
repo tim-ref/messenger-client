@@ -1,0 +1,23 @@
+{{- if .Values.openshift.route.enabled }}
+{{ $fullName := include "ti-messenger-web.fullname" . }}
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: "{{ $fullName }}-route"
+  {{- with .Values.openshift.route.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if ne .Values.openshift.route.host "" }}
+  host: {{ .Values.openshift.route.host }}
+  {{- end }}
+  to:
+    kind: Service
+    name: {{ $fullName }}
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: {{ .Values.openshift.route.wildcardPolicy }}
+{{- end }}

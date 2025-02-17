@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 05.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -21,6 +21,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../config/app_config.dart';
+import '../../utils/set_user_presence.dart';
 
 class SendLocationDialog extends StatefulWidget {
   final Room room;
@@ -87,17 +88,14 @@ class SendLocationDialogState extends State<SendLocationDialog> {
     setState(() => isSending = true);
     final body =
         'https://www.openstreetmap.org/?mlat=${position!.latitude}&mlon=${position!.longitude}#map=16/${position!.latitude}/${position!.longitude}';
-    final uri =
-        'geo:${position!.latitude},${position!.longitude};u=${position!.accuracy}';
+    final uri = 'geo:${position!.latitude},${position!.longitude};u=${position!.accuracy}';
     await showFutureLoadingDialog(
       context: context,
       future: () async {
         final room = widget.room;
         await room.sendLocation(body, uri);
 
-        if (AppConfig.sendPresenceUpdates && room.client.userID != null) {
-          room.client.setPresence(room.client.userID!, PresenceType.online);
-        }
+        setUserPresence(room.client);
       },
     );
     Navigator.of(context, rootNavigator: false).pop();
@@ -116,8 +114,7 @@ class SendLocationDialogState extends State<SendLocationDialog> {
     } else if (denied) {
       contentWidget = Text(L10n.of(context)!.locationPermissionDeniedNotice);
     } else if (error != null) {
-      contentWidget =
-          Text(L10n.of(context)!.errorObtainingLocation(error.toString()));
+      contentWidget = Text(L10n.of(context)!.errorObtainingLocation(error.toString()));
     } else {
       contentWidget = Row(
         mainAxisSize: MainAxisSize.min,

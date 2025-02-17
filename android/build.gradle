@@ -1,17 +1,3 @@
-buildscript {
-    ext.kotlin_version = '1.8.0'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.gms:google-services:4.3.8'
-    }
-}
-
 allprojects {
     repositories {
         google()
@@ -19,11 +5,53 @@ allprojects {
     }
 }
 
+// Fixup some configuration issues in downstream packages
+subprojects {
+    // Enforce consistent KGP version — some plugins use a version not supported by current AGP
+    buildscript.configurations.configureEach {
+        resolutionStrategy {
+            force "org.jetbrains.kotlin:kotlin-gradle-plugin:${rootProject.ext.kotlin_version}"
+        }
+    }
+    afterEvaluate {
+        def app = project(":app")
+        if (it.hasProperty("android")) {
+            android {
+                // Specify namespace in AGP instead AndroidManifest.xml — newer AGP requires this
+                if (namespace == null) {
+                    def manifest = new groovy.xml.XmlSlurper().parse(file(sourceSets.main.manifest.srcFile))
+                    def packageName = manifest.@package.text()
+                    namespace = packageName
+                }
+                compileSdk = app.android.compileSdk
+
+                // Make sure all subprojects use the correct Java Version — 17 for AGP 8
+                def javaVersion = app.android.kotlinOptions.jvmTarget
+                compileOptions {
+                    sourceCompatibility = javaVersion
+                    targetCompatibility = javaVersion
+                }
+                tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                    kotlinOptions {
+                        jvmTarget = app.android.kotlinOptions.jvmTarget
+                    }
+                }
+            }
+            tasks.withType(JavaCompile).configureEach {
+                // Don't -Werror — some plugins added this
+                if ("-Werror" in it.options.compilerArgs) {
+                    it.options.compilerArgs.remove("-Werror")
+                }
+            }
+        }
+
+    }
+}
+
 rootProject.buildDir = '../build'
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
     project.evaluationDependsOn(':app')
 }
 

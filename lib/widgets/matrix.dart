@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 30.04.2024
+ * Modified by akquinet GmbH on 05.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -80,7 +80,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
   Store store = Store();
   late BuildContext navigatorContext;
 
-  HomeserverSummary? loginHomeserverSummary;
+  List<LoginFlow>? loginFlows;
   XFile? loginAvatar;
   String? loginUsername;
   bool? loginRegistrationSupported;
@@ -208,11 +208,11 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         final statusMsg = await store.getItem(SettingKeys.ownStatusMessage);
         if (statusMsg?.isNotEmpty ?? false) {
           Logs().v('Send cached status message: "$statusMsg"');
-          if (AppConfig.sendPresenceUpdates && client.userID != null) {
-            await client.setPresence(
+          if (client.userID != null) {
+            client.setPresence(
               client.userID!,
-              PresenceType.online,
-              statusMsg: statusMsg,
+              AppConfig.sendPresenceUpdates ? PresenceType.online : PresenceType.offline,
+              statusMsg: AppConfig.sendPresenceUpdates ? statusMsg : null,
             );
           }
         }
@@ -421,7 +421,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     Logs().v('AppLifecycleState = $state');
     final foreground = state != AppLifecycleState.detached && state != AppLifecycleState.paused;
     client.backgroundSync = foreground;
-    client.syncPresence = foreground ? null : PresenceType.unavailable;
+    client.syncPresence = foreground ? PresenceType.offline : PresenceType.unavailable;
     client.requestHistoryOnLimitedTimeline = !foreground;
   }
 
@@ -472,8 +472,8 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         .getItemBool(SettingKeys.sendTypingNotifications, AppConfig.sendTypingNotifications)
         .then((value) => AppConfig.sendTypingNotifications = value);
     store
-        .getItemBool(SettingKeys.sendReadReceipts, AppConfig.sendReadReceipts)
-        .then((value) => AppConfig.sendReadReceipts = value);
+        .getItemBool(SettingKeys.sendPublicReadReceipts, AppConfig.sendPublicReadReceipts)
+        .then((value) => AppConfig.sendPublicReadReceipts = value);
     store
         .getItemBool(SettingKeys.sendPresenceUpdates, AppConfig.sendPresenceUpdates)
         .then((value) => AppConfig.sendPresenceUpdates = value);

@@ -16,9 +16,7 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 /// A fake for [PathProviderPlatform] that returns real folders under the system's temp directory.
-class FakePathProviderPlatform
-    with MockPlatformInterfaceMixin
-    implements PathProviderPlatform {
+class FakePathProviderPlatform with MockPlatformInterfaceMixin implements PathProviderPlatform {
   FakePathProviderPlatform() {
     for (final path in _allPaths) {
       Directory(path).createSync(recursive: true);
@@ -35,8 +33,7 @@ class FakePathProviderPlatform
   Future<String> getLibraryPath() async => _libraryPath;
 
   @override
-  Future<String> getApplicationDocumentsPath() async =>
-      _applicationDocumentsPath;
+  Future<String> getApplicationDocumentsPath() async => _applicationDocumentsPath;
 
   @override
   Future<String> getExternalStoragePath() async => _externalStoragePath;
@@ -45,12 +42,16 @@ class FakePathProviderPlatform
   Future<List<String>> getExternalCachePaths() async => [_externalCachePath];
 
   @override
-  Future<List<String>> getExternalStoragePaths(
-          {StorageDirectory? type,}) async =>
+  Future<List<String>> getExternalStoragePaths({
+    StorageDirectory? type,
+  }) async =>
       [await getExternalStoragePath()];
 
   @override
   Future<String> getDownloadsPath() async => _downloadsPath;
+
+  @override
+  Future<String> getApplicationCachePath() async => _applicationCachePath;
 }
 
 final _rootPath = "${Directory.systemTemp.path}/tim";
@@ -61,6 +62,7 @@ final _applicationDocumentsPath = "$_rootPath/applicationDocumentsPath";
 final _externalStoragePath = "$_rootPath/externalStoragePath";
 final _externalCachePath = "$_rootPath/externalCachePath";
 final _downloadsPath = "$_rootPath/downloadsPath";
+final _applicationCachePath = "$_rootPath/cpplicationCachePath";
 
 final _allPaths = [
   _rootPath,
@@ -71,4 +73,5 @@ final _allPaths = [
   _externalStoragePath,
   _externalCachePath,
   _downloadsPath,
+  _applicationCachePath
 ];

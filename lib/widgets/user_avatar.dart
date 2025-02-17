@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/presence_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -63,11 +64,7 @@ class _UserAvatarState extends State<UserAvatar> {
                     right: 0.0,
                     child: Icon(
                       Icons.circle,
-                      color: switch (cachedPresence.presence) {
-                        PresenceType.online => Colors.green,
-                        PresenceType.unavailable => Colors.yellow,
-                        PresenceType.offline => Colors.red,
-                      },
+                      color:cachedPresence.color,
                       size: diameter * 0.35,
                     ),
                   ),

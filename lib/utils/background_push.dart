@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 17.01.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -64,7 +64,9 @@ class BackgroundPush {
   void Function(String errorMsg, {Uri? link})? onFcmError;
   L10n? l10n;
   Store? _store;
+
   Store get store => _store ??= Store();
+
   Future<void> loadLocale() async {
     // inspired by _lookupL10n in .dart_tool/flutter_gen/gen_l10n/l10n.dart
     l10n ??= (context != null ? L10n.of(context!) : null) ??
@@ -124,14 +126,15 @@ class BackgroundPush {
     instance.router = router;
     // ignore: prefer_initializing_formals
     instance.onFcmError = onFcmError;
+
     return instance;
   }
 
   /// Workaround for the problem, that the devices property is required by the matrix
   /// PushNotification but not supplied by the push gateway
-  static Map<String, dynamic>_addDummyDevices(Map<String, dynamic> data) {
+  static Map<String, dynamic> _addDummyDevices(Map<String, dynamic> data) {
     final messageDataWithDefaultDevice = Map<String, dynamic>.from(data);
-    if(data['devices'] != null) {
+    if (data['devices'] != null) {
       return data;
     }
     messageDataWithDefaultDevice['devices'] = [
@@ -151,7 +154,10 @@ class BackgroundPush {
     Set<String?>? oldTokens,
     bool useDeviceSpecificAppId = false,
   }) async {
-    if (PlatformInfos.isIOS) {
+    // Android API level 33+: Have to request notification permissions actively on android, too.
+    // cave: Force-stopping the app, e.g. via Settings or Android Studio, blocks its FCM services.
+    // Until the user launches the app again, no notifications will be shown. This is intended.
+    if (PlatformInfos.isIOS || PlatformInfos.isAndroid) {
       await firebase.requestPermission();
     }
     final clientName = PlatformInfos.clientName;
@@ -163,7 +169,9 @@ class BackgroundPush {
         [];
     var setNewPusher = false;
     // Just the plain app id, we add the .data_message suffix later
-    var appId = PlatformInfos.isAndroid ? AppConfig.pushNotificationsAndroidAppId : AppConfig.pushNotificationsIOSAppId;
+    var appId = PlatformInfos.isAndroid
+        ? AppConfig.pushNotificationsAndroidAppId
+        : AppConfig.pushNotificationsIOSAppId;
     // we need the deviceAppId to remove potential legacy UP pusher
     var deviceAppId = '$appId.${client.deviceID}';
     // appId may only be up to 64 chars as per spec
@@ -183,8 +191,7 @@ class BackgroundPush {
           currentPushers.first.deviceDisplayName == client.deviceName &&
           currentPushers.first.lang == 'en' &&
           currentPushers.first.data.url.toString() == gatewayUrl &&
-          currentPushers.first.data.format ==
-              AppConfig.pushNotificationsPusherFormat) {
+          currentPushers.first.data.format == AppConfig.pushNotificationsPusherFormat) {
         Logs().i('[Push] Pusher already set');
       } else {
         Logs().i('Need to set new pusher');
@@ -197,9 +204,7 @@ class BackgroundPush {
       Logs().w('[Push] Missing required push credentials');
     }
     for (final pusher in pushers) {
-      if ((token != null &&
-              pusher.pushkey != token &&
-              deviceAppId == pusher.appId) ||
+      if ((token != null && pusher.pushkey != token && deviceAppId == pusher.appId) ||
           oldTokens.contains(pusher.pushkey)) {
         try {
           await client.deletePusher(pusher);
@@ -344,11 +349,9 @@ class BackgroundPush {
           .toString()
           .split('?')
           .first;
-      final res =
-          json.decode(utf8.decode((await http.get(Uri.parse(url))).bodyBytes));
+      final res = json.decode(utf8.decode((await http.get(Uri.parse(url))).bodyBytes));
       if (res['gateway'] == 'matrix' ||
-          (res['unifiedpush'] is Map &&
-              res['unifiedpush']['gateway'] == 'matrix')) {
+          (res['unifiedpush'] is Map && res['unifiedpush']['gateway'] == 'matrix')) {
         endpoint = url;
       }
     } catch (e) {
@@ -405,6 +408,7 @@ class BackgroundPush {
   /// sort by [roomId] which is a String. To make sure that we don't have duplicated
   /// IDs we map the [roomId] to a number and store this number.
   late Map<String, int> idMap;
+
   Future<void> _loadIdMap() async {
     idMap = Map<String, int>.from(
       json.decode(
@@ -434,6 +438,7 @@ class BackgroundPush {
   }
 
   bool _clearingPushLock = false;
+
   Future<void> _onClearingPush({bool getFromServer = true}) async {
     if (_clearingPushLock) {
       return;
@@ -460,9 +465,7 @@ class BackgroundPush {
             Logs().v('[Push] Error one-shot syncing', e);
           });
           if (!syncErrored) {
-            emptyRooms = client.rooms
-                .where((r) => r.notificationCount == 0)
-                .map((r) => r.id);
+            emptyRooms = client.rooms.where((r) => r.notificationCount == 0).map((r) => r.id);
           }
         }
         if (syncErrored) {
@@ -471,25 +474,19 @@ class BackgroundPush {
               '[Push] failed to sync for fallback push, fetching notifications endpoint...',
             );
             final notifications = await client.getNotifications(limit: 20);
-            final notificationRooms =
-                notifications.notifications.map((n) => n.roomId).toSet();
-            emptyRooms = client.rooms
-                .where((r) => !notificationRooms.contains(r.id))
-                .map((r) => r.id);
+            final notificationRooms = notifications.notifications.map((n) => n.roomId).toSet();
+            emptyRooms =
+                client.rooms.where((r) => !notificationRooms.contains(r.id)).map((r) => r.id);
           } catch (e) {
             Logs().v(
               '[Push] failed to fetch pending notifications for clearing push, falling back...',
               e,
             );
-            emptyRooms = client.rooms
-                .where((r) => r.notificationCount == 0)
-                .map((r) => r.id);
+            emptyRooms = client.rooms.where((r) => r.notificationCount == 0).map((r) => r.id);
           }
         }
       } else {
-        emptyRooms = client.rooms
-            .where((r) => r.notificationCount == 0)
-            .map((r) => r.id);
+        emptyRooms = client.rooms.where((r) => r.notificationCount == 0).map((r) => r.id);
       }
       await _loadIdMap();
       var changed = false;

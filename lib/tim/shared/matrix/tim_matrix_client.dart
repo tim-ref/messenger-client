@@ -12,9 +12,8 @@
 import 'package:fluffychat/tim/shared/errors/tim_bad_state_exception.dart';
 import 'package:fluffychat/tim/shared/matrix/tim_case_reference_content_blob.dart';
 import 'package:fluffychat/tim/tim_constants.dart';
-import 'package:matrix/src/utils/cached_stream_controller.dart';
-
 import 'package:matrix/matrix.dart';
+import 'package:matrix/src/utils/cached_stream_controller.dart';
 
 /// Abstraction to access Matrix data.
 abstract class TimMatrixClient {
@@ -342,10 +341,9 @@ class TimMatrixClientImpl implements TimMatrixClient {
 
     if (groupCall) {
       powerLevelContentOverride ??= {};
-      powerLevelContentOverride['events'] = <String, dynamic>{
-        EventTypes.GroupCallMemberPrefix: 0,
-        EventTypes.GroupCallPrefix: 0,
-      };
+      powerLevelContentOverride['events'] ??= {};
+      powerLevelContentOverride['events'][EventTypes.GroupCallMember] ??=
+          powerLevelContentOverride['events_default'] ?? 0;
     }
 
     if (name != null &&

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 05.12.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -84,10 +84,11 @@ class SettingsChatView extends StatelessWidget {
                 defaultValue: AppConfig.sendTypingNotifications,
               ),
               SettingsSwitchListTile.adaptive(
+                key: const Key("public_read_receipts_setting"),
                 title: L10n.of(context)!.sendReadReceipts,
-                onChanged: (b) => AppConfig.sendReadReceipts = b,
-                storeKey: SettingKeys.sendReadReceipts,
-                defaultValue: AppConfig.sendReadReceipts,
+                onChanged: (b) => AppConfig.sendPublicReadReceipts = b,
+                storeKey: SettingKeys.sendPublicReadReceipts,
+                defaultValue: AppConfig.sendPublicReadReceipts,
               ),
               if (matrixState.webrtcIsSupported)
                 SettingsSwitchListTile.adaptive(

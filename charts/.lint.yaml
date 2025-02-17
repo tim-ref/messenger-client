@@ -1,0 +1,4 @@
+backend:
+  config:
+    registrationServiceVZDUrl: "akquinet.de"
+    registrationServiceVZDTokenUrl: "akquinet.de"

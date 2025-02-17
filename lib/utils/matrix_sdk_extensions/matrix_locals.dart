@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -193,8 +193,10 @@ class MatrixLocals extends MatrixLocalizations {
   String get noPermission => l10n.noKeyForThisMessage;
 
   @override
-  String redactedAnEvent(String senderName) {
-    return l10n.redactedAnEvent(senderName);
+  String redactedAnEvent(Event redactedEvent) {
+    return l10n.redactedAnEvent(
+      redactedEvent.redactedBecause?.senderFromMemoryOrFallback.calcDisplayname() ?? l10n.user,
+    );
   }
 
   @override
@@ -203,8 +205,10 @@ class MatrixLocals extends MatrixLocalizations {
   }
 
   @override
-  String removedBy(String calcDisplayname) {
-    return l10n.removedBy(calcDisplayname);
+  String removedBy(Event redactedEvent) {
+    return l10n.redactedBy(
+      redactedEvent.senderFromMemoryOrFallback.calcDisplayname(),
+    );
   }
 
   @override
@@ -306,8 +310,7 @@ class MatrixLocals extends MatrixLocalizations {
   String youKicked(String targetName) => l10n.youKicked(targetName);
 
   @override
-  String youKickedAndBanned(String targetName) =>
-      l10n.youKickedAndBanned(targetName);
+  String youKickedAndBanned(String targetName) => l10n.youKickedAndBanned(targetName);
 
   @override
   // TODO: implement youRejectedTheInvitation
@@ -322,4 +325,31 @@ class MatrixLocals extends MatrixLocalizations {
 
   //@override
   String get unknownUser => l10n.user;
+
+  @override
+  String hasKnocked(String targetName) => l10n.hasKnocked(targetName);
+
+  @override
+  String canceledKeyVerification(String senderName) => l10n.canceledKeyVerification(senderName);
+
+  @override
+  String acceptedKeyVerification(String senderName) => l10n.acceptedKeyVerification(senderName);
+
+  @override
+  String completedKeyVerification(String senderName) => l10n.completedKeyVerification(senderName);
+
+  @override
+  String isReadyForKeyVerification(String senderName) => l10n.isReadyForKeyVerification(senderName);
+
+  @override
+  String requestedKeyVerification(String senderName) => l10n.requestedKeyVerification(senderName);
+
+  @override
+  String startedKeyVerification(String senderName) => l10n.startedKeyVerification(senderName);
+
+  @override
+  String invitedBy(String senderName) => senderName;
+
+  @override
+  String get cancelledSend => l10n.sendCanceled;
 }

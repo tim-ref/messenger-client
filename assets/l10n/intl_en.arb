@@ -531,6 +531,12 @@
         "type": "text",
         "description": "Usage hint for the command /unban"
     },
+    "commandHint_sendraw": "Send raw json",
+    "@commandHint_sendraw": {},
+    "commandHint_ignore": "Ignore the given matrix ID",
+    "@commandHint_ignore": {},
+    "commandHint_unignore": "Unignore the given matrix ID",
+    "@commandHint_unignore": {},
     "commandInvalid": "Command invalid",
     "@commandInvalid": {
         "type": "text"
@@ -818,6 +824,7 @@
     },
     "enterASpacepName": "Enter a space name",
     "@enterASpacepName": {},
+    "errorLoadingFuture": "An error occured while loading. ",
     "homeserver": "Homeserver",
     "@homeserver": {},
     "enterYourHomeserver": "Enter your homeserver",
@@ -1192,6 +1199,7 @@
         "type": "text",
         "placeholders": {}
     },
+    "messageEditHistory": "Message edits",
     "messages": "Messages",
     "@messages": {
         "type": "text",
@@ -1532,6 +1540,21 @@
         "type": "text",
         "placeholders": {}
     },
+    "redactedBy": "Redacted by {username}",
+    "@redactedBy": {
+        "type": "text",
+        "placeholders": {
+            "username": {}
+        }
+    },
+    "redactedByBecause": "Redacted by {username} because: \"{reason}\"",
+    "@redactedByBecause": {
+        "type": "text",
+        "placeholders": {
+            "username": {},
+            "reason": {}
+        }
+    },
     "redactedAnEvent": "{username} redacted an event",
     "@redactedAnEvent": {
         "type": "text",
@@ -1575,13 +1598,6 @@
     "@removeAllOtherDevices": {
         "type": "text",
         "placeholders": {}
-    },
-    "removedBy": "Removed by {username}",
-    "@removedBy": {
-        "type": "text",
-        "placeholders": {
-            "username": {}
-        }
     },
     "removeDevice": "Remove device",
     "@removeDevice": {
@@ -2322,6 +2338,12 @@
             "user": {}
         }
     },
+    "hasKnocked": "🚪 {user} has knocked",
+    "@hasKnocked": {
+        "placeholders": {
+            "user": {}
+        }
+    },
     "noEmailWarning": "Please enter a valid email address. Otherwise you won't be able to reset your password. If you don't want to, tap again on the button to continue.",
     "@noEmailWarning": {},
     "users": "Users",
@@ -2520,5 +2542,48 @@
     "inviteRejectionSettingsExceptionsAddExceptionButtonLabel": "Add exception",
     "inviteRejectionSettingsExceptionsListHeader": "{exceptionType, select, allowAll {Blocked} other {Allowed}} domains and users",
     "inviteRejectionSettingsExceptionsListEntryRemoveIconTooltip": "Remove exception",
-    "inviteRejectionSettingsExceptionsListRemoveAllIconTooltip": "Remove all exceptions"
+    "inviteRejectionSettingsExceptionsListRemoveAllIconTooltip": "Remove all exceptions",
+    "sendCanceled": "Sending canceled",
+    "acceptedKeyVerification": "{sender} accepted key verification",
+    "@acceptedKeyVerification": {
+        "type": "text",
+        "placeholders": {
+            "sender": {}
+        }
+    },
+    "canceledKeyVerification": "{sender} canceled key verification",
+    "@canceledKeyVerification": {
+        "type": "text",
+        "placeholders": {
+            "sender": {}
+        }
+    },
+    "completedKeyVerification": "{sender} completed key verification",
+    "@completedKeyVerification": {
+        "type": "text",
+        "placeholders": {
+            "sender": {}
+        }
+    },
+    "isReadyForKeyVerification": "{sender} is ready for key verification",
+    "@isReadyForKeyVerification": {
+        "type": "text",
+        "placeholders": {
+            "sender": {}
+        }
+    },
+    "requestedKeyVerification": "{sender} requested key verification",
+    "@requestedKeyVerification": {
+        "type": "text",
+        "placeholders": {
+            "sender": {}
+        }
+    },
+    "startedKeyVerification": "{sender} started key verification",
+    "@startedKeyVerification": {
+        "type": "text",
+        "placeholders": {
+            "sender": {}
+        }
+    }
 }

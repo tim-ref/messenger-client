@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 26.11.2024
+ * Modified by akquinet GmbH on 05.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -501,7 +501,7 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
       context: context,
       future: () => Matrix.of(context).client.setPresence(
             Matrix.of(context).client.userID!,
-            PresenceType.online,
+            AppConfig.sendPresenceUpdates ? PresenceType.online : PresenceType.offline,
             statusMsg: input.single,
           ),
     );

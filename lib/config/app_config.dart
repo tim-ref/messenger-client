@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 05.12.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -56,7 +56,7 @@ abstract class AppConfig {
   static bool autoplayImages = true;
   static bool sendOnEnter = false;
   static bool sendTypingNotifications = false;
-  static bool sendReadReceipts = false;
+  static bool sendPublicReadReceipts = false;
   static bool sendPresenceUpdates = false;
   static bool experimentalVoip = false;
   static const bool hideTypingUsernames = false;

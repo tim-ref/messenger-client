@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.04.2024
+ * Modified by akquinet GmbH on 05.12.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -118,7 +118,8 @@ extension LocalNotificationsExtension on MatrixState {
         final action = DesktopNotificationActions.values.singleWhere((a) => a.name == actionStr);
         switch (action) {
           case DesktopNotificationActions.seen:
-            if (AppConfig.sendReadReceipts) room.setReadMarker(event.eventId, mRead: event.eventId);
+            room.setReadMarker(event.eventId,
+                mRead: event.eventId, public: AppConfig.sendPublicReadReceipts);
             break;
           case DesktopNotificationActions.openChat:
             VRouter.of(navigatorContext).toSegments(['rooms', room.id]);

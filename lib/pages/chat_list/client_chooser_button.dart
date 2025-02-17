@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 20.11.2024
+ * Modified by akquinet GmbH on 05.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,18 +9,19 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:keyboard_shortcuts/keyboard_shortcuts.dart';
 import 'package:logger/logger.dart';
 import 'package:matrix/matrix.dart';
+import 'package:provider/provider.dart';
 import 'package:vrouter/vrouter.dart';
 
+import '../../tim/shared/tim_services.dart';
 import '../../utils/fluffy_share.dart';
 import 'chat_list.dart';
 
@@ -35,12 +36,16 @@ class ClientChooserButton extends StatefulWidget {
 
 class _ClientChooserButtonState extends State<ClientChooserButton> {
   late final Future<Profile?>? _ownProfileFuture;
+  late final Future<bool>? _hideContactManagementFuture;
 
   @override
   void initState() {
     super.initState();
     final matrix = Matrix.of(context);
     _ownProfileFuture = fetchOwnProfileSafe(matrix);
+
+    final versionService = context.read<TimServices>().timVersionService;
+    _hideContactManagementFuture = versionService.versionFeaturesClientSideInviteRejection();
   }
 
   Future<Profile?> fetchOwnProfileSafe(MatrixState matrix) async {
@@ -52,7 +57,7 @@ class _ClientChooserButtonState extends State<ClientChooserButton> {
     }
   }
 
-  List<PopupMenuEntry<Object>> _bundleMenuItems(BuildContext context) {
+  List<PopupMenuEntry<Object>> _bundleMenuItems(BuildContext context, bool hideContactManagement) {
     final matrix = Matrix.of(context);
     final bundles = matrix.accountBundles.keys.toList()
       ..sort(
@@ -83,17 +88,18 @@ class _ClientChooserButtonState extends State<ClientChooserButton> {
           ],
         ),
       ),
-      PopupMenuItem(
-        key: const ValueKey("popupMenuContacts"),
-        value: SettingsAction.contacts,
-        child: Row(
-          children: [
-            const Icon(Icons.contacts_outlined),
-            const SizedBox(width: 18),
-            Text(L10n.of(context)!.timContactApprovals),
-          ],
+      if (!hideContactManagement)
+        PopupMenuItem(
+          key: const ValueKey("popupMenuContacts"),
+          value: SettingsAction.contacts,
+          child: Row(
+            children: [
+              const Icon(Icons.contacts_outlined),
+              const SizedBox(width: 18),
+              Text(L10n.of(context)!.timContactApprovals),
+            ],
+          ),
         ),
-      ),
       PopupMenuItem(
         value: SettingsAction.invite,
         child: Row(
@@ -243,20 +249,31 @@ class _ClientChooserButtonState extends State<ClientChooserButton> {
             onKeysPressed: () => _previousAccount(matrix, context),
             child: const SizedBox.shrink(),
           ),
-          PopupMenuButton<Object>(
-            key: const ValueKey("popupMenuButton"),
-            onSelected: (o) => _clientSelected(o, context),
-            itemBuilder: _bundleMenuItems,
-            child: Material(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(99),
-              child: Avatar(
-                mxContent: snapshot.data?.avatarUrl,
-                name: snapshot.data?.displayName ?? matrix.client.userID!.localpart,
-                size: 28,
-                fontSize: 12,
-              ),
-            ),
+          FutureBuilder<bool?>(
+            future: _hideContactManagementFuture,
+            builder: (context, snapshotContactManagement) {
+              return PopupMenuButton<Object>(
+                key: const ValueKey("popupMenuButton"),
+                onSelected: (o) => _clientSelected(o, context),
+                itemBuilder: (_) {
+                  if (snapshotContactManagement.hasData && snapshotContactManagement.data == true) {
+                    return _bundleMenuItems(context, true);
+                  } else {
+                    return _bundleMenuItems(context, false);
+                  }
+                },
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(99),
+                  child: Avatar(
+                    mxContent: snapshot.data?.avatarUrl,
+                    name: snapshot.data?.displayName ?? matrix.client.userID!.localpart,
+                    size: 28,
+                    fontSize: 12,
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),

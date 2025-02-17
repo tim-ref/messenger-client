@@ -41,9 +41,9 @@ http://localhost:8989/
 
 ## Requirements
 
-> <span style="color:orange;">IMPORTANT:</span> Choose flutter sdk version **3.10.X** - newer versions are not supported!
+> <span style="color:orange;">IMPORTANT:</span> Choose flutter sdk version **3.24.X** - newer versions are not supported!
 
-* Flutter **3.10.4+**
+* Flutter **3.24** (tested: 3.24.4, Dart 3.5.4)
     * download SDK:
         * [for Windows](https://docs.flutter.dev/release/archive?tab=windows)
         * [for Linux](https://docs.flutter.dev/release/archive?tab=linux)
@@ -64,7 +64,7 @@ http://localhost:8989/
 
 To run the web client the following are required (see [Requirements](#requirements) for helpful links).
 
-* Flutter **3.10.4**
+* Flutter (version see above)
 * Browser: Current version of Google Chrome is the recommended browser. Firefox, Safari and Microsoft Edge are supported by flutter as well but are not 
 as thoroughly tested as Google Chrome.
 
@@ -104,6 +104,15 @@ the web client can be accessed under http://0.0.0.0:8989.
     * to accept the licenses i needed to use java 11:
         * e.g. `sdk use java 11.0.18-zulu`
         * `flutter doctor --android-licenses`
+5. Flutter can default to using Android Studio's JBR instead of the JDK at $JAVA_HOME. If this is the case,
+   switching SDKs with SdkMan has no effect, and updating Android Studio can break your Android build.
+   You can diagnose this misconfiguration by running `flutter doctor -v`. If it yields something like
+   "Java binary at: /Users/username/Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/java",
+   you're using the JBR.
+   You can switch to the current system JDK like this:
+   ```shell
+   flutter config --jdk-dir $JAVA_HOME
+   ```
 
 ### Code generation
 
@@ -112,7 +121,7 @@ the web client can be accessed under http://0.0.0.0:8989.
 Serialization is handled via [json_serializable](https://pub.dev/packages/json_serializable).
 After editing models with the annotation "@JsonSerializable", run the following command in the package directory:
 ```shell 
-dart run build_runner build
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 The generated code can be found in the referenced `*.g.dart` files.
@@ -176,7 +185,7 @@ Import the necessary classes and use the client as required in your implementati
 
 To run all test cases in this repository use
 ```shell
-$ flutter test
+$ flutter test --dart-define=TOKEN_DISPENSER_URL=https://timref-auth.eu.timref.akquinet.nx2.dev:8448/2/dispenseToken
 ```
 
 ### Code style & quality

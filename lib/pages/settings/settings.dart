@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 05.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,18 +11,17 @@
 
 import 'dart:async';
 
-import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
-import 'package:flutter/material.dart';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:matrix/matrix.dart';
 
-import 'package:fluffychat/utils/platform_infos.dart';
 import '../../widgets/matrix.dart';
 import '../bootstrap/bootstrap_dialog.dart';
 import 'settings_view.dart';
@@ -57,6 +56,15 @@ class SettingsController extends State<Settings> {
         OkCancelResult.cancel) {
       return;
     }
+    final client = Matrix.of(context).client;
+
+    if (client.userID != null) {
+      client.setPresence(
+        client.userID!,
+        PresenceType.offline,
+      );
+    }
+
     final matrix = Matrix.of(context);
     await showFutureLoadingDialog(
       context: context,
@@ -112,9 +120,7 @@ class SettingsController extends State<Settings> {
     MatrixFile file;
     if (PlatformInfos.isMobile) {
       final result = await ImagePicker().pickImage(
-        source: action == AvatarAction.camera
-            ? ImageSource.camera
-            : ImageSource.gallery,
+        source: action == AvatarAction.camera ? ImageSource.camera : ImageSource.gallery,
         imageQuality: 50,
       );
       if (result == null) return;
@@ -158,12 +164,10 @@ class SettingsController extends State<Settings> {
     if (client.prevBatch == null) {
       await client.onSync.stream.first;
     }
-    final crossSigning =
-        await client.encryption?.crossSigning.isCached() ?? false;
-    final needsBootstrap =
-        await client.encryption?.keyManager.isCached() == false ||
-            client.encryption?.crossSigning.enabled == false ||
-            crossSigning == false;
+    final crossSigning = await client.encryption?.crossSigning.isCached() ?? false;
+    final needsBootstrap = await client.encryption?.keyManager.isCached() == false ||
+        client.encryption?.crossSigning.enabled == false ||
+        crossSigning == false;
     final isUnknownSession = client.isUnknownSession;
     setState(() {
       showChatBackupBanner = needsBootstrap || isUnknownSession;

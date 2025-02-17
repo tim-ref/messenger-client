@@ -12,11 +12,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:fluffychat/tim/feature/hba/authentication/hba_authentication_dispenser.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
-
-import 'package:fluffychat/tim/feature/hba/authentication/hba_authentication_dispenser.dart';
 
 void main() {
   test('can fetch token from dispenser', () async {
@@ -26,9 +25,10 @@ void main() {
       }
 
       return Response(
-          """{"access_token":"token","token_type":"bearer","expires_in":86400}""",
-          200,
-          headers: {'content-type': 'application/json'},);
+        """{"access_token":"token","token_type":"bearer","expires_in":86400}""",
+        200,
+        headers: {'content-type': 'application/json'},
+      );
     });
 
     final sut = HbaTokenDispenserAuthentication(mockClient);
@@ -46,8 +46,8 @@ void main() {
 
     final sut = HbaTokenDispenserAuthentication(mockClient);
 
-    final matcher = isA<HttpException>()
-        .having((e) => e.message, "message", equals("unexpected status 404"));
+    final matcher =
+        isA<HttpException>().having((e) => e.message, "message", equals("unexpected status 404"));
     await expectLater(sut.getHbaToken(), throwsA(matcher));
   });
 
@@ -58,8 +58,8 @@ void main() {
 
     final sut = HbaTokenDispenserAuthentication(mockClient);
 
-    final matcher = isA<FormatException>()
-        .having((e) => e.source, "body", contains("invalid json"));
+    final matcher =
+        isA<FormatException>().having((e) => e.source, "body", contains("invalid json"));
     await expectLater(sut.getHbaToken(), throwsA(matcher));
   });
 
@@ -70,24 +70,28 @@ void main() {
 
     final sut = HbaTokenDispenserAuthentication(mockClient);
 
-    final matcher = isA<FormatException>()
-        .having((e) => e.message, "message", contains("""expires_in"""));
+    final matcher =
+        isA<FormatException>().having((e) => e.message, "message", contains("""expires_in"""));
     await expectLater(sut.getHbaToken(), throwsA(matcher));
   });
 
-  test('should have timeout', () async {
-    final mockClient = MockClient((request) {
-      return Future.delayed(
-        const Duration(seconds: 1),
-        () => Response("", 200),
+  test(
+    'should have timeout',
+    () async {
+      final mockClient = MockClient((request) {
+        return Future.delayed(
+          const Duration(seconds: 1),
+          () => Response("", 200),
+        );
+      });
+
+      final sut = HbaTokenDispenserAuthentication(
+        mockClient,
+        timeout: const Duration(milliseconds: 1000),
       );
-    });
 
-    final sut = HbaTokenDispenserAuthentication(
-      mockClient,
-      timeout: const Duration(milliseconds: 1000),
-    );
-
-    await expectLater(sut.getHbaToken(), throwsA(isA<TimeoutException>()));
-  }, timeout: const Timeout(Duration(seconds: 30)),);
+      await expectLater(sut.getHbaToken(), throwsA(isA<TimeoutException>()));
+    },
+    timeout: const Timeout(Duration(seconds: 30)),
+  );
 }

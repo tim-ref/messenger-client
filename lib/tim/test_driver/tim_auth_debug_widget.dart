@@ -9,16 +9,16 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'dart:async';
+import 'dart:convert';
 
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
+import 'package:fluffychat/tim/test_driver/test_driver_state_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
 import '../feature/automated_invite_rejection/invite_rejection_policy.dart';
 import '../feature/automated_invite_rejection/invite_rejection_policy_json.dart';
 import '../feature/automated_invite_rejection/invite_rejection_policy_repository.dart';
-import '../shared/tim_services.dart';
 
 class TimAuthConceptDebugWidget extends StatefulWidget {
   const TimAuthConceptDebugWidget({Key? key}) : super(key: key);
@@ -28,93 +28,43 @@ class TimAuthConceptDebugWidget extends StatefulWidget {
 }
 
 class _TimAuthConceptDebugWidgetState extends State<TimAuthConceptDebugWidget> {
-  late Stream<BasicEvent> _accountDataStream;
-  late StreamSubscription<BasicEvent> _streamSubscription;
-
-  Set<String> domainExceptions = {};
-  Set<String> userExceptions = {};
-  String defaultSetting = "";
-  bool isInitialLoading = true;
-
   @override
-  void initState() {
-    super.initState();
-    _accountDataStream = TimProvider.of(context)
-        .matrix()
-        .client()
-        .onAccountDataChange()
-        .stream
-        .where((event) => event.type == permissionConfigNameSpace);
+  Widget build(BuildContext context) => StreamBuilder<BasicEvent>(
+        stream: TimProvider.of(context)
+            .matrix()
+            .client()
+            .onAccountDataChange()
+            .stream
+            .where((event) => event.type == permissionConfigNameSpace),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text(snapshot.error.toString());
+          }
+          if (snapshot.hasData) {
+            final data = parseRejectionPolicyFromJson(snapshot.requireData.content);
+            final defaultSetting = data is AllowAllInvites ? 'allow all' : 'block all';
 
-    // Load initial data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getInitialAccountData(TimProvider.of(context));
-    });
+            final domainExceptions = switch (data) {
+              AllowAllInvites() => data.blockedDomains,
+              BlockAllInvites() => data.allowedDomains,
+            };
 
-    // Listen to the stream
-    _streamSubscription = _accountDataStream.listen(_updateAccountData);
-  }
+            final userExceptions = switch (data) {
+              AllowAllInvites() => data.blockedUsers,
+              BlockAllInvites() => data.allowedUsers,
+            };
 
-  Future<void> _getInitialAccountData(TimServices timService) async {
-    final policy = await timService.inviteRejectionPolicyRepository().getCurrentPolicy();
-
-    if (mounted) {
-      setState(() {
-        switch (policy) {
-          case AllowAllInvites():
-            domainExceptions = policy.blockedDomains;
-            userExceptions = policy.blockedUsers;
-            defaultSetting = 'allow all';
-            break;
-          case BlockAllInvites():
-            domainExceptions = policy.allowedDomains;
-            userExceptions = policy.allowedUsers;
-            defaultSetting = 'block all';
-            break;
-        }
-        isInitialLoading = false;
-      });
-    }
-  }
-
-  void _updateAccountData(BasicEvent event) {
-    final data = parseRejectionPolicyFromJson(event.content);
-
-    if (mounted) {
-      setState(() {
-        defaultSetting = data is AllowAllInvites ? 'allow all' : 'block all';
-
-        domainExceptions = switch (data) {
-          AllowAllInvites() => data.blockedDomains,
-          BlockAllInvites() => data.allowedDomains,
-        };
-
-        userExceptions = switch (data) {
-          AllowAllInvites() => data.blockedUsers,
-          BlockAllInvites() => data.allowedUsers,
-        };
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    // Cancel the stream subscription
-    _streamSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return isInitialLoading
-        ? Container()
-        : Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(defaultSetting, key: const ValueKey("TimAuthMode")),
-        Text(domainExceptions.join(';'), key: const ValueKey("TimAuthDomainExceptions")),
-        Text(userExceptions.join(';'), key: const ValueKey("TimAuthUserExceptions")),
-      ],
-    );
-  }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(defaultSetting, key: const ValueKey("TimAuthMode")),
+                Text(domainExceptions.join(';') ?? '',
+                    key: const ValueKey("TimAuthDomainExceptions")),
+                Text(userExceptions.join(';') ?? '', key: const ValueKey("TimAuthUserExceptions")),
+              ],
+            );
+          }
+          return const Text("no tim auth concept list received yet");
+        },
+      );
 }

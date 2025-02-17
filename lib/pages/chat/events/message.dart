@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 16.12.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -32,6 +32,7 @@ class Message extends StatelessWidget {
   final Event? nextEvent;
   final bool displayReadMarker;
   final void Function(Event)? onSelect;
+  final void Function(Event) onEditHistoryTap;
   final void Function(Event)? onAvatarTab;
   final void Function(Event)? onInfoTab;
   final void Function(String)? scrollToEventId;
@@ -52,6 +53,7 @@ class Message extends StatelessWidget {
     required this.onSwipe,
     this.selected = false,
     required this.timeline,
+    required this.onEditHistoryTap,
     Key? key,
   }) : super(key: key);
 
@@ -263,26 +265,29 @@ class Message extends StatelessWidget {
                               timeline,
                               RelationshipTypes.edit,
                             ))
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  top: 4.0 * AppConfig.bubbleSizeFactor,
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.edit_outlined,
-                                      color: textColor.withAlpha(164),
-                                      size: 14,
-                                    ),
-                                    Text(
-                                      ' - ${displayEvent.originServerTs.localizedTimeShort(context)}',
-                                      style: TextStyle(
+                              InkWell(
+                                onTap: () => onEditHistoryTap(event),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    top: 4.0 * AppConfig.bubbleSizeFactor,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.edit_outlined,
                                         color: textColor.withAlpha(164),
-                                        fontSize: 12,
+                                        size: 14,
                                       ),
-                                    ),
-                                  ],
+                                      Text(
+                                        ' - ${displayEvent.originServerTs.localizedTimeShort(context)}',
+                                        style: TextStyle(
+                                          color: textColor.withAlpha(164),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                           ],

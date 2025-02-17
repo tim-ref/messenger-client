@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,16 +11,15 @@
 
 import 'dart:async';
 
+import 'package:fluffychat/config/app_config.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
 import 'events/audio_player.dart';
 
 class RecordingDialog extends StatefulWidget {
@@ -56,7 +55,7 @@ class RecordingDialogState extends State<RecordingDialog> {
         setState(() => error = true);
         return;
       }
-      await Wakelock.enable();
+      await WakelockPlus.enable();
       await _audioRecorder.start(
         path: _recordedPath,
         bitRate: bitRate,
@@ -64,8 +63,7 @@ class RecordingDialogState extends State<RecordingDialog> {
       );
       setState(() => _duration = Duration.zero);
       _recorderSubscription?.cancel();
-      _recorderSubscription =
-          Timer.periodic(const Duration(milliseconds: 100), (_) async {
+      _recorderSubscription = Timer.periodic(const Duration(milliseconds: 100), (_) async {
         final amplitude = await _audioRecorder.getAmplitude();
         var value = 100 + amplitude.current * 2;
         value = value < 1 ? 1 : value;
@@ -88,7 +86,7 @@ class RecordingDialogState extends State<RecordingDialog> {
 
   @override
   void dispose() {
-    Wakelock.disable();
+    WakelockPlus.disable();
     _recorderSubscription?.cancel();
     _audioRecorder.stop();
     super.dispose();
@@ -100,9 +98,8 @@ class RecordingDialogState extends State<RecordingDialog> {
     final path = _recordedPath;
     if (path == null) throw ('Recording failed!');
     const waveCount = AudioPlayerWidget.wavesCount;
-    final step = amplitudeTimeline.length < waveCount
-        ? 1
-        : (amplitudeTimeline.length / waveCount).round();
+    final step =
+        amplitudeTimeline.length < waveCount ? 1 : (amplitudeTimeline.length / waveCount).round();
     final waveform = <int>[];
     for (var i = 0; i < amplitudeTimeline.length; i += step) {
       waveform.add((amplitudeTimeline[i] / 100 * 1024).round());
@@ -147,8 +144,7 @@ class RecordingDialogState extends State<RecordingDialog> {
                           width: 4,
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.primary,
-                            borderRadius:
-                                BorderRadius.circular(AppConfig.borderRadius),
+                            borderRadius: BorderRadius.circular(AppConfig.borderRadius),
                           ),
                           height: maxDecibalWidth * (amplitude / 100),
                         ),
@@ -172,11 +168,7 @@ class RecordingDialogState extends State<RecordingDialog> {
             child: Text(
               L10n.of(context)!.cancel.toUpperCase(),
               style: TextStyle(
-                color: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.color
-                    ?.withAlpha(150),
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withAlpha(150),
               ),
             ),
           ),
@@ -196,8 +188,7 @@ class RecordingDialogState extends State<RecordingDialog> {
           child: Text(
             L10n.of(context)!.cancel.toUpperCase(),
             style: TextStyle(
-              color:
-                  Theme.of(context).textTheme.bodyMedium?.color?.withAlpha(150),
+              color: Theme.of(context).textTheme.bodyMedium?.color?.withAlpha(150),
             ),
           ),
         ),
@@ -229,8 +220,7 @@ class RecordingResult {
     required this.waveform,
   });
 
-  factory RecordingResult.fromJson(Map<String, dynamic> json) =>
-      RecordingResult(
+  factory RecordingResult.fromJson(Map<String, dynamic> json) => RecordingResult(
         path: json['path'],
         duration: json['duration'],
         waveform: List<int>.from(json['waveform']),

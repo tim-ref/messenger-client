@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -12,7 +12,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
 
@@ -65,7 +64,7 @@ extension LocalizedExceptionExtension on Object {
         supportedVersions,
       );
     }
-    if (this is MatrixConnectionException || this is SocketException) {
+    if (this is IOException || this is SocketException) {
       return L10n.of(context)!.noConnectionToTheServer;
     }
     if (this is String) return toString();

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.04.2024
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,19 +9,18 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:emojis/emoji.dart';
+import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:emojis/emoji.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:matrix/matrix.dart';
 import 'package:slugify/slugify.dart';
 
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
 import '../../widgets/avatar.dart';
 import '../../widgets/matrix.dart';
 import 'command_hints.dart';
@@ -148,9 +147,13 @@ class InputBar extends StatelessWidget {
         final state = r.getState(EventTypes.RoomCanonicalAlias);
         if ((state != null &&
                 ((state.content['alias'] is String &&
-                        state.content['alias'].split(':')[0].toLowerCase().contains(roomSearch)) ||
+                        state.content
+                            .tryGet<String>('alias')!
+                            .split(':')[0]
+                            .toLowerCase()
+                            .contains(roomSearch)) ||
                     (state.content['alt_aliases'] is List &&
-                        state.content['alt_aliases'].any(
+                        (state.content['alt_aliases'] as List).any(
                           (l) => l is String && l.split(':')[0].toLowerCase().contains(roomSearch),
                         )))) ||
             (r.getLocalizedDisplaynameFromCustomNameEvent().toLowerCase().contains(roomSearch))) {

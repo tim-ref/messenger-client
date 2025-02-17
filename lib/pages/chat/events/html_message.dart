@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.04.2024
+ * Modified by akquinet GmbH on 18.12.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,33 +9,57 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
+import 'package:fluffychat/config/app_config.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
+import 'package:fluffychat/widgets/avatar.dart';
+import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_highlighter/flutter_highlighter.dart';
 import 'package:flutter_highlighter/themes/shades-of-purple.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html_table/flutter_html_table.dart';
+import 'package:html/parser.dart' as html_parser;
 import 'package:linkify/linkify.dart';
 import 'package:matrix/matrix.dart';
 
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/mxc_image.dart';
 import '../../../utils/url_launcher.dart';
 
 class HtmlMessage extends StatelessWidget {
-  final String html;
+  late final String html;
   final Room room;
   final Color textColor;
 
-  const HtmlMessage({
+  HtmlMessage({
     Key? key,
-    required this.html,
+    required String html,
     required this.room,
     this.textColor = Colors.black,
-  }) : super(key: key);
+  }) : super(key: key) {
+    final parser = html_parser.HtmlParser(html);
+    final parsed = parser.parseFragment();
+    if (parser.errors.isNotEmpty) {
+      Logs().w("Errors when parsing message: ${parser.errors}");
+      // Don't do anything on parsing errors, we don't want to break the message.
+      this.html = html;
+    } else {
+      // inline — <span data-mx-maths="…"><code>…</code></span>           → <span>…</span>
+      for (final span in parsed.querySelectorAll("span[data-mx-maths]")) {
+        final maths = span.attributes.remove("data-mx-maths");
+        if (maths != null) {
+          span.innerHtml = maths;
+        }
+      }
+      // block  — <div data-mx-maths="…"><pre><code>…</code></pre></div>   → <div>…</div>
+      for (final div in parsed.querySelectorAll("div[data-mx-maths]")) {
+        final maths = div.attributes.remove("data-mx-maths");
+        if (maths != null) {
+          div.innerHtml = maths;
+        }
+      }
+      this.html = parsed.outerHtml;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -334,6 +358,7 @@ class CodeExtension extends HtmlExtension {
   final double fontSize;
 
   CodeExtension({required this.fontSize});
+
   @override
   Set<String> get supportedTags => {'code'};
 
@@ -371,6 +396,7 @@ class RoomPillExtension extends HtmlExtension {
   final BuildContext context;
 
   RoomPillExtension(this.context, this.room);
+
   @override
   Set<String> get supportedTags => {'a'};
 

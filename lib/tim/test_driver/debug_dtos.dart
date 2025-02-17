@@ -49,44 +49,53 @@ class RoomDebugDto {
 
   factory RoomDebugDto.fromJson(Map<String, dynamic> json) => _$RoomDebugDtoFromJson(json);
 
+  static final _inviteMembership = Membership.invite.toString();
+  static final _joinMembership = Membership.join.toString();
+
   static Future<RoomDebugDto> getDtoFromMatrixRoom(Room r, Client client) async {
     final roomStates = generateListFromStates(r.states);
-    final creatorId = roomStates.firstWhere((e) => e.type == "m.room.create").content["creator"];
+    // https://spec.matrix.org/v1.11/rooms/v11/#event-format
+    // „Clients should no longer depend on the creator property in the content of m.room.create events.
+    //  In all room versions, clients can rely on sender instead to determine a room creator.”
+    final senderId = roomStates.firstWhere((e) => e.type == EventTypes.RoomCreate).senderId;
     final roomAccess = r.joinRules == JoinRules.public ? "public" : "private";
 
     final members =
-        r.getParticipants().map((e) => MemberDebugDto(e.id, getMemberState(e, creatorId))).toList();
+        r.getParticipants().map((e) => MemberDebugDto(e.id, getMemberState(e, senderId))).toList();
 
     for (int i = 0; i < members.length; i++) {
       final dbUser = await client.database?.getUser(members[i].mxid, r);
       if (dbUser != null) {
         final userIndex = members.indexWhere((element) => element.mxid == dbUser.id);
 
-        members[userIndex] = MemberDebugDto(dbUser.id, getMemberState(dbUser, creatorId));
+        members[userIndex] = MemberDebugDto(dbUser.id, getMemberState(dbUser, senderId));
       }
     }
 
-    // creator of room is invite which should be join
+    // sender of room create event is invite which should be join
     if (members.any(
-      (member) =>
-          member.mxid == creatorId && member.membershipState == Membership.invite.toString(),
+      (member) => member.mxid == senderId && member.membershipState == _inviteMembership,
     )) {
-      members.firstWhere((member) => member.mxid == creatorId).membershipState =
-          Membership.join.toString();
+      members.firstWhere((member) => member.mxid == senderId).membershipState = _joinMembership;
     }
 
-    final roomStateDebugDtos = roomStates
-        .map(
-          (e) => StateDebugDto(
-            e.content.toString(),
-            e.eventId,
-            e.roomId,
-            e.senderId,
-            e.stateKey,
-            e.type,
-          ),
-        )
-        .toList();
+    final roomStateDebugDtos = roomStates.map((e) {
+      String? eventId;
+      String? roomId;
+      if (e.runtimeType is Event) {
+        eventId = (e as Event).eventId;
+        roomId = e.roomId;
+      }
+
+      return StateDebugDto(
+        e.content.toString(),
+        eventId,
+        roomId,
+        e.senderId,
+        e.stateKey,
+        e.type,
+      );
+    }).toList();
 
     return RoomDebugDto(
       r.id,
@@ -108,7 +117,7 @@ class RoomDebugDto {
 //
 // User.membership returns membership.join as default if missing =>
 // invited member is joined before join was triggered
-String getMemberState(User e, String creatorId) {
+String getMemberState(User e, String senderId) {
   if (e.content['membership'] != null) {
     return e.membership.toString();
   } else {
@@ -131,7 +140,7 @@ class MemberDebugDto {
 @JsonSerializable()
 class StateDebugDto {
   String content;
-  String eventId;
+  String? eventId;
   String? roomId;
   String sender;
   String? stateKey;
@@ -151,7 +160,8 @@ class StateDebugDto {
   factory StateDebugDto.fromJson(Map<String, dynamic> json) => _$StateDebugDtoFromJson(json);
 }
 
-List<Event> generateListFromStates(Map<String, Map<String, Event>> states) {
+List<StrippedStateEvent> generateListFromStates(
+    Map<String, Map<String, StrippedStateEvent>> states) {
   // first turn the outer map into a list of all inner maps
   final outerMapAsList = states.entries.map((entry) => entry.value).toList();
   // then turn all the inner maps into lists
@@ -174,11 +184,11 @@ String timelineToMessageJsonString(Timeline t) {
         (e) => MessageDebugDto(
           e.eventId,
           e.originServerTs.toUtc().toIso8601String(),
-          e.messageType == "m.text" ? e.text : e.content["fileName"] ?? e.text,
+          e.messageType == "m.text" ? e.text : e.content.tryGet("fileName") ?? e.text,
           e.senderId,
           e.messageType,
           const JsonEncoder().convert(e),
-          e.messageType == "m.text" ? null : (e.content["fileId"] ?? e.text),
+          e.messageType == "m.text" ? null : (e.content.tryGet("fileId") ?? e.text),
         ),
       )
       .toList();

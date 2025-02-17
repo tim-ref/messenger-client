@@ -431,6 +431,12 @@
     "type": "text",
     "description": "Usage hint for the command /unban"
   },
+  "commandHint_sendraw": "Rohes JSON senden",
+  "@commandHint_sendraw": {},
+  "commandHint_ignore": "Angegebene Matrix-ID ignorieren",
+  "@commandHint_ignore": {},
+  "commandHint_unignore": "Angegebene Matrix-ID nicht mehr ignorieren",
+  "@commandHint_unignore": {},
   "commandInvalid": "Befehl ungültig",
   "@commandInvalid": {
     "type": "text"
@@ -664,6 +670,11 @@
     "type": "text",
     "placeholders": {}
   },
+  "emptyChat": "Leerer Chat",
+  "@emptyChat": {
+    "type": "text",
+    "placeholders": {}
+  },
   "editRoomAliases": "Raum-Aliase bearbeiten",
   "@editRoomAliases": {
     "type": "text",
@@ -740,6 +751,7 @@
     "type": "text",
     "placeholders": {}
   },
+  "errorLoadingFuture": "Beim Laden ist ein Fehler aufgetreten. ",
   "fileName": "Dateiname",
   "@fileName": {
     "type": "text",
@@ -1079,6 +1091,7 @@
     "type": "text",
     "placeholders": {}
   },
+  "messageEditHistory": "Nachrichtenänderungen",
   "messages": "Nachrichten",
   "@messages": {
     "type": "text",
@@ -1378,6 +1391,21 @@
     "type": "text",
     "placeholders": {}
   },
+  "redactedBy": "Gelöscht von {username}",
+  "@redactedBy": {
+    "type": "text",
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "redactedByBecause": "Gelöscht von {username} weil: \"{reason}\"",
+  "@redactedByBecause": {
+    "type": "text",
+    "placeholders": {
+      "username": {},
+      "reason": {}
+    }
+  },
   "redactedAnEvent": "{username} hat ein Ereignis entfernt",
   "@redactedAnEvent": {
     "type": "text",
@@ -1421,13 +1449,6 @@
   "@removeAllOtherDevices": {
     "type": "text",
     "placeholders": {}
-  },
-  "removedBy": "Entfernt von {username}",
-  "@removedBy": {
-    "type": "text",
-    "placeholders": {
-      "username": {}
-    }
   },
   "removeDevice": "Gerät entfernen",
   "@removeDevice": {
@@ -1520,6 +1541,11 @@
   },
   "sendFile": "Datei senden",
   "@sendFile": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendFileTest": "Test-Datei senden",
+  "@sendFileTest": {
     "type": "text",
     "placeholders": {}
   },
@@ -2431,6 +2457,71 @@
   "@noBackupWarning": {},
   "noOtherDevicesFound": "Keine anderen Geräte anwesend",
   "@noOtherDevicesFound": {},
+  "sendCanceled": "Senden abgebrochen",
+  "@sendCanceled": {},
+  "hasKnocked": "🚪 {user} hat angeklopft",
+  "@hasKnocked": {
+    "placeholders": {
+      "user": {}
+    }
+  },
+  "fileHasBeenSavedAt": "Datei wurde gespeichert unter {path}",
+  "@fileHasBeenSavedAt": {
+    "type": "text",
+    "placeholders": {
+      "path": {}
+    }
+  },
+  "jumpToLastReadMessage": "Zur letzten ungelesenen Nachricht",
+  "@jumpToLastReadMessage": {},
+  "readUpToHere": "Bis hier gelesen",
+  "@readUpToHere": {},
+  "jump": "Springen",
+  "@jump": {},
+  "openLinkInBrowser": "Link im Browser öffnen",
+  "@openLinkInBrowser": {},
+  "acceptedKeyVerification": "{sender} hat die Schlüsselverifikation akzeptiert",
+  "@acceptedKeyVerification": {
+    "type": "text",
+    "placeholders": {
+      "sender": {}
+    }
+  },
+  "canceledKeyVerification": "{sender} hat die Schlüsselverifikation abgebrochen",
+  "@canceledKeyVerification": {
+    "type": "text",
+    "placeholders": {
+      "sender": {}
+    }
+  },
+  "completedKeyVerification": "{sender} hat die Schlüsselverifikation abgeschlossen",
+  "@completedKeyVerification": {
+    "type": "text",
+    "placeholders": {
+      "sender": {}
+    }
+  },
+  "isReadyForKeyVerification": "{sender} ist bereit für die Schlüsselverifikation",
+  "@isReadyForKeyVerification": {
+    "type": "text",
+    "placeholders": {
+      "sender": {}
+    }
+  },
+  "requestedKeyVerification": "{sender} hat eine Schlüsselverifikation angefragt",
+  "@requestedKeyVerification": {
+    "type": "text",
+    "placeholders": {
+      "sender": {}
+    }
+  },
+  "startedKeyVerification": "{sender} hat die Schlüsselverifikation gestartet",
+  "@startedKeyVerification": {
+    "type": "text",
+    "placeholders": {
+      "sender": {}
+    }
+  },
   "timContactApprovals": "Freigaben",
   "timNoContactApprovals": "Keine Freigaben",
   "timApproveContact": "Kontakt freigeben?",
@@ -2469,6 +2560,41 @@
   },
   "timFhirResourceTypePractitionerRole": "Person",
   "timFhirResourceTypeHealthcareService": "Healthcare Service",
+  "practitionerRoleDoctor": "Ärztin/Arzt",
+  "practitionerRoleDentist": "Zahnärztin/Zahnarzt",
+  "practitionerRolePharmacist": "Apotheker/-in",
+  "practitionerRolePharmacistAssistant": "Apothekerassistent/-in",
+  "practitionerRolePharmacyEngineer": "Pharmazieingenieur/-in",
+  "practitionerRolePharmaceuticalTechnicalAssistant": "pharmazeutisch-technische/-r Assistent/-in",
+  "practitionerRolePharmaceuticalCommercialEmployee": "pharmazeutisch-kaufmännische/-r Angestellte",
+  "practitionerRolePharmacyHelper": "Apothekenhelfer/-in",
+  "practitionerRolePharmacyAssistant": "Apothekenassistent/-in",
+  "practitionerRolePharmaceuticalAssistant": "Pharmazeutische/-r Assistent/-in",
+  "practitionerRolePharmacyTechnician": "Apothekenfacharbeiter/-in",
+  "practitionerRolePharmacyTrainee": "Pharmaziepraktikant/-in",
+  "practitionerRoleStudentPharmacist": "Stud.pharm. oder Famulant/-in",
+  "practitionerRolePtaIntern": "PTA-Praktikant/-in",
+  "practitionerRolePkaAzubi": "PKA Auszubildende/-r",
+  "practitionerRolePsychotherapist": "Psychotherapeut/-in",
+  "practitionerRolePsychologicalPsychotherapist": "Psychologische/-r Psychotherapeut/-in",
+  "practitionerRoleChildAndAdolescentPsychotherapist": "Kinder- und Jugendlichenpsychotherapeut/-in",
+  "practitionerRoleParamedic": "Rettungsassistent/-in",
+  "practitionerRoleInsuredPersons": "Versicherte/-r",
+  "practitionerRoleEmergencyParamedic": "Notfallsanitäter/-in",
+  "practitionerRoleNursingAssistant": "Gesundheits- und Krankenpfleger/-in, Gesundheits- und Kinderkrankenpfleger/-in",
+  "practitionerRoleElderlyNurse": "Altenpfleger/-in",
+  "practitionerRoleNursingProfessionals": "Pflegefachfrauen und Pflegefachmänner",
+  "practitionerRoleMidwife": "Hebamme",
+  "practitionerRolePhysio": "Physiotherapeut/-in",
+  "practitionerRoleOptician": "Augenoptiker/-in und Optometrist/-in",
+  "practitionerRoleHearingAcoustician": "Hörakustiker/-in",
+  "practitionerRoleOrthopedicShoemaker": "Orthopädieschuhmacher/-in",
+  "practitionerRoleOrthopaedicTechnician": "Orthopädietechniker/-in",
+  "practitionerRoleDentalTechnician": "Zahntechniker/-in",
+  "practitionerRoleOccupationalTherapist": "Ergotherapeut/-in",
+  "practitionerRoleSpeechTherapist": "Logopäde/Logopädin",
+  "practitionerRolePodiatrist": "Podologe/Podologin",
+  "practitionerRoleNutritionalTherapist": "Ernährungstherapeut/-in",
   "timFhirSearchEmpty": "Keine Ergebnisse gefunden.",
   "timVersionLabel": "Wähle eine TI-Messenger-Version",
   "timVersionClassic": "Classic - TI-Messenger Dienst",

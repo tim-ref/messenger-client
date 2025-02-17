@@ -13,14 +13,14 @@ import 'dart:convert';
 
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:tim_contact_management_api/api.dart';
+import 'package:tim_contact_management_api/api.dart' as api;
 
 class ContactDebugWidget extends StatelessWidget {
   const ContactDebugWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Contact>?>(
+    return StreamBuilder<List<api.Contact>?>(
       stream: TimProvider.of(context).testDriverStateHelper()!.contactApprovalListViewData.stream,
       builder: (context, snapshot) {
         return snapshot.hasData

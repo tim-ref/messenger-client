@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 2025-02-04
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -22,7 +22,6 @@ import 'package:matrix/matrix.dart';
 import 'package:vrouter/vrouter.dart';
 
 class HomeserverPicker extends StatefulWidget {
-
   final bool enableBackButton;
 
   const HomeserverPicker({Key? key, this.enableBackButton = false}) : super(key: key);
@@ -40,13 +39,11 @@ class HomeserverPickerController extends State<HomeserverPicker> {
   bool isLoading = false;
   String searchTerm = '';
 
-  void onChanged(String text) =>
-      setState(() {
+  void onChanged(String text) => setState(() {
         searchTerm = text;
       });
 
-  void setServer(String server) =>
-      setState(() {
+  void setServer(String server) => setState(() {
         homeserverController.text = server;
         searchTerm = '';
         homeserverFocusNode.unfocus();
@@ -72,13 +69,13 @@ class HomeserverPickerController extends State<HomeserverPicker> {
         homeserver = Uri.https(homeserverController.text, '');
       }
       final matrix = Matrix.of(context);
-      matrix.loginHomeserverSummary =
-      await matrix.getLoginClient().checkHomeserver(homeserver);
-      final ssoSupported = matrix.loginHomeserverSummary!.loginFlows
-          .any((flow) => flow.type == 'm.login.sso');
+      final loginClient = matrix.getLoginClient();
+      final (_, _, loginFlows) = await loginClient.checkHomeserver(homeserver);
+      matrix.loginFlows = loginFlows;
+      final ssoSupported = matrix.loginFlows?.any((flow) => flow.type == 'm.login.sso') ?? false;
 
       try {
-        await Matrix.of(context).getLoginClient().register();
+        await loginClient.register(refreshToken: true);
         matrix.loginRegistrationSupported = true;
       } on MatrixException catch (e) {
         matrix.loginRegistrationSupported = e.requireAdditionalAuthentication;
@@ -101,9 +98,7 @@ class HomeserverPickerController extends State<HomeserverPicker> {
 
   @override
   Widget build(BuildContext context) {
-    Matrix
-        .of(context)
-        .navigatorContext = context;
+    Matrix.of(context).navigatorContext = context;
     return HomeserverPickerView(this);
   }
 

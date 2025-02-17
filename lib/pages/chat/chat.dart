@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 07.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -42,9 +42,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vrouter/vrouter.dart';
 
 import '../../config/app_config.dart';
+import '../../tim/feature/chat/message_edit_history_dialog.dart';
 import '../../utils/account_bundles.dart';
 import '../../utils/localized_exception_extension.dart';
 import '../../utils/matrix_sdk_extensions/matrix_file_extension.dart';
+import '../../utils/set_user_presence.dart';
 import 'send_file_dialog.dart';
 import 'send_location_dialog.dart';
 import 'sticker_picker_dialog.dart';
@@ -162,6 +164,8 @@ class ChatController extends State<ChatPageWithRoom> {
   final Set<String> unfolded = {};
 
   Event? replyEvent;
+
+  Event? editEvent;
 
   bool showScrollDownButton = false;
 
@@ -367,13 +371,12 @@ class ChatController extends State<ChatPageWithRoom> {
     if (timeline == null || timeline.events.isEmpty) return;
 
     eventId ??= timeline.events.first.eventId;
-    if (AppConfig.sendReadReceipts) {
-      Logs().v('Set read marker...', eventId);
-      // ignore: unawaited_futures
-      _setReadMarkerFuture = timeline.setReadMarker(eventId).then((_) {
-        _setReadMarkerFuture = null;
-      });
-    }
+    Logs().v('Set read marker...', eventId);
+    _setReadMarkerFuture = timeline
+        .setReadMarker(eventId: eventId, public: AppConfig.sendPublicReadReceipts)
+        .then((_) {
+      _setReadMarkerFuture = null;
+    });
     room.client.updateIosBadge();
   }
 
@@ -411,17 +414,13 @@ class ChatController extends State<ChatPageWithRoom> {
     prefs.remove('draft_$roomId');
     const parseCommands = false;
     // ignore: unawaited_futures
-    room.sendTextEvent(
+    room.sendTextEventWithMentions(
       sendController.text,
       inReplyTo: replyEvent,
+      editEventId: editEvent?.eventId,
       parseCommands: parseCommands,
     );
-    if (AppConfig.sendPresenceUpdates && room.client.userID != null) {
-      room.client.setPresence(
-        room.client.userID!,
-        PresenceType.online,
-      );
-    }
+    setUserPresence(room.client);
     sendController.value = TextEditingValue(
       text: pendingText,
       selection: const TextSelection.collapsed(offset: 0),
@@ -430,6 +429,7 @@ class ChatController extends State<ChatPageWithRoom> {
     setState(() {
       inputText = pendingText;
       replyEvent = null;
+      editEvent = null;
       pendingText = '';
     });
   }
@@ -740,7 +740,7 @@ class ChatController extends State<ChatPageWithRoom> {
               await Event.fromJson(event.toJson(), room).redactEvent();
             }
           } else {
-            await event.remove();
+            await event.cancelSend();
           }
         },
       );
@@ -761,8 +761,9 @@ class ChatController extends State<ChatPageWithRoom> {
     if (isArchived) return false;
     final clients = Matrix.of(context).currentBundle;
     for (final event in selectedEvents) {
-      if (event.canRedact == false && !(clients!.any((cl) => event.senderId == cl!.userID)))
+      if (event.canRedact == false && !(clients!.any((cl) => event.senderId == cl!.userID))) {
         return false;
+      }
     }
     return true;
   }
@@ -791,6 +792,14 @@ class ChatController extends State<ChatPageWithRoom> {
   void replyAction({Event? replyTo}) {
     setState(() {
       replyEvent = replyTo ?? selectedEvents.first;
+      selectedEvents.clear();
+    });
+    inputFocus.requestFocus();
+  }
+
+  void editAction() {
+    setState(() {
+      editEvent = selectedEvents.first;
       selectedEvents.clear();
     });
     inputFocus.requestFocus();
@@ -847,7 +856,9 @@ class ChatController extends State<ChatPageWithRoom> {
     setState(() => showEmojiPicker = false);
     if (emoji == null) return;
     // make sure we don't send the same emoji twice
-    if (_allReactionEvents.any((e) => e.content['m.relates_to']['key'] == emoji.emoji)) return;
+    if (_allReactionEvents.any((e) => e.content.tryGetMap('m.relates_to')?['key'] == emoji.emoji)) {
+      return;
+    }
     return sendEmojiAction(emoji.emoji);
   }
 
@@ -909,12 +920,7 @@ class ChatController extends State<ChatPageWithRoom> {
       );
     }
 
-    if (AppConfig.sendPresenceUpdates && room.client.userID != null) {
-      room.client.setPresence(
-        room.client.userID!,
-        PresenceType.online,
-      );
-    }
+    setUserPresence(room.client);
   }
 
   void clearSelectedEvents() => setState(() {
@@ -1099,6 +1105,17 @@ class ChatController extends State<ChatPageWithRoom> {
 
   bool get isArchived => {Membership.leave, Membership.ban}.contains(room.membership);
 
+  void showEditHistory(Event event) async {
+    await showDialog(
+      context: context,
+      useRootNavigator: false,
+      builder: (_) => MessageEditHistoryDialog(
+        event: event,
+        room: room,
+      ),
+    );
+  }
+
   void showEventInfo([Event? event]) => (event ?? selectedEvents.single).showInfoDialog(context);
 
   void onPhoneButtonTap() async {
@@ -1136,31 +1153,22 @@ class ChatController extends State<ChatPageWithRoom> {
     );
     if (callType == null) return;
 
-    final success = await showFutureLoadingDialog(
-      context: context,
-      future: () => Matrix.of(context).voipPlugin!.voip.requestTurnServerCredentials(),
-    );
-    if (success.result != null) {
-      final voipPlugin = Matrix.of(context).voipPlugin;
-      try {
-        await voipPlugin!.voip.inviteToCall(room.id, callType);
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toLocalizedString(context))),
-        );
-      }
-    } else {
-      await showOkAlertDialog(
-        context: context,
-        title: L10n.of(context)!.unavailable,
-        okLabel: L10n.of(context)!.next,
-        useRootNavigator: false,
+    final voipPlugin = Matrix.of(context).voipPlugin;
+    try {
+      await voipPlugin!.voip.inviteToCall(room, callType);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toLocalizedString(context))),
       );
     }
   }
 
   void cancelReplyEventAction() => setState(() {
         replyEvent = null;
+      });
+
+  void cancelEditEventAction() => setState(() {
+        editEvent = null;
       });
 
   @override

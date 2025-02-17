@@ -15,7 +15,7 @@ import 'package:flutter_gen/gen_l10n/l10n.dart';
 
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:matrix/matrix.dart';
-import 'package:tim_contact_management_api/api.dart';
+import 'package:tim_contact_management_api/api.dart' as api;
 import 'package:vrouter/vrouter.dart';
 
 import 'package:fluffychat/config/themes.dart';
@@ -228,16 +228,16 @@ class _ContactsProfileBottomSheetState extends State<ContactsProfileBottomSheet>
     BuildContext context,
     Profile? profile,
   ) async {
-    final contact = Contact(
+    final contact = api.Contact(
       mxid: profile!.userId,
       displayName: profile.displayName!,
-      inviteSettings: ContactInviteSettings(start: DateTime.now().secondsSinceEpoch),
+      inviteSettings: api.ContactInviteSettings(start: DateTime.now().secondsSinceEpoch),
     );
-    await showFutureLoadingDialog<Contact?>(
+    await showFutureLoadingDialog<api.Contact?>(
       context: context,
       future: () => TimProvider.of(context).contactsApprovalRepository().addApproval(contact),
       onError: (error) =>
-          error is ApiException && error.message != null ? error.message! : error.toString(),
+          error is api.ApiException && error.message != null ? error.message! : error.toString(),
     );
     if (VRouter.of(context).path == '/newcontact') {
       VRouter.of(context).to("/contacts");

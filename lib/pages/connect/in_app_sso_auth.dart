@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 – akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -83,6 +83,7 @@ class InAppSsoAuthState extends State<InAppSsoAuth> {
             LoginType.mLoginToken,
             token: token,
             initialDeviceDisplayName: PlatformInfos.clientName,
+            refreshToken: true,
           ),
     );
   }

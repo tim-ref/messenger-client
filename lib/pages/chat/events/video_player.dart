@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,10 +11,12 @@
 
 import 'dart:io';
 
+import 'package:chewie/chewie.dart';
+import 'package:fluffychat/pages/chat/events/image_bubble.dart';
+import 'package:fluffychat/utils/localized_exception_extension.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:chewie/chewie.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
@@ -22,12 +24,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:video_player/video_player.dart';
 
-import 'package:fluffychat/pages/chat/events/image_bubble.dart';
-import 'package:fluffychat/utils/localized_exception_extension.dart';
-import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
-
 class EventVideoPlayer extends StatefulWidget {
   final Event event;
+
   const EventVideoPlayer(this.event, {Key? key}) : super(key: key);
 
   @override
@@ -73,7 +72,7 @@ class EventVideoPlayerState extends State<EventVideoPlayer> {
           autoInitialize: true,
         );
       }
-    } on MatrixConnectionException catch (e) {
+    } on IOException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toLocalizedString(context)),
@@ -104,9 +103,9 @@ class EventVideoPlayerState extends State<EventVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     final hasThumbnail = widget.event.hasThumbnail;
-    final blurHash = (widget.event.infoMap as Map<String, dynamic>)
-            .tryGet<String>('xyz.amorgan.blurhash') ??
-        fallbackBlurHash;
+    final blurHash =
+        (widget.event.infoMap as Map<String, dynamic>).tryGet<String>('xyz.amorgan.blurhash') ??
+            fallbackBlurHash;
 
     final chewieManager = _chewieManager;
     return Material(

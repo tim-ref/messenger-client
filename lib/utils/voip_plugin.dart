@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,25 +11,25 @@
 
 import 'dart:core';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:fluffychat/pages/chat_list/chat_list.dart';
+import 'package:fluffychat/pages/dialer/dialer.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc_impl;
 import 'package:matrix/matrix.dart';
 import 'package:webrtc_interface/webrtc_interface.dart' hide Navigator;
 
-import 'package:fluffychat/pages/chat_list/chat_list.dart';
-import 'package:fluffychat/pages/dialer/dialer.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'famedlysdk_store.dart';
 import 'voip/callkeep_manager.dart';
 import 'voip/user_media_manager.dart';
 
 class VoipPlugin with WidgetsBindingObserver implements WebRTCDelegate {
   final Client client;
+
   VoipPlugin(this.client) {
     voip = VoIP(client, this);
     Connectivity()
@@ -46,6 +46,7 @@ class VoipPlugin with WidgetsBindingObserver implements WebRTCDelegate {
       didChangeAppLifecycleState(wb.lifecycleState);
     }
   }
+
   bool background = false;
   bool speakerOn = false;
   late VoIP voip;
@@ -65,14 +66,12 @@ class VoipPlugin with WidgetsBindingObserver implements WebRTCDelegate {
   @override
   void didChangeAppLifecycleState(AppLifecycleState? state) {
     Logs().v('AppLifecycleState = $state');
-    background = (state == AppLifecycleState.detached ||
-        state == AppLifecycleState.paused);
+    background = (state == AppLifecycleState.detached || state == AppLifecycleState.paused);
   }
 
   void addCallingOverlay(String callId, CallSession call) {
-    final context = kIsWeb
-        ? ChatList.contextForVoip!
-        : FluffyChatApp.routerKey.currentContext!; // web is weird
+    final context =
+        kIsWeb ? ChatList.contextForVoip! : FluffyChatApp.routerKey.currentContext!; // web is weird
     if (overlayEntry != null) {
       Logs().e('[VOIP] addCallingOverlay: The call session already exists?');
       overlayEntry!.remove();
@@ -119,11 +118,6 @@ class VoipPlugin with WidgetsBindingObserver implements WebRTCDelegate {
     Map<String, dynamic> constraints = const {},
   ]) =>
       webrtc_impl.createPeerConnection(configuration, constraints);
-
-  @override
-  VideoRenderer createRenderer() {
-    return webrtc_impl.RTCVideoRenderer();
-  }
 
   Future<bool> get hasCallingAccount async =>
       kIsWeb ? false : await CallKeepManager().hasPhoneAccountEnabled;
@@ -176,8 +170,7 @@ class VoipPlugin with WidgetsBindingObserver implements WebRTCDelegate {
         addCallingOverlay(call.callId, call);
         try {
           if (!hasCallingAccount) {
-            ScaffoldMessenger.of(FluffyChatApp.routerKey.currentContext!)
-                .showSnackBar(
+            ScaffoldMessenger.of(FluffyChatApp.routerKey.currentContext!).showSnackBar(
               const SnackBar(
                 content: Text(
                   'No calling accounts found (used for native calls UI)',
@@ -209,22 +202,25 @@ class VoipPlugin with WidgetsBindingObserver implements WebRTCDelegate {
   }
 
   @override
-  Future<void> handleGroupCallEnded(GroupCall groupCall) async {
+  Future<void> handleGroupCallEnded(GroupCallSession groupCall) async {
     // TODO: implement handleGroupCallEnded
   }
 
   @override
-  Future<void> handleNewGroupCall(GroupCall groupCall) async {
+  Future<void> handleNewGroupCall(GroupCallSession groupCall) async {
     // TODO: implement handleNewGroupCall
   }
 
   @override
   // TODO: implement canHandleNewCall
-  bool get canHandleNewCall =>
-      voip.currentCID == null && voip.currentGroupCID == null;
+  bool get canHandleNewCall => voip.currentCID == null && voip.currentGroupCID == null;
 
   @override
   Future<void> handleMissedCall(CallSession session) async {
     // TODO: implement handleMissedCall
   }
+
+  @override
+  // TODO: implement keyProvider
+  EncryptionKeyProvider? get keyProvider => throw UnimplementedError();
 }

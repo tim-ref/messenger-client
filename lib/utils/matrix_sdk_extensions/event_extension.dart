@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.07.2024
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,13 +11,12 @@
 
 import 'dart:developer';
 
+import 'package:fluffychat/utils/size_string.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:matrix/matrix.dart';
 
-import 'package:fluffychat/utils/size_string.dart';
 import 'matrix_file_extension.dart';
 
 extension LocalizedBody on Event {
@@ -41,33 +40,25 @@ extension LocalizedBody on Event {
   }
 
   bool get isAttachmentSmallEnough =>
-      infoMap['size'] is int &&
-      infoMap['size'] < room.client.database!.maxFileSize;
+      infoMap['size'] is int && infoMap['size'] < room.client.database!.maxFileSize;
 
   bool get isThumbnailSmallEnough =>
       thumbnailInfoMap['size'] is int &&
       thumbnailInfoMap['size'] < room.client.database!.maxFileSize;
 
   bool get showThumbnail =>
-      [MessageTypes.Image, MessageTypes.Sticker, MessageTypes.Video]
-          .contains(messageType) &&
-      (kIsWeb ||
-          isAttachmentSmallEnough ||
-          isThumbnailSmallEnough ||
-          (content['url'] is String));
+      [MessageTypes.Image, MessageTypes.Sticker, MessageTypes.Video].contains(messageType) &&
+      (kIsWeb || isAttachmentSmallEnough || isThumbnailSmallEnough || (content['url'] is String));
 
-  String? get sizeString => content
-      .tryGetMap<String, dynamic>('info')
-      ?.tryGet<int>('size')
-      ?.sizeString;
+  String? get sizeString =>
+      content.tryGetMap<String, dynamic>('info')?.tryGet<int>('size')?.sizeString;
 
   /// Downloads (and decrypts if necessary) the attachment of this
   /// event and returns it as a [MatrixFile]. If this event doesn't
   /// contain an attachment, this throws an error. Set [getThumbnail] to
   /// true to download the thumbnail instead.
   Future<MatrixFile> downloadAndDecryptAttachmentWithCorrectName(
-      {bool getThumbnail = false,
-        Future<Uint8List> Function(Uri)? downloadCallback}) async {
+      {bool getThumbnail = false, Future<Uint8List> Function(Uri)? downloadCallback}) async {
     if (![EventTypes.Message, EventTypes.Sticker].contains(type)) {
       throw ("This event has the type '$type' and so it can't contain an attachment.");
     }
@@ -81,8 +72,7 @@ extension LocalizedBody on Event {
       throw "This event hasn't any attachment or thumbnail.";
     }
     getThumbnail = mxcUrl != attachmentMxcUrl;
-    final isEncrypted =
-    getThumbnail ? isThumbnailEncrypted : isAttachmentEncrypted;
+    final isEncrypted = getThumbnail ? isThumbnailEncrypted : isAttachmentEncrypted;
     if (isEncrypted && !room.client.encryptionEnabled) {
       throw ('Encryption is not enabled in your Client.');
     }
@@ -101,22 +91,17 @@ extension LocalizedBody on Event {
     // Download the file
     if (uint8list == null) {
       final httpClient = room.client.httpClient;
-      downloadCallback ??=
-          (Uri url) async => (await httpClient.get(url)).bodyBytes;
+      downloadCallback ??= (Uri url) async => (await httpClient.get(url)).bodyBytes;
       uint8list = await downloadCallback(mxcUrl.getDownloadLink(room.client));
-      storeable = database != null &&
-          storeable &&
-          uint8list.lengthInBytes < database.maxFileSize;
+      storeable = database != null && storeable && uint8list.lengthInBytes < database.maxFileSize;
       if (storeable) {
-        await database.storeFile(
-            mxcUrl, uint8list, DateTime.now().millisecondsSinceEpoch);
+        await database.storeFile(mxcUrl, uint8list, DateTime.now().millisecondsSinceEpoch);
       }
     }
 
     // Decrypt the file
     if (isEncrypted) {
-      final fileMap =
-      getThumbnail ? infoMap['thumbnail_file'] : content['file'];
+      final fileMap = getThumbnail ? infoMap['thumbnail_file'] : content['file'];
       if (!fileMap['key']['key_ops'].contains('decrypt')) {
         throw ("Missing 'decrypt' in 'key_ops'.");
       }
@@ -126,12 +111,11 @@ extension LocalizedBody on Event {
         k: fileMap['key']['k'],
         sha256: fileMap['hashes']['sha256'],
       );
-      uint8list =
-      await room.client.nativeImplementations.decryptFile(encryptedFile);
+      uint8list = await room.client.nativeImplementations.decryptFile(encryptedFile);
       if (uint8list == null) {
         throw ('Unable to decrypt file');
       }
     }
-    return MatrixFile(bytes: uint8list, name: content["fileId"] ?? body);
+    return MatrixFile(bytes: uint8list, name: content.tryGet("fileId") ?? body);
   }
 }

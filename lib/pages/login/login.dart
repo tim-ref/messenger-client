@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 05.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,18 +11,18 @@
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:fluffychat/tim/tim_constants.dart';
+import 'package:fluffychat/utils/localized_exception_extension.dart';
+import 'package:fluffychat/widgets/matrix.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:matrix/matrix.dart';
 
-import 'package:fluffychat/utils/localized_exception_extension.dart';
-import 'package:fluffychat/widgets/matrix.dart';
+import '../../config/app_config.dart';
 import '../../utils/platform_infos.dart';
 import 'login_view.dart';
-import 'package:fluffychat/tim/tim_constants.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -39,8 +39,7 @@ class LoginController extends State<Login> {
   bool loading = false;
   bool showPassword = false;
 
-  void toggleShowPassword() =>
-      setState(() => showPassword = !loading && !showPassword);
+  void toggleShowPassword() => setState(() => showPassword = !loading && !showPassword);
 
   void login() async {
     final matrix = Matrix.of(context);
@@ -93,12 +92,19 @@ class LoginController extends State<Login> {
         identifier: identifier,
         // To stay compatible with older server versions
         // ignore: deprecated_member_use
-        user: identifier.type == AuthenticationIdentifierTypes.userId
-            ? username
-            : null,
+        user: identifier.type == AuthenticationIdentifierTypes.userId ? username : null,
         password: passwordController.text,
         initialDeviceDisplayName: PlatformInfos.clientName,
+        refreshToken: true,
       );
+
+      // login successful if no Exception is thrown
+      if (matrix.client.userID != null) {
+        matrix.client.setPresence(
+          matrix.client.userID!,
+          AppConfig.sendPresenceUpdates ? PresenceType.online : PresenceType.offline,
+        );
+      }
     } on MatrixException catch (exception) {
       setState(() => passwordError = exception.errorMessage);
       return setState(() => loading = false);
@@ -123,14 +129,14 @@ class LoginController extends State<Login> {
   void _checkWellKnown(String userId) async {
     if (mounted) setState(() => usernameError = null);
     if (!userId.isValidMatrixId) return;
-    final oldHomeserver = Matrix.of(context).getLoginClient().homeserver;
+    final loginClient = Matrix.of(context).getLoginClient();
+    final oldHomeserver = loginClient.homeserver;
     try {
       var newDomain = Uri.https(userId.domain!, '');
-      Matrix.of(context).getLoginClient().homeserver = newDomain;
+      loginClient.homeserver = newDomain;
       DiscoveryInformation? wellKnownInformation;
       try {
-        wellKnownInformation =
-            await Matrix.of(context).getLoginClient().getWellknown();
+        wellKnownInformation = await loginClient.getWellknown();
         if (wellKnownInformation.mHomeserver.baseUrl.toString().isNotEmpty) {
           newDomain = wellKnownInformation.mHomeserver.baseUrl;
         }
@@ -138,10 +144,10 @@ class LoginController extends State<Login> {
         // do nothing, newDomain is already set to a reasonable fallback
       }
       if (newDomain != oldHomeserver) {
-        await Matrix.of(context).getLoginClient().checkHomeserver(newDomain);
+        await loginClient.checkHomeserver(newDomain);
 
-        if (Matrix.of(context).getLoginClient().homeserver == null) {
-          Matrix.of(context).getLoginClient().homeserver = oldHomeserver;
+        if (loginClient.homeserver == null) {
+          loginClient.homeserver = oldHomeserver;
           // okay, the server we checked does not appear to be a matrix server
           Logs().v(
             '$newDomain is not running a homeserver, asking to use $oldHomeserver',
@@ -149,8 +155,7 @@ class LoginController extends State<Login> {
           final dialogResult = await showOkCancelAlertDialog(
             context: context,
             useRootNavigator: false,
-            message:
-                L10n.of(context)!.noMatrixServer(newDomain, oldHomeserver!),
+            message: L10n.of(context)!.noMatrixServer(newDomain, oldHomeserver!),
             okLabel: L10n.of(context)!.ok,
             cancelLabel: L10n.of(context)!.cancel,
           );
@@ -164,13 +169,13 @@ class LoginController extends State<Login> {
         usernameError = null;
         if (mounted) setState(() {});
       } else {
-        Matrix.of(context).getLoginClient().homeserver = oldHomeserver;
+        loginClient.homeserver = oldHomeserver;
         if (mounted) {
           setState(() {});
         }
       }
     } catch (e) {
-      Matrix.of(context).getLoginClient().homeserver = oldHomeserver;
+      loginClient.homeserver = oldHomeserver;
       usernameError = e.toLocalizedString(context);
       if (mounted) setState(() {});
     }
@@ -187,8 +192,7 @@ class LoginController extends State<Login> {
       fullyCapitalizedForMaterial: false,
       textFields: [
         DialogTextField(
-          initialText:
-              usernameController.text.isEmail ? usernameController.text : '',
+          initialText: usernameController.text.isEmail ? usernameController.text : '',
           hintText: L10n.of(context)!.enterAnEmailAddress,
           keyboardType: TextInputType.emailAddress,
         ),
@@ -198,12 +202,11 @@ class LoginController extends State<Login> {
     final clientSecret = DateTime.now().millisecondsSinceEpoch.toString();
     final response = await showFutureLoadingDialog(
       context: context,
-      future: () =>
-          Matrix.of(context).getLoginClient().requestTokenToResetPasswordEmail(
-                clientSecret,
-                input.single,
-                sendAttempt++,
-              ),
+      future: () => Matrix.of(context).getLoginClient().requestTokenToResetPasswordEmail(
+            clientSecret,
+            input.single,
+            sendAttempt++,
+          ),
     );
     if (response.error != null) return;
     final password = await showTextInputDialog(
@@ -269,8 +272,7 @@ class LoginController extends State<Login> {
 }
 
 extension on String {
-  static final RegExp _phoneRegex =
-      RegExp(r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$');
+  static final RegExp _phoneRegex = RegExp(r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$');
   static final RegExp _emailRegex = RegExp(r'(.+)@(.+)\.(.+)');
 
   bool get isEmail => _emailRegex.hasMatch(this);

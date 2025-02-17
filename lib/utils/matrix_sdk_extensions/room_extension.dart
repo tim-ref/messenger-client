@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 09.07.2024
+ * Modified by akquinet GmbH on 10.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,8 +9,11 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:collection/collection.dart';
 import 'package:fluffychat/tim/tim_constants.dart';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:matrix/matrix.dart';
+import 'package:matrix/src/utils/markdown.dart';
 
 /// Extend the Matrix SDK Room class with TIM custom room functionality
 ///
@@ -32,7 +35,8 @@ extension RoomExtension on Room {
 
   /// The type of the room, defaults to TimRoomTypes.timDefault
   String get roomType {
-    return getState(EventTypes.RoomCreate)?.content['type'] ?? TimRoomType.defaultValue.value;
+    return getState(EventTypes.RoomCreate)?.content.tryGet('type') ??
+        TimRoomType.defaultValue.value;
   }
 
   /// Check if room type is casereference
@@ -75,16 +79,17 @@ extension RoomExtension on Room {
     }
     switch (membership) {
       case Membership.invite:
-        final sender = getState(EventTypes.RoomMember, client.userID!)
-            ?.senderFromMemoryOrFallback
-            .calcDisplayname();
-        if (sender != null) return sender;
+        final event = getState(EventTypes.RoomMember, client.userID!);
+        if (event is Event) {
+          return event.senderFromMemoryOrFallback.calcDisplayname();
+        }
         break;
       case Membership.join:
-        final invitation = getState(EventTypes.RoomMember, client.userID!);
-        if (invitation != null && invitation.unsigned?['prev_sender'] != null) {
-          final name = unsafeGetUserFromMemoryOrFallback(invitation.unsigned?['prev_sender'])
-              .calcDisplayname();
+        final event = getState(EventTypes.RoomMember, client.userID!);
+        if (event is Event && event.unsigned?['prev_sender'] != null) {
+          final name =
+              unsafeGetUserFromMemoryOrFallback(event.unsigned!.tryGet<String>('prev_sender')!)
+                  .calcDisplayname();
           return i18n.wasDirectChatDisplayName(name);
         }
         break;
@@ -110,6 +115,84 @@ extension RoomExtension on Room {
         {'topic': value},
       );
 
+  /// Sends an event to this room with this json as a content. Returns the
+  /// event ID generated from the server.
+  /// It uses list of completer to make sure events are sending in a row.
+  Future<String?> sendTextEventWithMentions(
+    String message, {
+    String? txid,
+    Event? inReplyTo,
+    String? editEventId,
+    bool parseMarkdown = true,
+    bool parseCommands = true,
+    String msgtype = MessageTypes.Text,
+    String? threadRootEventId,
+    String? threadLastEventId,
+  }) {
+    if (parseCommands) {
+      return client.parseAndRunCommand(
+        this,
+        message,
+        inReplyTo: inReplyTo,
+        editEventId: editEventId,
+        txid: txid,
+        threadRootEventId: threadRootEventId,
+        threadLastEventId: threadLastEventId,
+      );
+    }
+    final event = <String, dynamic>{
+      'msgtype': msgtype,
+      'body': message,
+      'm.mentions': {},
+    };
+
+    final Map<String, dynamic> enrichedEvent = parseMarkdown ? enrichEventWithMentions(event) : event;
+    return sendEvent(
+      enrichedEvent,
+      txid: txid,
+      inReplyTo: inReplyTo,
+      editEventId: editEventId,
+      threadRootEventId: threadRootEventId,
+      threadLastEventId: threadLastEventId,
+    );
+  }
+
+  Map<String, dynamic> enrichEventWithMentions(Map<String, dynamic> event) {
+    final enrichedEvent = event;
+    final mentionsRaw = extractRawMentionsFromEventBody(enrichedEvent['body']);
+    final mentionsMxid = extractMentionMxidsFromRawMentionList(mentionsRaw);
+
+    final html = markdown(enrichedEvent['body'],
+        getEmotePacks: () => getImagePacksFlat(ImagePackUsage.emoticon), getMention: getMention);
+    // if the decoded html is the same as the body, there is no need in sending a formatted message
+    if (HtmlUnescape().convert(html.replaceAll(RegExp(r'<br />\n?'), '\n')) !=
+        enrichedEvent['body']) {
+      enrichedEvent['format'] = 'org.matrix.custom.html';
+      enrichedEvent['formatted_body'] = html;
+      enrichedEvent['m.mentions'] = mentionsMxid.isEmpty
+          ? {}
+          : {
+              'user_ids': mentionsMxid,
+            };
+    }
+
+    return enrichedEvent;
+  }
+
+  // Return all mentioned users from a message body
+  static List<String> extractRawMentionsFromEventBody(String text) {
+    // The regular expression matches an '@' followed by one or more word characters.
+    final RegExp regex = RegExp(r'@(\w+)');
+
+    final matches = regex.allMatches(text);
+
+    return matches.map((match) => match.group(0)!).toList();
+  }
+
+  // Extracts the Mxids for a raw Mentions list
+  List<String> extractMentionMxidsFromRawMentionList(List<String> mentionsRaw) =>
+      mentionsRaw.map((e) => getMention(e)).whereNotNull().toList();
+
   /// Sends a [file] to this room after uploading it. Returns the mxc uri of
   /// the uploaded file. If [waitUntilSent] is true, the future will wait until
   /// the message event has received the server. Otherwise the future will only
@@ -122,15 +205,15 @@ extension RoomExtension on Room {
   /// your image before sending. This is ignored if the File is not a
   /// [MatrixImageFile].
   Future<String?> sendFileEventWithMessageBody(
-      MatrixFile file, {
-        String? txid,
-        Event? inReplyTo,
-        String? editEventId,
-        int? shrinkImageMaxDimension,
-        MatrixImageFile? thumbnail,
-        Map<String, dynamic>? extraContent,
-        String? messageBody
-      }) async {
+    MatrixFile file, {
+    String? txid,
+    Event? inReplyTo,
+    String? editEventId,
+    int? shrinkImageMaxDimension,
+    MatrixImageFile? thumbnail,
+    Map<String, dynamic>? extraContent,
+    String? messageBody,
+  }) async {
     txid ??= client.generateUniqueTransactionId();
     sendingFilePlaceholders[txid] = file;
     if (thumbnail != null) {
@@ -191,10 +274,8 @@ extension RoomExtension on Room {
 
     MatrixFile uploadFile = file; // ignore: omit_local_variable_types
     // computing the thumbnail in case we can
-    if (file is MatrixImageFile &&
-        (thumbnail == null || shrinkImageMaxDimension != null)) {
-      syncUpdate.rooms!.join!.values.first.timeline!.events!.first
-          .unsigned![fileSendingStatusKey] =
+    if (file is MatrixImageFile && (thumbnail == null || shrinkImageMaxDimension != null)) {
+      syncUpdate.rooms!.join!.values.first.timeline!.events!.first.unsigned![fileSendingStatusKey] =
           FileSendingStatus.generatingThumbnail.name;
       await _handleFakeSync(syncUpdate);
       thumbnail ??= await file.generateThumbnail(
@@ -216,13 +297,12 @@ extension RoomExtension on Room {
       }
     }
 
-    MatrixFile? uploadThumbnail =
-        thumbnail; // ignore: omit_local_variable_types
+    MatrixFile? uploadThumbnail = thumbnail; // ignore: omit_local_variable_types
     EncryptedFile? encryptedFile;
     EncryptedFile? encryptedThumbnail;
     if (encrypted && client.fileEncryptionEnabled) {
-      syncUpdate.rooms!.join!.values.first.timeline!.events!.first
-          .unsigned![fileSendingStatusKey] = FileSendingStatus.encrypting.name;
+      syncUpdate.rooms!.join!.values.first.timeline!.events!.first.unsigned![fileSendingStatusKey] =
+          FileSendingStatus.encrypting.name;
       await _handleFakeSync(syncUpdate);
       encryptedFile = await file.encrypt();
       uploadFile = encryptedFile.toMatrixFile();
@@ -236,10 +316,9 @@ extension RoomExtension on Room {
 
     final timeoutDate = DateTime.now().add(client.sendTimelineEventTimeout);
 
-    syncUpdate.rooms!.join!.values.first.timeline!.events!.first
-        .unsigned![fileSendingStatusKey] = FileSendingStatus.uploading.name;
-    while (uploadResp == null ||
-        (uploadThumbnail != null && thumbnailUploadResp == null)) {
+    syncUpdate.rooms!.join!.values.first.timeline!.events!.first.unsigned![fileSendingStatusKey] =
+        FileSendingStatus.uploading.name;
+    while (uploadResp == null || (uploadThumbnail != null && thumbnailUploadResp == null)) {
       try {
         uploadResp = await client.uploadContent(
           uploadFile.bytes,
@@ -248,10 +327,10 @@ extension RoomExtension on Room {
         );
         thumbnailUploadResp = uploadThumbnail != null
             ? await client.uploadContent(
-          uploadThumbnail.bytes,
-          filename: uploadThumbnail.name,
-          contentType: uploadThumbnail.mimeType,
-        )
+                uploadThumbnail.bytes,
+                filename: uploadThumbnail.name,
+                contentType: uploadThumbnail.mimeType,
+              )
             : null;
       } on MatrixException catch (_) {
         syncUpdate.rooms!.join!.values.first.timeline!.events!.first
@@ -266,7 +345,7 @@ extension RoomExtension on Room {
           rethrow;
         }
         Logs().v('Send File into room failed. Try again...');
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(const Duration(seconds: 1));
       }
     }
 
@@ -311,9 +390,7 @@ extension RoomExtension on Room {
             'hashes': {'sha256': encryptedThumbnail.sha256}
           },
         if (thumbnail != null) 'thumbnail_info': thumbnail.info,
-        if (thumbnail?.blurhash != null &&
-            file is MatrixImageFile &&
-            file.blurhash == null)
+        if (thumbnail?.blurhash != null && file is MatrixImageFile && file.blurhash == null)
           'xyz.amorgan.blurhash': thumbnail!.blurhash
       },
       if (extraContent != null) ...extraContent,
@@ -329,8 +406,7 @@ extension RoomExtension on Room {
     return eventId;
   }
 
-  Future<void> _handleFakeSync(SyncUpdate syncUpdate,
-      {Direction? direction}) async {
+  Future<void> _handleFakeSync(SyncUpdate syncUpdate, {Direction? direction}) async {
     if (client.database != null) {
       await client.database?.transaction(() async {
         await client.handleSync(syncUpdate, direction: direction);
@@ -363,10 +439,9 @@ class FileSendRequestCredentials {
       );
 
   Map<String, dynamic> toJson() => {
-    if (inReplyTo != null) 'in_reply_to': inReplyTo,
-    if (editEventId != null) 'edit_event_id': editEventId,
-    if (shrinkImageMaxDimension != null)
-      'shrink_image_max_dimension': shrinkImageMaxDimension,
-    if (extraContent != null) 'extra_content': extraContent,
-  };
+        if (inReplyTo != null) 'in_reply_to': inReplyTo,
+        if (editEventId != null) 'edit_event_id': editEventId,
+        if (shrinkImageMaxDimension != null) 'shrink_image_max_dimension': shrinkImageMaxDimension,
+        if (extraContent != null) 'extra_content': extraContent,
+      };
 }

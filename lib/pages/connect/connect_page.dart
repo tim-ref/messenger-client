@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 2025-02-04
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,24 +9,21 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/l10n.dart';
-
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
-import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:matrix/matrix.dart';
-import 'package:vrouter/vrouter.dart';
-import 'package:universal_html/html.dart' as html;
-
+import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/pages/connect/connect_page_view.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/widgets/matrix.dart';
-
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:future_loading_dialog/future_loading_dialog.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:matrix/matrix.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:vrouter/vrouter.dart';
 
 class ConnectPage extends StatefulWidget {
   const ConnectPage({Key? key}) : super(key: key);
@@ -89,7 +86,10 @@ class ConnectPageController extends State<ConnectPage> {
 
     try {
       try {
-        await Matrix.of(context).getLoginClient().register(username: localpart);
+        await Matrix.of(context).getLoginClient().register(
+              username: localpart,
+              refreshToken: true,
+            );
       } on MatrixException catch (e) {
         if (!e.requireAdditionalAuthentication) rethrow;
       }
@@ -108,8 +108,7 @@ class ConnectPageController extends State<ConnectPage> {
   }
 
   bool _supportsFlow(String flowType) =>
-      Matrix.of(context).loginHomeserverSummary?.loginFlows.any((flow) => flow.type == flowType) ??
-      false;
+      Matrix.of(context).loginFlows?.any((flow) => flow.type == flowType) ?? false;
 
   bool get supportsSso => _supportsFlow('m.login.sso');
 
@@ -166,6 +165,7 @@ class ConnectPageController extends State<ConnectPage> {
             LoginType.mLoginToken,
             token: token,
             initialDeviceDisplayName: PlatformInfos.clientName,
+            refreshToken: true,
           ),
     );
   }

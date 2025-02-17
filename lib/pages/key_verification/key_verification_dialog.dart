@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -116,6 +116,9 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
     Widget body;
     final buttons = <Widget>[];
     switch (widget.request.state) {
+      case KeyVerificationState.showQRSuccess:
+      case KeyVerificationState.confirmQRScan:
+        throw 'Not implemented';
       case KeyVerificationState.askSSSS:
         // prompt the user for their ssss passphrase / key
         final textEditingController = TextEditingController();
@@ -208,6 +211,7 @@ class KeyVerificationPageState extends State<KeyVerificationDialog> {
           ),
         );
         break;
+      case KeyVerificationState.askChoice:
       case KeyVerificationState.waitingAccept:
         body = Center(
           child: Column(

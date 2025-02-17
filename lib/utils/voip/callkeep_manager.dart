@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.04.2024
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -8,19 +8,15 @@
  *
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import 'dart:async';
 
+import 'package:callkeep/callkeep.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
-
-import 'package:callkeep/callkeep.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
 import 'package:permission_handler/permission_handler.dart';
-
-import 'package:fluffychat/utils/voip_plugin.dart';
 
 class CallKeeper {
   CallKeeper(this.callKeepManager, this.call) {
@@ -52,31 +48,14 @@ class CallKeeper {
       case CallState.kEnded:
         callKeepManager.hangup(call.callId);
         break;
-      /* TODO:
-      case CallState.kMuted:
-        callKeepManager.setMutedCall(uuid, true);
-        break;
-      case CallState.kHeld:
-        callKeepManager.setOnHold(uuid, true);
-        break;
-      */
+      // TODO: Figure out if we have to handle these — they are all currently no-ops in fluffychat as well though.
       case CallState.kFledgling:
-        // TODO: Handle this case.
-        break;
       case CallState.kInviteSent:
-        // TODO: Handle this case.
-        break;
       case CallState.kWaitLocalMedia:
-        // TODO: Handle this case.
-        break;
       case CallState.kCreateOffer:
-        // TODO: Handle this case.
-        break;
       case CallState.kCreateAnswer:
-        // TODO: Handle this case.
-        break;
       case CallState.kRinging:
-        // TODO: Handle this case.
+      case CallState.kEnding:
         break;
     }
   }
@@ -96,7 +75,6 @@ class CallKeepManager {
   static final CallKeepManager _instance = CallKeepManager._internal();
 
   late FlutterCallkeep _callKeep;
-  VoipPlugin? _voipPlugin;
 
   String get appName => 'FluffyChat';
 
@@ -141,7 +119,7 @@ class CallKeepManager {
     });
     call.onCallEventChanged.stream.listen(
       (event) {
-        if (event == CallEvent.kLocalHoldUnhold) {
+        if (event == CallStateChange.kLocalHoldUnhold) {
           Logs().i(
             'Call hold event: local ${call.localHold}, remote ${call.remoteOnHold}',
           );
@@ -181,10 +159,7 @@ class CallKeepManager {
   Future<void> initialize() async {
     _callKeep.on(CallKeepPerformAnswerCallAction(), answerCall);
     _callKeep.on(CallKeepDidPerformDTMFAction(), didPerformDTMFAction);
-    _callKeep.on(
-      CallKeepDidReceiveStartCallAction(),
-      didReceiveStartCallAction,
-    );
+
     _callKeep.on(CallKeepDidToggleHoldAction(), didToggleHoldCallAction);
     _callKeep.on(
       CallKeepDidPerformSetMutedCallAction(),
@@ -323,31 +298,13 @@ class CallKeepManager {
 
   Future<void> endCall(CallKeepPerformEndCallAction event) async {
     final keeper = calls[event.callUUID];
-    keeper?.call.hangup();
+    keeper?.call.hangup(reason: CallErrorCode.userHangup);
     removeCall(event.callUUID);
   }
 
   Future<void> didPerformDTMFAction(CallKeepDidPerformDTMFAction event) async {
     final keeper = calls[event.callUUID]!;
     keeper.call.sendDTMF(event.digits!);
-  }
-
-  Future<void> didReceiveStartCallAction(
-    CallKeepDidReceiveStartCallAction event,
-  ) async {
-    if (event.handle == null) {
-      // @TODO: sometime we receive `didReceiveStartCallAction` with handle` undefined`
-      return;
-    }
-    final callUUID = event.callUUID!;
-    if (event.callUUID == null) {
-      final call = await _voipPlugin!.voip.inviteToCall(event.handle!, CallType.kVideo);
-      addCall(callUUID, CallKeeper(this, call));
-    }
-    await _callKeep.startCall(callUUID, event.handle!, event.handle!);
-    Timer(const Duration(seconds: 1), () {
-      _callKeep.setCurrentCallActive(callUUID);
-    });
   }
 
   Future<void> didPerformSetMutedCallAction(

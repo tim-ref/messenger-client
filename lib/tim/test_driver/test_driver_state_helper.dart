@@ -12,18 +12,18 @@
 import 'package:fluffychat/tim/feature/fhir/search/fhir_search_result.dart';
 import 'package:matrix/matrix.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:tim_contact_management_api/api.dart';
+import 'package:tim_contact_management_api/api.dart' as api;
 
 /// A List of FhirSearchResults and the original parsed JSON-formatted String
 typedef OptionalFhirSearchResultSet = ({List<FhirSearchResult>? entries, String? response});
 
 class TestDriverStateHelper {
-  late PublishSubject<List<Contact>?> contactApprovalListViewData;
+  late PublishSubject<List<api.Contact>?> contactApprovalListViewData;
   late PublishSubject<OptionalFhirSearchResultSet> fhirSearchResults;
   late PublishSubject<Timeline?> roomTimeline;
 
   void initTestDriverSubjects() {
-    contactApprovalListViewData = PublishSubject<List<Contact>?>();
+    contactApprovalListViewData = PublishSubject<List<api.Contact>?>();
     fhirSearchResults = PublishSubject<OptionalFhirSearchResultSet>();
     roomTimeline = PublishSubject<Timeline?>();
   }

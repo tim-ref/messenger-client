@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 .travis.yml
 README.md
 analysis_options.yaml
@@ -28,10 +27,3 @@ lib/model/contacts.dart
 lib/model/error.dart
 lib/model/info_object.dart
 pubspec.yaml
-test/contact_invite_settings_test.dart
-test/contact_test.dart
-test/contacts_api_test.dart
-test/contacts_test.dart
-test/error_test.dart
-test/info_api_test.dart
-test/info_object_test.dart

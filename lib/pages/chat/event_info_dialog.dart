@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 19.08.2024
+ * Modified by akquinet GmbH on 21.11.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -49,7 +49,7 @@ class EventInfoDialog extends StatelessWidget {
     String? redactedEventTime;
     try {
       redactedEventTime = DateTime.fromMillisecondsSinceEpoch(
-        (event.unsigned!['redacted_because']['origin_server_ts']),
+        (event.unsigned?.tryGetMap('redacted_because')?['origin_server_ts']),
       ).localizedDateTime(context);
     } catch (e) {
       redactedEventTime = null;

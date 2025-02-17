@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 05.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,18 +9,18 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:future_loading_dialog/future_loading_dialog.dart';
-import 'package:matrix/matrix.dart';
-
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:future_loading_dialog/future_loading_dialog.dart';
+import 'package:matrix/matrix.dart';
+
+import '../../../utils/set_user_presence.dart';
 
 class MessageReactions extends StatelessWidget {
   final Event event;
@@ -68,7 +68,7 @@ class MessageReactions extends StatelessWidget {
                     final evt = allReactionEvents.firstWhereOrNull(
                       (e) =>
                           e.senderId == e.room.client.userID &&
-                          e.content['m.relates_to']['key'] == r.key,
+                          e.content.tryGetMap('m.relates_to')?['key'] == r.key,
                     );
                     if (evt != null) {
                       showFutureLoadingDialog(
@@ -79,10 +79,7 @@ class MessageReactions extends StatelessWidget {
                   } else {
                     final room = event.room;
                     room.sendReaction(event.eventId, r.key!);
-
-                    if (AppConfig.sendPresenceUpdates && room.client.userID != null) {
-                      room.client.setPresence(room.client.userID!, PresenceType.online);
-                    }
+                    setUserPresence(room.client);
                   }
                 },
                 onLongPress: () async => await _AdaptableReactorsDialog(

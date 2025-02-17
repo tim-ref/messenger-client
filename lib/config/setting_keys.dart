@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 05.12.2024
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -14,10 +14,8 @@ abstract class SettingKeys {
   static const String renderHtml = 'chat.fluffy.renderHtml';
   static const String hideRedactedEvents = 'chat.fluffy.hideRedactedEvents';
   static const String hideUnknownEvents = 'chat.fluffy.hideUnknownEvents';
-  static const String hideUnimportantStateEvents =
-      'chat.fluffy.hideUnimportantStateEvents';
-  static const String showDirectChatsInSpaces =
-      'chat.fluffy.showDirectChatsInSpaces';
+  static const String hideUnimportantStateEvents = 'chat.fluffy.hideUnimportantStateEvents';
+  static const String showDirectChatsInSpaces = 'chat.fluffy.showDirectChatsInSpaces';
   static const String separateChatTypes = 'chat.fluffy.separateChatTypes';
   static const String sentry = 'sentry';
   static const String theme = 'theme';
@@ -29,17 +27,15 @@ abstract class SettingKeys {
   static const String showNoPid = 'chat.fluffy.show_no_pid';
   static const String databasePassword = 'database-password';
   static const String appLockKey = 'chat.fluffy.app_lock';
-  static const String unifiedPushRegistered =
-      'chat.fluffy.unifiedpush.registered';
+  static const String unifiedPushRegistered = 'chat.fluffy.unifiedpush.registered';
   static const String unifiedPushEndpoint = 'chat.fluffy.unifiedpush.endpoint';
   static const String notificationCurrentIds = 'chat.fluffy.notification_ids';
   static const String ownStatusMessage = 'chat.fluffy.status_msg';
-  static const String dontAskForBootstrapKey =
-      'chat.fluffychat.dont_ask_bootstrap';
+  static const String dontAskForBootstrapKey = 'chat.fluffychat.dont_ask_bootstrap';
   static const String autoplayImages = 'chat.fluffy.autoplay_images';
   static const String sendOnEnter = 'chat.fluffy.send_on_enter';
   static const String sendTypingNotifications = 'chat.fluffy.send_typing_notifications';
-  static const String sendReadReceipts = 'chat.fluffy.send_read_receipts';
+  static const String sendPublicReadReceipts = 'chat.fluffy.send_public_read_receipts';
   static const String sendPresenceUpdates = 'chat.fluffy.send_presence_updates';
   static const String experimentalVoip = 'chat.fluffy.experimental_voip';
 }

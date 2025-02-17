@@ -54,7 +54,7 @@ Map<String, dynamic> _$MemberDebugDtoToJson(MemberDebugDto instance) =>
 StateDebugDto _$StateDebugDtoFromJson(Map<String, dynamic> json) =>
     StateDebugDto(
       json['content'] as String,
-      json['eventId'] as String,
+      json['eventId'] as String?,
       json['roomId'] as String?,
       json['sender'] as String,
       json['stateKey'] as String?,
