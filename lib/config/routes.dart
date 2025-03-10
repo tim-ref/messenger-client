@@ -41,7 +41,7 @@ import 'package:fluffychat/tim/feature/contact_approval/ui/contact_approval_deta
 import 'package:fluffychat/tim/feature/contact_approval/ui/contact_approval_view.dart';
 import 'package:fluffychat/tim/feature/contact_approval/ui/new_contact_approval.dart';
 import 'package:fluffychat/tim/feature/fhir/search/ui/fhir_search_view.dart';
-import 'package:fluffychat/tim/feature/fhir/settings/fhir_account_settings.dart';
+import 'package:fluffychat/tim/feature/fhir/settings/ui/fhir_account_settings.dart';
 import 'package:fluffychat/tim/feature/hba/view/hba_view_page.dart';
 import 'package:fluffychat/widgets/layouts/empty_page.dart';
 import 'package:fluffychat/widgets/layouts/loading_view.dart';

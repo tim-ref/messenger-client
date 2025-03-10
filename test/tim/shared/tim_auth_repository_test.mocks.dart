@@ -78,21 +78,6 @@ class MockFhirConfig extends _i1.Mock implements _i3.FhirConfig {
           Invocation.getter(#ownerBase),
         ),
       ) as String);
-
-  @override
-  String fhirServer() => (super.noSuchMethod(
-        Invocation.method(
-          #fhirServer,
-          [],
-        ),
-        returnValue: _i4.dummyValue<String>(
-          this,
-          Invocation.method(
-            #fhirServer,
-            [],
-          ),
-        ),
-      ) as String);
 }
 
 /// A class which mocks [HbaAuthentication].

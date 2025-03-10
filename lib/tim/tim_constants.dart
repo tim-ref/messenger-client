@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - 2025 akquinet GmbH
+ * Copyright (C) 2025 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -14,11 +14,14 @@ const String enableDebugWidget = "ENABLE_DEBUG_WIDGET";
 const String debugWidgetVisible = "DEBUG_WIDGET_VISIBLE";
 
 const String contactMgmtAPIPath = '/tim-contact-mgmt';
+const String timInformationPath = '/tim-information';
 const String tokenDispenserUser = 'TOKEN_DISPENSER_USER';
 const String tokenDispenserPassword = 'TOKEN_DISPENSER_PASSWORD';
 
 const String fhirAuthTokenStorageKey = 'fhirAuthToken';
 const String defaultTokenDispenserUrl = 'TOKEN_DISPENSER_URL';
+
+const String defaultHistoryVisibility =  'invited';
 
 /// Types of room within TIM specification
 enum TimRoomType {

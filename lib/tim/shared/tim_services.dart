@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -19,6 +19,8 @@ import 'package:fluffychat/tim/shared/matrix/tim_matrix.dart';
 import 'package:fluffychat/tim/shared/tim_auth_state.dart';
 import 'package:fluffychat/tim/test_driver/test_driver_state_helper.dart';
 
+import '../feature/automated_invite_rejection/insurer_information_repository.dart';
+
 /// Container providing services used in TIM.
 /// These abstractions are meant to improve decoupling between TIM and FluffyChat as well as testability.
 ///
@@ -35,6 +37,8 @@ abstract class TimServices {
   FhirAccountService fhirAccountService();
 
   InviteRejectionPolicyRepository inviteRejectionPolicyRepository();
+
+  InsurerInformationRepository insurerInformationRepository();
 
   TimVersionService get timVersionService;
 

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 27.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -88,7 +88,6 @@ class SettingsNotificationsController extends State<SettingsNotifications> {
     showFutureLoadingDialog(
       context: context,
       future: () => Matrix.of(context).client.setPushRuleEnabled(
-            'global',
             item.type,
             item.key,
             enabled,

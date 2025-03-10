@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 – akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -35,7 +35,7 @@ void main() {
   test('searchPractitionerRole() should correctly map results for complete Dataset', () async {
     // given
     final expectedQuery = buildPRQuery();
-    when(fhirRepository.search(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
+    when(fhirRepository.searchResources(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
       return (
         entries: FhirSearchServiceTestData.practitionerRoleCompleteEntries(),
         response: '{"resourceType":"Bundle"}'
@@ -57,7 +57,7 @@ void main() {
   test('searchPractitionerRole() Should not map results missing Practitioner reference', () async {
     // given
     final expectedQuery = buildPRQuery();
-    when(fhirRepository.search(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
+    when(fhirRepository.searchResources(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
       return (
         entries: FhirSearchServiceTestData.practitionerRoleEntriesMissingPractitionerReference(),
         response: '{"resourceType":"Bundle"}'
@@ -77,7 +77,7 @@ void main() {
       () async {
     // given
     final expectedQuery = buildPRQuery();
-    when(fhirRepository.search(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
+    when(fhirRepository.searchResources(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
       return (
         entries:
             FhirSearchServiceTestData.practitionerRoleEntriesMissingPractitionerReferenceValue(),
@@ -97,7 +97,7 @@ void main() {
   test('searchPractitionerRole() Should not map results missing endpoint reference', () async {
     // given
     final expectedQuery = buildPRQuery();
-    when(fhirRepository.search(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
+    when(fhirRepository.searchResources(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
       return (
         entries: FhirSearchServiceTestData.practitionerRoleEntriesMissingEndpointReference(),
         response: '{"resourceType":"Bundle"}'
@@ -117,7 +117,7 @@ void main() {
       () async {
     // given
     final expectedQuery = buildPRQuery();
-    when(fhirRepository.search(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
+    when(fhirRepository.searchResources(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
       return (
         entries: FhirSearchServiceTestData.practitionerRoleEntriesMissingEndpointReferenceValue(),
         response: '{"resourceType":"Bundle"}'
@@ -137,7 +137,7 @@ void main() {
       () async {
     // given
     final expectedQuery = buildPRQuery();
-    when(fhirRepository.search(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
+    when(fhirRepository.searchResources(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
       final ResourceSearchResult entries = (
         entries: FhirSearchServiceTestData.practitionerRoleCompleteEntries(),
         response: '{"resourceType":"Bundle"}'
@@ -168,7 +168,7 @@ void main() {
   test('searchPractitionerRole() should not include results without endpoints', () async {
     // given
     final expectedQuery = buildPRQuery();
-    when(fhirRepository.search(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
+    when(fhirRepository.searchResources(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
       final ResourceSearchResult entries = (
         entries: FhirSearchServiceTestData.practitionerRoleCompleteEntries(),
         response: '{"resourceType":"Bundle"}'
@@ -197,7 +197,7 @@ void main() {
   test('searchPractitionerRole() should correctly handle empty search response', () async {
     // given
     final expectedQuery = buildPRQuery();
-    when(fhirRepository.search(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
+    when(fhirRepository.searchResources(ResourceType.PractitionerRole, expectedQuery)).thenAnswer((_) async {
       return (entries: <Entry>[], response: '{"resourceType":"Bundle"}');
     });
 
@@ -213,7 +213,7 @@ void main() {
   test(' searchHealthcareService() Should correctly map results for complete Dataset', () async {
     // given
     final expectedQuery = _buildHSQuery();
-    when(fhirRepository.search(ResourceType.HealthcareService, expectedQuery))
+    when(fhirRepository.searchResources(ResourceType.HealthcareService, expectedQuery))
         .thenAnswer((_) async {
       return (
         entries: FhirSearchServiceTestData.healthcareServiceCompleteEntries(),
@@ -265,7 +265,7 @@ void main() {
   test('searchHealthcareService() should correctly handle empty search response', () async {
     // given
     final expectedQuery = _buildHSQuery();
-    when(fhirRepository.search(ResourceType.HealthcareService, expectedQuery))
+    when(fhirRepository.searchResources(ResourceType.HealthcareService, expectedQuery))
         .thenAnswer((_) async {
       return (entries: <Entry>[], response: '{"resourceType":"Bundle"}');
     });

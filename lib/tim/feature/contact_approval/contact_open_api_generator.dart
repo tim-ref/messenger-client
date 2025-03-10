@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2025-02-04T14:21:00.238311
+// Openapi Generator last run: : 2025-02-27T15:03:14.419236
 /*
  * TIM-Referenzumgebung
  * Copyright (C) 2024 - 2025 akquinet GmbH
@@ -10,7 +10,6 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Openapi Generator last run: : 2025-01-21T09:01:00.127737
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 
 @Openapi(

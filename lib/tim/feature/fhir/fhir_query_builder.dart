@@ -11,6 +11,9 @@
 
 import 'package:fluffychat/tim/feature/fhir/search/fhir_search_constants.dart';
 
+/// Generates URL parameters strings for FHIR requests.
+/// BUG!!! 'PractitionerRole:endpoint' is not correctly encoded.
+/// Suggested solution: Generate query strings safely from Maps like this: [Uri(queryParameters: mapOfParameters).query]
 class FhirQueryBuilder {
   static String findOwnerByMxidAndTelematikId(String mxid, String telematikId) {
     return '_format=json&practitioner.active=true&practitioner.identifier=${Uri.encodeComponent(telematikId)}&endpoint.address=${Uri.encodeComponent(mxid)}&_include=PractitionerRole:endpoint';

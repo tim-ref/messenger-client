@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.12.2024
+ * Modified by akquinet GmbH on 26.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,6 +11,7 @@
 
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:fluffychat/utils/string_color.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -166,7 +167,7 @@ class Message extends StatelessWidget {
             if (!sameSender)
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, bottom: 4),
-                child: ownMessage || event.room.isDirectChat
+                child: ownMessage || event.room.isDirectChatWithTwoOrLessParticipants
                     ? const SizedBox(height: 12)
                     : FutureBuilder<User?>(
                         future: event.fetchSenderUser(),

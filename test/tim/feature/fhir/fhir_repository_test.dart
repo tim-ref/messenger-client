@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 – akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -72,7 +72,7 @@ void main() {
 
     // when
     final (entries: actualEntries, response: actualResponse) =
-        await fhirRepository.search(ResourceType.PractitionerRole, query);
+        await fhirRepository.searchResources(ResourceType.PractitionerRole, query);
 
     // expect
     expect(actualEntries, equals(expectedBundle.entry));
@@ -104,7 +104,7 @@ void main() {
 
     // when
     final (entries: actualEntries, response: actualResponse) =
-        await fhirRepository.search(ResourceType.HealthcareService, query);
+        await fhirRepository.searchResources(ResourceType.HealthcareService, query);
 
     // expect
     expect(actualEntries, equals(expectedBundle.entry));
@@ -155,7 +155,7 @@ void main() {
 
     // when
     final (entries: actualEntries, response: actualResponse) =
-        await fhirRepository.search(ResourceType.PractitionerRole, query);
+        await fhirRepository.searchResources(ResourceType.PractitionerRole, query);
 
     // expect
     expect(actualEntries, equals(expectedEntries));
@@ -176,7 +176,7 @@ void main() {
         .thenAnswer((_) async => http.Response(responseBodyString, 200));
 
     // when
-    final searchResult = await fhirRepository.ownerSearch(expectedQuery, defaultOpenIdToken());
+    final searchResult = await fhirRepository.searchPractitionerRoleAsOwner(expectedQuery, defaultOpenIdToken());
 
     // then
     expect(searchResult, equals(jsonDecode(responseBodyString)));

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 07.01.2025
+ * Modified by akquinet GmbH on 26.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -28,6 +28,7 @@ import 'package:fluffychat/pages/chat/pinned_events.dart';
 import 'package:fluffychat/pages/chat/reactions_picker.dart';
 import 'package:fluffychat/pages/chat/reply_display.dart';
 import 'package:fluffychat/pages/chat/tombstone_display.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:fluffychat/widgets/chat_settings_popup_menu.dart';
 import 'package:fluffychat/widgets/connection_status_header.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -75,7 +76,8 @@ class ChatView extends StatelessWidget {
           tooltip: L10n.of(context)!.pinMessage,
         ),
         // can only edit own messages and 1 at a time
-        if (controller.selectedEvents.length == 1 && controller.selectedEvents.first.senderId == controller.matrixClient.userID)
+        if (controller.selectedEvents.length == 1 &&
+            controller.selectedEvents.first.senderId == controller.matrixClient.userID)
           IconButton(onPressed: controller.editAction, icon: const Icon(Icons.edit)),
         if (controller.selectedEvents.length == 1)
           PopupMenuButton<_EventContextAction>(
@@ -135,7 +137,8 @@ class ChatView extends StatelessWidget {
       ];
     } else {
       return [
-        if (Matrix.of(context).voipPlugin != null && controller.room.isDirectChat)
+        if (Matrix.of(context).voipPlugin != null &&
+            controller.room.isDirectChatWithTwoOrLessParticipants)
           IconButton(
             onPressed: controller.onPhoneButtonTap,
             icon: const Icon(Icons.call_outlined),
@@ -149,7 +152,7 @@ class ChatView extends StatelessWidget {
           container: true,
           child: ChatSettingsPopupMenu(
             controller.room,
-            !controller.room.isDirectChat,
+            true,
           ),
         ),
       ];

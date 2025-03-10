@@ -1134,14 +1134,14 @@ class MockRoom extends _i1.Mock implements _i2.Room {
 
   @override
   _i5.Future<String> setPower(
-    String? userID,
+    String? userId,
     int? power,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
           #setPower,
           [
-            userID,
+            userId,
             power,
           ],
         ),
@@ -1150,7 +1150,7 @@ class MockRoom extends _i1.Mock implements _i2.Room {
           Invocation.method(
             #setPower,
             [
-              userID,
+              userId,
               power,
             ],
           ),
@@ -1161,7 +1161,7 @@ class MockRoom extends _i1.Mock implements _i2.Room {
           Invocation.method(
             #setPower,
             [
-              userID,
+              userId,
               power,
             ],
           ),
@@ -1347,7 +1347,7 @@ class MockRoom extends _i1.Mock implements _i2.Room {
       _i2.Membership.knock,
     ],
     bool? suppressWarning = false,
-    bool? cache = true,
+    bool? cache,
   ]) =>
       (super.noSuchMethod(
         Invocation.method(

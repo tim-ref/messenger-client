@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 05.12.2024
+ * Modified by akquinet GmbH on 26.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,7 +11,6 @@
 
 import 'dart:io';
 
-import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:desktop_lifecycle/desktop_lifecycle.dart';
@@ -25,6 +24,7 @@ import 'package:vrouter/vrouter.dart';
 
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 
@@ -48,7 +48,8 @@ extension LocalNotificationsExtension on MatrixState {
         room.getLocalizedDisplaynameFromCustomNameEvent(MatrixLocals(L10n.of(widget.context)!));
     final body = await event.calcLocalizedBody(
       MatrixLocals(L10n.of(widget.context)!),
-      withSenderNamePrefix: !room.isDirectChat || room.lastEvent?.senderId == client.userID,
+      withSenderNamePrefix:
+          !room.isDirectChatWithTwoOrLessParticipants || room.lastEvent?.senderId == client.userID,
       plaintextBody: true,
       hideReply: true,
       hideEdit: true,

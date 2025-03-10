@@ -891,6 +891,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.6+hotfix.1"
+  fpdart:
+    dependency: "direct main"
+    description:
+      name: fpdart
+      sha256: "1b84ce64453974159f08046f5d05592020d1fcb2099d7fe6ec58da0e7337af77"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   frontend_server_client:
     dependency: transitive
     description:
@@ -1314,10 +1322,10 @@ packages:
   matrix:
     dependency: "direct main"
     description:
-      path: "packages/matrix-0.33.0"
+      path: "packages/matrix-0.35.0"
       relative: true
     source: path
-    version: "0.33.0"
+    version: "0.35.0"
   meta:
     dependency: transitive
     description:
@@ -2110,6 +2118,13 @@ packages:
     dependency: "direct main"
     description:
       path: "openapi/tim_contact_management_api"
+      relative: true
+    source: path
+    version: "1.0.0"
+  tim_information_api:
+    dependency: "direct main"
+    description:
+      path: "openapi/tim_information_api"
       relative: true
     source: path
     version: "1.0.0"

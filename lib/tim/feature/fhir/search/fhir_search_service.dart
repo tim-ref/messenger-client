@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 – akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -44,7 +44,7 @@ class FhirSearchService {
 
   Future<PractitionerSearchResultSet> searchPractitionerRole(String query) async {
     final (entries: entries, response: fullResult) =
-        await _repository.search(ResourceType.PractitionerRole, query);
+        await _repository.searchResources(ResourceType.PractitionerRole, query);
 
     if (entries.isEmpty) {
       return (entries: <PractitionerSearchResult>[], response: fullResult);
@@ -68,7 +68,7 @@ class FhirSearchService {
   Future<HealthcareServiceSearchResultSet> searchHealthcareService(
     String query,
   ) async {
-    final (entries: entries, response: fullResponse) = await _repository.search(
+    final (entries: entries, response: fullResponse) = await _repository.searchResources(
       ResourceType.HealthcareService,
       query,
     );

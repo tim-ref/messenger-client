@@ -52,10 +52,6 @@ class _FakeResponse_1 extends _i1.SmartFake implements _i3.Response {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockTimAuthRepository extends _i1.Mock implements _i4.TimAuthRepository {
-  MockTimAuthRepository() {
-    _i1.throwOnMissingStub(this);
-  }
-
   @override
   _i5.Future<_i2.TimAuthToken> getOpenIdToken() => (super.noSuchMethod(
         Invocation.method(
@@ -63,6 +59,14 @@ class MockTimAuthRepository extends _i1.Mock implements _i4.TimAuthRepository {
           [],
         ),
         returnValue: _i5.Future<_i2.TimAuthToken>.value(_FakeTimAuthToken_0(
+          this,
+          Invocation.method(
+            #getOpenIdToken,
+            [],
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i2.TimAuthToken>.value(_FakeTimAuthToken_0(
           this,
           Invocation.method(
             #getOpenIdToken,
@@ -84,6 +88,14 @@ class MockTimAuthRepository extends _i1.Mock implements _i4.TimAuthRepository {
             [],
           ),
         )),
+        returnValueForMissingStub:
+            _i5.Future<_i2.TimAuthToken>.value(_FakeTimAuthToken_0(
+          this,
+          Invocation.method(
+            #getFhirToken,
+            [],
+          ),
+        )),
       ) as _i5.Future<_i2.TimAuthToken>);
 
   @override
@@ -93,6 +105,14 @@ class MockTimAuthRepository extends _i1.Mock implements _i4.TimAuthRepository {
           [],
         ),
         returnValue: _i5.Future<_i2.TimAuthToken>.value(_FakeTimAuthToken_0(
+          this,
+          Invocation.method(
+            #getHbaToken,
+            [],
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i2.TimAuthToken>.value(_FakeTimAuthToken_0(
           this,
           Invocation.method(
             #getHbaToken,
@@ -109,6 +129,14 @@ class MockTimAuthRepository extends _i1.Mock implements _i4.TimAuthRepository {
           [url],
         ),
         returnValue: _i5.Future<_i2.TimAuthToken>.value(_FakeTimAuthToken_0(
+          this,
+          Invocation.method(
+            #getHbaTokenFromUrl,
+            [url],
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i2.TimAuthToken>.value(_FakeTimAuthToken_0(
           this,
           Invocation.method(
             #getHbaTokenFromUrl,
@@ -136,218 +164,8 @@ class MockTimAuthRepository extends _i1.Mock implements _i4.TimAuthRepository {
             {#headers: headers},
           ),
         )),
-      ) as _i5.Future<_i3.Response>);
-
-  @override
-  _i5.Future<_i3.Response> post(
-    Uri? uri, {
-    required Map<String, String>? headers,
-    String? body,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #post,
-          [uri],
-          {
-            #headers: headers,
-            #body: body,
-          },
-        ),
-        returnValue: _i5.Future<_i3.Response>.value(_FakeResponse_1(
-          this,
-          Invocation.method(
-            #post,
-            [uri],
-            {
-              #headers: headers,
-              #body: body,
-            },
-          ),
-        )),
-      ) as _i5.Future<_i3.Response>);
-
-  @override
-  _i5.Future<_i3.Response> put(
-    Uri? uri, {
-    required Map<String, String>? headers,
-    String? body,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #put,
-          [uri],
-          {
-            #headers: headers,
-            #body: body,
-          },
-        ),
-        returnValue: _i5.Future<_i3.Response>.value(_FakeResponse_1(
-          this,
-          Invocation.method(
-            #put,
-            [uri],
-            {
-              #headers: headers,
-              #body: body,
-            },
-          ),
-        )),
-      ) as _i5.Future<_i3.Response>);
-
-  @override
-  _i5.Future<_i3.Response> delete(
-    Uri? uri, {
-    required Map<String, String>? headers,
-    String? body,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #delete,
-          [uri],
-          {
-            #headers: headers,
-            #body: body,
-          },
-        ),
-        returnValue: _i5.Future<_i3.Response>.value(_FakeResponse_1(
-          this,
-          Invocation.method(
-            #delete,
-            [uri],
-            {
-              #headers: headers,
-              #body: body,
-            },
-          ),
-        )),
-      ) as _i5.Future<_i3.Response>);
-}
-
-/// A class which mocks [FhirRepository].
-///
-/// See the documentation for Mockito's code generation for more information.
-class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
-  MockFhirRepository() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  @override
-  _i5.Future<({List<_i7.Entry> entries, String response})> search(
-    _i8.ResourceType? resourceType,
-    String? query,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #search,
-          [
-            resourceType,
-            query,
-          ],
-        ),
-        returnValue:
-            _i5.Future<({List<_i7.Entry> entries, String response})>.value((
-          entries: <_i7.Entry>[],
-          response: _i9.dummyValue<String>(
-            this,
-            Invocation.method(
-              #search,
-              [
-                resourceType,
-                query,
-              ],
-            ),
-          )
-        )),
-      ) as _i5.Future<({List<_i7.Entry> entries, String response})>);
-
-  @override
-  _i5.Future<Map<String, dynamic>> ownerSearch(
-    String? query,
-    _i2.TimAuthToken? token,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #ownerSearch,
-          [
-            query,
-            token,
-          ],
-        ),
-        returnValue:
-            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
-      ) as _i5.Future<Map<String, dynamic>>);
-
-  @override
-  _i5.Future<Map<String, dynamic>> createResource(
-    _i8.ResourceType? resourceType,
-    _i2.TimAuthToken? token,
-    String? bodyJson,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #createResource,
-          [
-            resourceType,
-            token,
-            bodyJson,
-          ],
-        ),
-        returnValue:
-            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
-      ) as _i5.Future<Map<String, dynamic>>);
-
-  @override
-  _i5.Future<Map<String, dynamic>> updateResource(
-    _i8.ResourceType? resourceType,
-    String? resourceId,
-    _i2.TimAuthToken? token,
-    String? bodyJson,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #updateResource,
-          [
-            resourceType,
-            resourceId,
-            token,
-            bodyJson,
-          ],
-        ),
-        returnValue:
-            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
-      ) as _i5.Future<Map<String, dynamic>>);
-
-  @override
-  _i5.Future<Map<String, dynamic>> deleteResource(
-    _i8.ResourceType? resourceType,
-    String? resourceId,
-    _i2.TimAuthToken? token,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #deleteResource,
-          [
-            resourceType,
-            resourceId,
-            token,
-          ],
-        ),
-        returnValue:
-            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
-      ) as _i5.Future<Map<String, dynamic>>);
-
-  @override
-  _i5.Future<_i3.Response> get(
-    Uri? uri, {
-    required Map<String, String>? headers,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #get,
-          [uri],
-          {#headers: headers},
-        ),
-        returnValue: _i5.Future<_i3.Response>.value(_FakeResponse_1(
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response>.value(_FakeResponse_1(
           this,
           Invocation.method(
             #get,
@@ -383,6 +201,18 @@ class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
             },
           ),
         )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #post,
+            [uri],
+            {
+              #headers: headers,
+              #body: body,
+            },
+          ),
+        )),
       ) as _i5.Future<_i3.Response>);
 
   @override
@@ -401,6 +231,18 @@ class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
           },
         ),
         returnValue: _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #put,
+            [uri],
+            {
+              #headers: headers,
+              #body: body,
+            },
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response>.value(_FakeResponse_1(
           this,
           Invocation.method(
             #put,
@@ -439,6 +281,300 @@ class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
             },
           ),
         )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #delete,
+            [uri],
+            {
+              #headers: headers,
+              #body: body,
+            },
+          ),
+        )),
+      ) as _i5.Future<_i3.Response>);
+}
+
+/// A class which mocks [FhirRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
+  @override
+  _i5.Future<({List<_i7.Entry> entries, String response})> searchResources(
+    _i8.ResourceType? resourceType,
+    String? query,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #searchResources,
+          [
+            resourceType,
+            query,
+          ],
+        ),
+        returnValue:
+            _i5.Future<({List<_i7.Entry> entries, String response})>.value((
+          entries: <_i7.Entry>[],
+          response: _i9.dummyValue<String>(
+            this,
+            Invocation.method(
+              #searchResources,
+              [
+                resourceType,
+                query,
+              ],
+            ),
+          )
+        )),
+        returnValueForMissingStub:
+            _i5.Future<({List<_i7.Entry> entries, String response})>.value((
+          entries: <_i7.Entry>[],
+          response: _i9.dummyValue<String>(
+            this,
+            Invocation.method(
+              #searchResources,
+              [
+                resourceType,
+                query,
+              ],
+            ),
+          )
+        )),
+      ) as _i5.Future<({List<_i7.Entry> entries, String response})>);
+
+  @override
+  _i5.Future<Map<String, dynamic>> searchPractitionerRoleAsOwner(
+    String? query,
+    _i2.TimAuthToken? token,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #searchPractitionerRoleAsOwner,
+          [
+            query,
+            token,
+          ],
+        ),
+        returnValue:
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValueForMissingStub:
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+      ) as _i5.Future<Map<String, dynamic>>);
+
+  @override
+  _i5.Future<Map<String, dynamic>> createResource(
+    _i8.ResourceType? resourceType,
+    _i2.TimAuthToken? token,
+    String? bodyJson,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createResource,
+          [
+            resourceType,
+            token,
+            bodyJson,
+          ],
+        ),
+        returnValue:
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValueForMissingStub:
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+      ) as _i5.Future<Map<String, dynamic>>);
+
+  @override
+  _i5.Future<Map<String, dynamic>> updateResource(
+    _i8.ResourceType? resourceType,
+    String? resourceId,
+    _i2.TimAuthToken? token,
+    String? bodyJson,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateResource,
+          [
+            resourceType,
+            resourceId,
+            token,
+            bodyJson,
+          ],
+        ),
+        returnValue:
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValueForMissingStub:
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+      ) as _i5.Future<Map<String, dynamic>>);
+
+  @override
+  _i5.Future<Map<String, dynamic>> deleteResource(
+    _i8.ResourceType? resourceType,
+    String? resourceId,
+    _i2.TimAuthToken? token,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #deleteResource,
+          [
+            resourceType,
+            resourceId,
+            token,
+          ],
+        ),
+        returnValue:
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+        returnValueForMissingStub:
+            _i5.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
+      ) as _i5.Future<Map<String, dynamic>>);
+
+  @override
+  _i5.Future<_i3.Response> get(
+    Uri? uri, {
+    required Map<String, String>? headers,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #get,
+          [uri],
+          {#headers: headers},
+        ),
+        returnValue: _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #get,
+            [uri],
+            {#headers: headers},
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #get,
+            [uri],
+            {#headers: headers},
+          ),
+        )),
+      ) as _i5.Future<_i3.Response>);
+
+  @override
+  _i5.Future<_i3.Response> post(
+    Uri? uri, {
+    required Map<String, String>? headers,
+    String? body,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #post,
+          [uri],
+          {
+            #headers: headers,
+            #body: body,
+          },
+        ),
+        returnValue: _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #post,
+            [uri],
+            {
+              #headers: headers,
+              #body: body,
+            },
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #post,
+            [uri],
+            {
+              #headers: headers,
+              #body: body,
+            },
+          ),
+        )),
+      ) as _i5.Future<_i3.Response>);
+
+  @override
+  _i5.Future<_i3.Response> put(
+    Uri? uri, {
+    required Map<String, String>? headers,
+    String? body,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #put,
+          [uri],
+          {
+            #headers: headers,
+            #body: body,
+          },
+        ),
+        returnValue: _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #put,
+            [uri],
+            {
+              #headers: headers,
+              #body: body,
+            },
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #put,
+            [uri],
+            {
+              #headers: headers,
+              #body: body,
+            },
+          ),
+        )),
+      ) as _i5.Future<_i3.Response>);
+
+  @override
+  _i5.Future<_i3.Response> delete(
+    Uri? uri, {
+    required Map<String, String>? headers,
+    String? body,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #delete,
+          [uri],
+          {
+            #headers: headers,
+            #body: body,
+          },
+        ),
+        returnValue: _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #delete,
+            [uri],
+            {
+              #headers: headers,
+              #body: body,
+            },
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response>.value(_FakeResponse_1(
+          this,
+          Invocation.method(
+            #delete,
+            [uri],
+            {
+              #headers: headers,
+              #body: body,
+            },
+          ),
+        )),
       ) as _i5.Future<_i3.Response>);
 }
 
@@ -446,10 +582,6 @@ class MockFhirRepository extends _i1.Mock implements _i6.FhirRepository {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockTimAuthState extends _i1.Mock implements _i10.TimAuthState {
-  MockTimAuthState() {
-    _i1.throwOnMissingStub(this);
-  }
-
   @override
   set hbaToken(_i2.TimAuthToken? _hbaToken) => super.noSuchMethod(
         Invocation.setter(
@@ -466,6 +598,7 @@ class MockTimAuthState extends _i1.Mock implements _i10.TimAuthState {
           [],
         ),
         returnValue: false,
+        returnValueForMissingStub: false,
       ) as bool);
 
   @override

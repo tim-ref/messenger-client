@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 05.02.2025
+ * Modified by akquinet GmbH on 26.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -90,10 +90,7 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
 
   bool get shouldShowBlockAllInvitesWithoutExceptionsWarning {
     if (_disabledBlockAllInvitesWithoutExceptionsWarning) return false;
-    final policy = _inviteRejectionPolicy;
-    return policy is BlockAllInvites &&
-        policy.allowedUsers.isEmpty &&
-        policy.allowedDomains.isEmpty;
+    return rejectsEveryone(_inviteRejectionPolicy);
   }
 
   void dismissBlockAllInvitesWithoutExceptionsWarning() {
@@ -159,19 +156,16 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
       case ActiveFilter.allChats:
         return (room) => !room.isSpace;
       case ActiveFilter.groups:
-        return (room) => !room.isSpace && !room.isDirectChat;
+        return (room) => !room.isSpace && !room.isDirectChatWithTwoOrLessParticipants;
       case ActiveFilter.messages:
-        return (room) => !room.isSpace && room.isDirectChat;
+        return (room) => !room.isSpace && room.isDirectChatWithTwoOrLessParticipants;
       case ActiveFilter.spaces:
         return (room) => room.isSpace;
     }
   }
 
-  List<Room> get filteredRooms => Matrix.of(context)
-        .client
-        .rooms
-        .where(getRoomFilterByActiveFilter(activeFilter))
-        .toList();
+  List<Room> get filteredRooms =>
+      Matrix.of(context).client.rooms.where(getRoomFilterByActiveFilter(activeFilter)).toList();
 
   bool isSearchMode = false;
   Future<QueryPublicRoomsResponse>? publicRoomsResponse;

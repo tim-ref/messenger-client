@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.02.2025
+ * Modified by akquinet GmbH on 26.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -49,6 +49,11 @@ extension RoomExtension on Room {
     return state?.content ?? {};
   }
 
+  /// Check if room is direct chat and has less then three participants
+  /// returns false if room is not a direct chat
+  bool get isDirectChatWithTwoOrLessParticipants =>
+      isDirectChat && (summary.mHeroes == null || summary.mHeroes!.length < 2);
+
   /// Returns a localized displayname for this server. If the room is a groupchat
   /// without a name, then it will return the localized version of 'Group with Alice' instead
   /// of just 'Alice' to make it different to a direct chat.
@@ -75,7 +80,7 @@ extension RoomExtension on Room {
         return i18n.wasDirectChatDisplayName(result);
       }
 
-      return isDirectChat ? result : i18n.groupWith(result);
+      return isDirectChatWithTwoOrLessParticipants ? result : i18n.groupWith(result);
     }
     switch (membership) {
       case Membership.invite:
@@ -146,7 +151,8 @@ extension RoomExtension on Room {
       'm.mentions': {},
     };
 
-    final Map<String, dynamic> enrichedEvent = parseMarkdown ? enrichEventWithMentions(event) : event;
+    final Map<String, dynamic> enrichedEvent =
+        parseMarkdown ? enrichEventWithMentions(event) : event;
     return sendEvent(
       enrichedEvent,
       txid: txid,

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 07.02.2025
+ * Modified by akquinet GmbH on 27.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -43,6 +43,7 @@ import 'package:vrouter/vrouter.dart';
 
 import '../../config/app_config.dart';
 import '../../tim/feature/chat/message_edit_history_dialog.dart';
+import '../../tim/shared/provider/tim_provider.dart';
 import '../../utils/account_bundles.dart';
 import '../../utils/localized_exception_extension.dart';
 import '../../utils/matrix_sdk_extensions/matrix_file_extension.dart';
@@ -195,7 +196,7 @@ class ChatController extends State<ChatPageWithRoom> {
             client.onSync.stream.firstWhere((s) => s.rooms?.leave?.containsKey(room.id) ?? false);
         await room.leave();
         await waitForSync;
-        return await client.startDirectChat(userId);
+        return await TimProvider.of(context).matrix().client().startDirectChatWithCustomRoomType(userId);
       },
     );
     final roomId = success.result;

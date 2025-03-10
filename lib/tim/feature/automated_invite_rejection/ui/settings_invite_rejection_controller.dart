@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 – akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -35,13 +35,20 @@ class SettingsInviteRejectionController extends ChangeNotifier {
   }
 
   Set<String> get exceptionEntries => switch (inviteRejectionPolicy) {
-        AllowAllInvites(blockedDomains: final domains, blockedUsers: final users) => {
-            ...domains,
-            ...users,
-          },
-        BlockAllInvites(allowedDomains: final domains, allowedUsers: final users) => {
-            ...domains,
-            ...users,
+        AllowAllInvites(
+          blockedServers: final serverExceptions,
+          blockedUsers: final userExceptions,
+        blockedUserGroups: final userGroupExceptions,
+        ) ||
+        BlockAllInvites(
+          allowedServers: final serverExceptions,
+          allowedUsers: final userExceptions,
+        allowedUserGroups: final userGroupExceptions
+        ) =>
+          {
+            ...serverExceptions,
+            ...userExceptions,
+            ...userGroupExceptions.asNameMap().keys
           },
         null => {},
       };
@@ -111,6 +118,11 @@ class SettingsInviteRejectionController extends ChangeNotifier {
     await _inviteRejectionPolicyRepository.setNewPolicy(newPolicy);
     inviteRejectionPolicy = newPolicy;
     notifyListeners();
+  }
+
+  void handleGroupSelect(String value) async {
+    assert(UserGroup.values.asNameMap().containsKey(value));
+    await addExceptionEntry(value);
   }
 }
 

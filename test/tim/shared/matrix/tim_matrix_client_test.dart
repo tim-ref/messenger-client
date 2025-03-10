@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2025 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -84,6 +84,12 @@ void main() {
         },
         type: TimRoomStateEventType.roomTopic.value,
       ),
+      StateEvent(
+        content: {
+          'history_visibility': defaultHistoryVisibility,
+        },
+        type: EventTypes.HistoryVisibility,
+      ),
     ];
 
     expect(
@@ -148,6 +154,12 @@ void main() {
           'topic': topic,
         },
         type: TimRoomStateEventType.roomTopic.value,
+      ),
+      StateEvent(
+          content: {
+            'history_visibility': defaultHistoryVisibility,
+          },
+          type: EventTypes.HistoryVisibility,
       ),
     ];
 
@@ -214,6 +226,12 @@ void main() {
         },
         type: TimRoomStateEventType.roomTopic.value,
       ),
+      StateEvent(
+        content: {
+          'history_visibility': defaultHistoryVisibility,
+        },
+        type: EventTypes.HistoryVisibility,
+      ),
     ];
 
     expect(
@@ -277,6 +295,12 @@ void main() {
           'topic': topic,
         },
         type: TimRoomStateEventType.roomTopic.value,
+      ),
+      StateEvent(
+        content: {
+          'history_visibility': defaultHistoryVisibility,
+        },
+        type: EventTypes.HistoryVisibility,
       ),
     ];
 

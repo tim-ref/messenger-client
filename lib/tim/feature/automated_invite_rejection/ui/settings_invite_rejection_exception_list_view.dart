@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -9,10 +9,12 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:fluffychat/tim/feature/automated_invite_rejection/ui/settings_invite_rejection_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:provider/provider.dart';
+
+import '../../../../utils/get_label_for_user_group.dart';
 
 class SettingsInviteRejectionExceptionListView extends StatelessWidget {
   const SettingsInviteRejectionExceptionListView({super.key});
@@ -58,9 +60,17 @@ class SettingsInviteRejectionExceptionListView extends StatelessWidget {
                   child: ListTile(
                     textColor: onTileColor,
                     tileColor: tileColor,
-                    title: Text(exceptions.elementAt(index)),
+                    title: Text(
+                      getLabelForUserGroup(
+                        L10n.of(context)!,
+                        exceptions.elementAt(index),
+                        throwOnNonExisting: false,
+                      ),
+                    ),
                     trailing: IconButton(
-                      key: ValueKey("inviteRejectionSettingsRemoveExceptionButton${exceptions.elementAt(index)}"),
+                      key: ValueKey(
+                        "inviteRejectionSettingsRemoveExceptionButton${exceptions.elementAt(index)}",
+                      ),
                       icon: Icon(
                         Icons.delete_forever_outlined,
                         color: onTileColor,

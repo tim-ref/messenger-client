@@ -1,7 +1,7 @@
 name: fluffychat
 description: Chat with your friends.
 publish_to: none
-version: 1.26.0+3360
+version: 1.27.0+3360
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -53,6 +53,7 @@ dependencies:
   flutter_secure_storage: ^7.0.1
   flutter_typeahead: ^4.3.2
   flutter_webrtc: ^0.11.6+hotfix.1
+  fpdart: ^1.1.1
   future_loading_dialog: ^0.2.3
   geolocator: ^7.6.2
   hive: ^2.2.3
@@ -70,7 +71,7 @@ dependencies:
   latlong2: ^0.8.1
   logger: ^2.4.0
   matrix:
-    path: packages/matrix-0.33.0
+    path: packages/matrix-0.35.0
   native_imaging: ^0.1.0
   package_info_plus: ^8.1.1
   path_provider: ^2.0.9
@@ -92,6 +93,8 @@ dependencies:
   test: ^1.24.0
   tim_contact_management_api:
     path: ./openapi/tim_contact_management_api
+  tim_information_api:
+    path: ./openapi/tim_information_api
   tuple: ^2.0.1
   uni_links: ^0.5.1
   unifiedpush: ^4.0.3

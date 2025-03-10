@@ -26,4 +26,3 @@ lib/model/contact_invite_settings.dart
 lib/model/contacts.dart
 lib/model/error.dart
 lib/model/info_object.dart
-pubspec.yaml

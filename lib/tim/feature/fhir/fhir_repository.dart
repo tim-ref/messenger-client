@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 – akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -25,18 +25,20 @@ import 'package:http/http.dart' as http;
 /// A List of FHIR Entries and the JSON-formatted String from which they were parsed
 typedef ResourceSearchResult = ({List<Entry> entries, String response});
 
+/// See FHIR [REST API](https://hl7.org/fhir/R4/http.html) + [Search](https://hl7.org/fhir/R4/search.html)
 class FhirRepository extends TimRestRepository {
   final FhirConfig _config;
   final TimAuthRepository _tokenService;
 
   FhirRepository(http.Client httpClient, this._tokenService, this._config) : super(httpClient);
 
-  Future<ResourceSearchResult> search(ResourceType resourceType, String query) async {
-    final buildUri = _buildUri(resourceType, query);
-    final headers = await _buildHeaders();
+  /// Searches resources specified in [query], returns the Bundles' entries.
+  Future<ResourceSearchResult> searchResources(ResourceType resourceType, String query) async {
+    final buildUri = Uri.parse('${_config.host}${_config.searchBase}/${resourceType.name}?$query');
+    final fhirToken = await _tokenService.getFhirToken();
     final response = await get(
       buildUri,
-      headers: headers,
+      headers: _commonHeaders(fhirToken),
     );
     _handleErroneousResponse(response);
     final bundle = Bundle.fromJson(jsonDecode(response.body));
@@ -52,7 +54,8 @@ class FhirRepository extends TimRestRepository {
     return (entries: entries, response: response.body);
   }
 
-  Future<Map<String, dynamic>> ownerSearch(
+  /// Searches one Practitioner resource specified in [query], returns a Bundle.
+  Future<Map<String, dynamic>> searchPractitionerRoleAsOwner(
     String query,
     TimAuthToken token,
   ) async {
@@ -61,15 +64,13 @@ class FhirRepository extends TimRestRepository {
     );
     final response = await get(
       uri,
-      headers: <String, String>{
-        HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
-      },
+      headers: _commonHeaders(token),
     );
     _handleErroneousResponse(response);
     return jsonDecode(response.body);
   }
 
+  /// Creates a new resource, and returns the server's response.
   Future<Map<String, dynamic>> createResource(
     ResourceType resourceType,
     TimAuthToken token,
@@ -78,16 +79,14 @@ class FhirRepository extends TimRestRepository {
     final uri = Uri.parse('${_config.host}${_config.ownerBase}/${resourceType.name}');
     final response = await post(
       uri,
-      headers: <String, String>{
-        HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
-      },
+      headers: _commonHeaders(token),
       body: bodyJson,
     );
     _handleErroneousResponse(response);
     return jsonDecode(response.body);
   }
 
+  /// Updates the resource with [resourceId], and returns the server's response.
   Future<Map<String, dynamic>> updateResource(
     ResourceType resourceType,
     String resourceId,
@@ -99,16 +98,14 @@ class FhirRepository extends TimRestRepository {
     );
     final response = await put(
       uri,
-      headers: <String, String>{
-        HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
-      },
+      headers: _commonHeaders(token),
       body: bodyJson,
     );
     _handleErroneousResponse(response);
     return jsonDecode(response.body);
   }
 
+  /// Deletes the resource with [resourceId], and returns the server's response.
   Future<Map<String, dynamic>> deleteResource(
     ResourceType resourceType,
     String resourceId,
@@ -119,10 +116,7 @@ class FhirRepository extends TimRestRepository {
     );
     final response = await delete(
       uri,
-      headers: <String, String>{
-        HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
-      },
+      headers: _commonHeaders(token),
     );
     _handleErroneousResponse(response);
     return jsonDecode(response.body);
@@ -138,10 +132,10 @@ class FhirRepository extends TimRestRepository {
     Uri url, {
     bool? recursively = false,
   }) async {
-    final headers = await _buildHeaders();
+    final fhirToken = await _tokenService.getFhirToken();
     final response = await get(
       url,
-      headers: headers,
+      headers: _commonHeaders(fhirToken),
     );
     final bundle = Bundle.fromJson(jsonDecode(response.body));
     bundles.add(bundle);
@@ -154,25 +148,14 @@ class FhirRepository extends TimRestRepository {
     return bundle.link!.where((element) => element.relation == LinkRelation.next).first.url;
   }
 
-  Uri _buildUri(ResourceType resourceType, String query) {
-    return Uri.parse('${_config.fhirServer()}/${resourceType.name}?$query');
-  }
-
-  Future<Map<String, String>> _buildHeaders() async {
-    final headers = <String, String>{
-      HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-    };
-    final fhirToken = await _tokenService.getFhirToken();
-    headers.putIfAbsent(
-      HttpHeaders.authorizationHeader,
-      () => 'Bearer ${fhirToken.accessToken}',
-    );
-    return headers;
-  }
-
   void _handleErroneousResponse(http.Response response) {
     if (response.statusCode >= 400) {
       throw HttpException("unexpected status ${response.statusCode}");
     }
   }
 }
+
+Map<String, String> _commonHeaders(TimAuthToken token) => {
+      HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
+    };

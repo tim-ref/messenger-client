@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -9,11 +9,13 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:fluffychat/tim/feature/automated_invite_rejection/ui/settings_invite_rejection_exception_list_view.dart';
-import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:fluffychat/tim/feature/automated_invite_rejection/ui/settings_invite_rejection_controller.dart';
+import 'package:fluffychat/tim/feature/automated_invite_rejection/ui/settings_invite_rejection_exception_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:provider/provider.dart';
+
+import 'elements/add_group_widget.dart';
 
 class SettingsInviteRejectionViewBody extends StatefulWidget {
   const SettingsInviteRejectionViewBody({super.key});
@@ -63,7 +65,8 @@ class _SettingsInviteRejectionViewBodyState extends State<SettingsInviteRejectio
         const SizedBox(
           height: 8,
         ),
-        Semantics( label: "inviteRejectionSettingsAddExceptionField",
+        Semantics(
+          label: "inviteRejectionSettingsAddExceptionField",
           container: true,
           textField: true,
           child: TextField(
@@ -81,13 +84,19 @@ class _SettingsInviteRejectionViewBodyState extends State<SettingsInviteRejectio
         const SizedBox(
           height: 8,
         ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: FilledButton(
-            key: const ValueKey("inviteRejectionSettingsAddExceptionButton"),
-            onPressed: () => _addException(),
-            child: Text(L10n.of(context)!.inviteRejectionSettingsExceptionsAddExceptionButtonLabel),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            AddGroupsDropdown(
+              onGroupSelected: _controller.handleGroupSelect,
+            ),
+            FilledButton(
+              key: const ValueKey("inviteRejectionSettingsAddExceptionButton"),
+              onPressed: _addException,
+              child:
+                  Text(L10n.of(context)!.inviteRejectionSettingsExceptionsAddExceptionButtonLabel),
+            ),
+          ],
         ),
         const SizedBox(
           height: 8,

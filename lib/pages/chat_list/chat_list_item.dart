@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 26.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -277,7 +277,7 @@ class ChatListItem extends StatelessWidget {
                               hideEdit: true,
                               plaintextBody: true,
                               removeMarkdown: true,
-                              withSenderNamePrefix: !room.isDirectChat ||
+                              withSenderNamePrefix: !room.isDirectChatWithTwoOrLessParticipants ||
                                   room.directChatMatrixID != room.lastEvent?.senderId,
                             ) ??
                             Future.value(L10n.of(context)!.emptyChat),
@@ -292,8 +292,9 @@ class ChatListItem extends StatelessWidget {
                                       hideEdit: true,
                                       plaintextBody: true,
                                       removeMarkdown: true,
-                                      withSenderNamePrefix: !room.isDirectChat ||
-                                          room.directChatMatrixID != room.lastEvent?.senderId,
+                                      withSenderNamePrefix:
+                                          !room.isDirectChatWithTwoOrLessParticipants ||
+                                              room.directChatMatrixID != room.lastEvent?.senderId,
                                     ) ??
                                     L10n.of(context)!.emptyChat,
                             softWrap: false,

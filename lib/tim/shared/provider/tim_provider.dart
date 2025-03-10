@@ -35,6 +35,7 @@ import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
 
+import '../../feature/automated_invite_rejection/insurer_information_repository.dart';
 import '../../feature/tim_version/tim_version_service.dart';
 
 /// Provider for [TimServices].
@@ -67,6 +68,12 @@ class TimProviderState extends State<TimProvider> implements TimServices {
 
   InviteRejectionService? _inviteRejectionService;
   InviteRejectionPolicyRepository? _inviteRejectionPolicyRepository;
+  late final InsurerInformationRepository _insurerInformationRepository =
+      InsurerInformationRepository(
+    widget.matrix.client(),
+    _timAuthRepository(),
+    _httpClient(),
+  );
 
   @override
   TimMatrix matrix() => widget.matrix;
@@ -110,10 +117,10 @@ class TimProviderState extends State<TimProvider> implements TimServices {
     return _inviteRejectionPolicyRepository!;
   }
 
-  // Use for local testing purposes without an existing instance that has configured the authorisation concept in the client.
-  /*  @override
-   InviteRejectionPolicyRepository inviteRejectionPolicyRepository() =>
-       InviteRejectionPolicyRepositoryFakeImpl(widget.matrix.client());
+  /* // Use for local testing purposes without an existing instance that has configured the authorisation concept in the client.
+  @override
+  InviteRejectionPolicyRepository inviteRejectionPolicyRepository() =>
+      InviteRejectionPolicyRepositoryFakeImpl(widget.matrix.client());
 */
   @override
   InviteRejectionService inviteRejectionService() {
@@ -202,6 +209,7 @@ class TimProviderState extends State<TimProvider> implements TimServices {
         timVersionService: timVersionService,
         inviteRejectionPolicyRepository: inviteRejectionPolicyRepository(),
         client: widget.matrix.client(),
+        timInformationRepository: insurerInformationRepository(),
       );
       _inviteRejectionService!.initInviteRejectOnEventStream();
     }
@@ -220,4 +228,7 @@ class TimProviderState extends State<TimProvider> implements TimServices {
         FixedTimeoutHttpClient(http.Client(), const Duration(seconds: 180)),
         UserAgentBuilder(),
       );
+
+  @override
+  InsurerInformationRepository insurerInformationRepository() => _insurerInformationRepository;
 }

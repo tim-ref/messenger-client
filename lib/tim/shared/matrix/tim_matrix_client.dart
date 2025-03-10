@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:collection/collection.dart';
 import 'package:fluffychat/tim/shared/errors/tim_bad_state_exception.dart';
 import 'package:fluffychat/tim/shared/matrix/tim_case_reference_content_blob.dart';
 import 'package:fluffychat/tim/tim_constants.dart';
@@ -38,15 +39,6 @@ abstract class TimMatrixClient {
     String? to,
     int? limit,
     String? filter,
-  });
-
-  Future<String> startDirectChat(
-    String mxid, {
-    bool? enableEncryption,
-    List<StateEvent>? initialState,
-    bool waitForSync = true,
-    Map<String, dynamic>? powerLevelContentOverride,
-    CreateRoomPreset? preset = CreateRoomPreset.trustedPrivateChat,
   });
 
   Future<String> startDirectChatWithCustomRoomType(
@@ -153,24 +145,6 @@ class TimMatrixClientImpl implements TimMatrixClient {
         filter: filter,
       );
 
-  @override
-  Future<String> startDirectChat(
-    String mxid, {
-    bool? enableEncryption,
-    List<StateEvent>? initialState,
-    bool waitForSync = true,
-    Map<String, dynamic>? powerLevelContentOverride,
-    CreateRoomPreset? preset = CreateRoomPreset.trustedPrivateChat,
-  }) =>
-      _client.startDirectChat(
-        mxid,
-        enableEncryption: enableEncryption,
-        initialState: initialState,
-        waitForSync: waitForSync,
-        powerLevelContentOverride: powerLevelContentOverride,
-        preset: preset,
-      );
-
   /// Returns an existing direct room ID with this user or creates a new one.
   /// By default encryption will be enabled if the client supports encryption
   /// and the other user has uploaded any encryption keys.
@@ -250,6 +224,15 @@ class TimMatrixClientImpl implements TimMatrixClient {
         )) {
       initialState.add(
         StateEvent(content: {'topic': topic}, type: TimRoomStateEventType.roomTopic.value),
+      );
+    }
+
+    // A_25481
+    if (initialState.none(
+          (element) => element.type == EventTypes.HistoryVisibility,
+    )) {
+      initialState.add(
+        StateEvent(content: {'history_visibility': defaultHistoryVisibility}, type: EventTypes.HistoryVisibility ),
       );
     }
 
@@ -361,6 +344,15 @@ class TimMatrixClientImpl implements TimMatrixClient {
         )) {
       initialState.add(
         StateEvent(content: {'topic': topic}, type: TimRoomStateEventType.roomTopic.value),
+      );
+    }
+
+    // A_25481
+    if (!initialState.any(
+          (element) => element.type == EventTypes.HistoryVisibility,
+    )) {
+      initialState.add(
+        StateEvent(content: {'history_visibility': defaultHistoryVisibility}, type: EventTypes.HistoryVisibility ),
       );
     }
 

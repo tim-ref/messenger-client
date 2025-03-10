@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 21.11.2024
+ * Modified by akquinet GmbH on 27.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -17,6 +17,7 @@ import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:matrix/matrix.dart';
 import 'package:vrouter/vrouter.dart';
 
+import '../../tim/shared/provider/tim_provider.dart';
 import '../../widgets/matrix.dart';
 import 'user_bottom_sheet_view.dart';
 
@@ -154,7 +155,7 @@ class UserBottomSheetController extends State<UserBottomSheet> {
       case UserBottomSheetAction.message:
         final roomIdResult = await showFutureLoadingDialog(
           context: context,
-          future: () => widget.user.startDirectChat(),
+          future: () => TimProvider.of(context).matrix().client().startDirectChatWithCustomRoomType(widget.user.id),
         );
         if (roomIdResult.error != null) return;
         VRouter.of(widget.outerContext).toSegments(['rooms', roomIdResult.result!]);

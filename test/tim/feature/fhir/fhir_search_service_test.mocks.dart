@@ -45,13 +45,13 @@ class MockFhirRepository extends _i1.Mock implements _i3.FhirRepository {
   }
 
   @override
-  _i4.Future<({List<_i5.Entry> entries, String response})> search(
+  _i4.Future<({List<_i5.Entry> entries, String response})> searchResources(
     _i6.ResourceType? resourceType,
     String? query,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #search,
+          #searchResources,
           [
             resourceType,
             query,
@@ -63,7 +63,7 @@ class MockFhirRepository extends _i1.Mock implements _i3.FhirRepository {
           response: _i7.dummyValue<String>(
             this,
             Invocation.method(
-              #search,
+              #searchResources,
               [
                 resourceType,
                 query,
@@ -74,13 +74,13 @@ class MockFhirRepository extends _i1.Mock implements _i3.FhirRepository {
       ) as _i4.Future<({List<_i5.Entry> entries, String response})>);
 
   @override
-  _i4.Future<Map<String, dynamic>> ownerSearch(
+  _i4.Future<Map<String, dynamic>> searchPractitionerRoleAsOwner(
     String? query,
     _i8.TimAuthToken? token,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
-          #ownerSearch,
+          #searchPractitionerRoleAsOwner,
           [
             query,
             token,

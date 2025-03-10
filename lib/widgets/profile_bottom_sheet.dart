@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 27.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -19,6 +19,8 @@ import 'package:vrouter/vrouter.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 
+import '../tim/shared/provider/tim_provider.dart';
+
 class ProfileBottomSheet extends StatelessWidget {
   final String userId;
   final BuildContext outerContext;
@@ -30,10 +32,10 @@ class ProfileBottomSheet extends StatelessWidget {
   }) : super(key: key);
 
   void _startDirectChat(BuildContext context) async {
-    final client = Matrix.of(context).client;
+    final client = TimProvider.of(context).matrix().client();
     final result = await showFutureLoadingDialog<String>(
       context: context,
-      future: () => client.startDirectChat(userId),
+      future: () => client.startDirectChatWithCustomRoomType(userId),
     );
     if (result.error == null) {
       VRouter.of(context).toSegments(['rooms', result.result!]);

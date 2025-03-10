@@ -181,6 +181,19 @@ Import the necessary classes and use the client as required in your implementati
 
   Add `--dart-define=ENABLE_DEBUG_WIDGET=true --dart-define=DEBUG_WIDGET_VISIBLE=true` to your build command.
 
+#### Run with working FHIR client
+
+The build-in FHIR client requires additional configuration. Run it like this:
+
+```shell
+fvm flutter run \
+    --dart-define=TOKEN_DISPENSER_URL="${TOKEN_DISPENSER_URL}" \
+    --dart-define=TOKEN_DISPENSER_USER="${eu-token-dispenser-1-credentials--username}" \
+    --dart-define=TOKEN_DISPENSER_PASSWORD="${eu-token-dispenser-1-credentials--password}"
+```
+
+You need to insert the missing configuration/secrets.
+
 ### Unit Testing
 
 To run all test cases in this repository use

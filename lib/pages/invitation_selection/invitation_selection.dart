@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.04.2024
+ * Modified by akquinet GmbH on 27.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -11,7 +11,6 @@
 
 import 'dart:async';
 
-import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -22,6 +21,7 @@ import 'package:vrouter/vrouter.dart';
 
 import 'package:fluffychat/pages/invitation_selection/invitation_selection_view.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import '../../utils/localized_exception_extension.dart';
 
@@ -50,7 +50,7 @@ class InvitationSelectionController extends State<InvitationSelection> {
     );
     final participantsIds = participants.map((p) => p.stateKey).toList();
     final contacts = client.rooms
-        .where((r) => r.isDirectChat)
+        .where((r) => r.isDirectChatWithTwoOrLessParticipants)
         .map((r) => r.unsafeGetUserFromMemoryOrFallback(r.directChatMatrixID!))
         .toList()
       ..removeWhere((u) => participantsIds.contains(u.stateKey));
@@ -72,6 +72,7 @@ class InvitationSelectionController extends State<InvitationSelection> {
               MatrixLocals(L10n.of(context)!),
             ),
           ),
+          message: L10n.of(context)!.inviteContactToGroupMessage,
           okLabel: L10n.of(context)!.yes,
           cancelLabel: L10n.of(context)!.cancel,
         )) {

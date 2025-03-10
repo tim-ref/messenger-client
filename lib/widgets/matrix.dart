@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 05.02.2025
+ * Modified by akquinet GmbH on 26.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -44,8 +44,6 @@ import '../utils/account_bundles.dart';
 import '../utils/background_push.dart';
 import '../utils/famedlysdk_store.dart';
 import 'local_notifications_extension.dart';
-
-// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Matrix extends StatefulWidget {
   final Widget? child;
@@ -300,31 +298,9 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
       hidPopup = true;
       await KeyVerificationDialog(request: request).show(navigatorContext);
     });
-    onLoginStateChanged[name] ??= c.onLoginStateChanged.stream.listen((state) {
-      final loggedInWithMultipleClients = widget.clients.length > 1;
-      if (loggedInWithMultipleClients && state != LoginState.loggedIn) {
-        _cancelSubs(c.clientName);
-        widget.clients.remove(c);
-        ClientManager.removeClientNameFromStore(c.clientName);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(L10n.of(context)!.oneClientLoggedOut),
-          ),
-        );
-
-        if (state != LoginState.loggedIn) {
-          widget.router?.currentState?.to(
-            '/rooms',
-            queryParameters: widget.router?.currentState?.queryParameters ?? {},
-          );
-        }
-      } else {
-        widget.router?.currentState?.to(
-          state == LoginState.loggedIn ? '/rooms' : '/home',
-          queryParameters: widget.router?.currentState?.queryParameters ?? {},
-        );
-      }
-    });
+    onLoginStateChanged[name] ??= c.onLoginStateChanged.stream.listen(
+      (state) => _handleLoginStateChanges(c, state),
+    );
     onUiaRequest[name] ??= c.onUiaRequest.stream.listen(uiaRequestHandler);
     if (PlatformInfos.isWeb || PlatformInfos.isLinux) {
       c.onSync.stream.first.then((s) {
@@ -339,6 +315,45 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
             )
             .listen(showLocalNotification);
       });
+    }
+  }
+
+  void _handleLoginStateChanges(Client client, LoginState state) {
+    final loggedInWithMultipleClients = widget.clients.length > 1;
+    final currentRouterState = widget.router?.currentState;
+    final queryParameters = currentRouterState?.queryParameters ?? {};
+
+    String? nextPath;
+
+    // use LoginState.loggedOut to not remove clients on soft logout cause refreshing token
+    if (loggedInWithMultipleClients && state == LoginState.loggedOut) {
+      _cancelSubs(client.clientName);
+      widget.clients.remove(client);
+      ClientManager.removeClientNameFromStore(client.clientName);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.oneClientLoggedOut),
+        ),
+      );
+      nextPath = '/rooms'; // prevent navigating to home on logout with multiple clients
+    } else {
+      final currentVRouterDelegate = currentRouterState?.vRouterDelegate;
+
+      nextPath = switch (state) {
+        LoginState.loggedOut => '/home',
+        LoginState.loggedIn => (currentVRouterDelegate != null &&
+                currentVRouterDelegate.url != null &&
+                currentVRouterDelegate.url!.contains('/home'))
+            ? '/rooms'
+            : null,
+        LoginState.softLoggedOut => null, // prevent navigation on soft logout
+      };
+    }
+    if (nextPath != null) {
+      currentRouterState?.to(
+        nextPath,
+        queryParameters: queryParameters,
+      );
     }
   }
 

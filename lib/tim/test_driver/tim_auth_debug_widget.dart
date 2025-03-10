@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 – akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -9,10 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
-
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
-import 'package:fluffychat/tim/test_driver/test_driver_state_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -42,25 +39,29 @@ class _TimAuthConceptDebugWidgetState extends State<TimAuthConceptDebugWidget> {
           }
           if (snapshot.hasData) {
             final data = parseRejectionPolicyFromJson(snapshot.requireData.content);
-            final defaultSetting = data is AllowAllInvites ? 'allow all' : 'block all';
+            final defaultSetting = switch (data) {
+              AllowAllInvites() => 'allow all',
+              BlockAllInvites() => 'block all',
+            };
 
             final domainExceptions = switch (data) {
-              AllowAllInvites() => data.blockedDomains,
-              BlockAllInvites() => data.allowedDomains,
+              AllowAllInvites(blockedServers: final serverExceptions) ||
+              BlockAllInvites(allowedServers: final serverExceptions) =>
+                serverExceptions,
             };
 
             final userExceptions = switch (data) {
-              AllowAllInvites() => data.blockedUsers,
-              BlockAllInvites() => data.allowedUsers,
+              AllowAllInvites(blockedUsers: final userExceptions) ||
+              BlockAllInvites(allowedUsers: final userExceptions) =>
+                userExceptions,
             };
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(defaultSetting, key: const ValueKey("TimAuthMode")),
-                Text(domainExceptions.join(';') ?? '',
-                    key: const ValueKey("TimAuthDomainExceptions")),
-                Text(userExceptions.join(';') ?? '', key: const ValueKey("TimAuthUserExceptions")),
+                Text(domainExceptions.join(';'), key: const ValueKey("TimAuthDomainExceptions")),
+                Text(userExceptions.join(';'), key: const ValueKey("TimAuthUserExceptions")),
               ],
             );
           }

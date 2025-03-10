@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 – akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -17,9 +17,12 @@ import 'package:matrix/matrix.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
+@GenerateNiceMocks([
+  MockSpec<Client>(),
+  MockSpec<InviteRejectionPolicyRepository>(),
+])
 import 'settings_invite_rejection_controller_test.mocks.dart';
 
-@GenerateNiceMocks([MockSpec<Client>(), MockSpec<InviteRejectionPolicyRepository>()])
 void main() {
   late InviteRejectionPolicyRepository inviteRejectionPolicyRepository;
   late SettingsInviteRejectionController controller;
@@ -30,10 +33,10 @@ void main() {
 
   // Issue of Mockito when using mocks which depend on sealed classes
   // https://github.com/dart-lang/mockito/issues/675
-  provideDummy<InviteRejectionPolicy>(AllowAllInvites(blockedDomains: {}, blockedUsers: {}));
+  provideDummy<InviteRejectionPolicy>(AllowAllInvites.blockingNone());
 
   test("after creation of controller instance -> loads invite rejection policy", () async {
-    final policy = AllowAllInvites(blockedDomains: {}, blockedUsers: {});
+    final policy = AllowAllInvites.blockingNone();
     inviteRejectionPolicyRepository = MockInviteRejectionPolicyRepository();
     when(inviteRejectionPolicyRepository.getCurrentPolicy())
         .thenAnswer((_) => Future.value(policy));
@@ -47,7 +50,7 @@ void main() {
   });
 
   group("AllowAll", () {
-    final policy = AllowAllInvites(blockedDomains: {}, blockedUsers: {});
+    final policy = AllowAllInvites.blockingNone();
 
     // always reinitialize controller for each test
     setUp(() {
@@ -62,31 +65,39 @@ void main() {
     test("add homeserver to exceptions -> adds entry to blocked domains", () async {
       await controller.addExceptionEntry(domain);
 
-      final blockedDomains = (controller.inviteRejectionPolicy as AllowAllInvites).blockedDomains;
-      expect(blockedDomains, contains(domain));
+      expect(
+        controller.inviteRejectionPolicy,
+        isA<AllowAllInvites>().having((p) => p.blockedServers, 'blockedServers', contains(domain)),
+      );
     });
 
     test("add mxid to exceptions -> adds entry to blocked users", () async {
       await controller.addExceptionEntry(mxid);
 
-      final blockedUsers = (controller.inviteRejectionPolicy as AllowAllInvites).blockedUsers;
-      expect(blockedUsers, contains(mxid));
+      expect(
+        controller.inviteRejectionPolicy,
+        isA<AllowAllInvites>().having((p) => p.blockedUsers, 'blockedUsers', contains(mxid)),
+      );
     });
 
     test("remove homeserver from exceptions -> removes entry from blocked domains", () async {
       await controller.addExceptionEntry(domain);
       await controller.removeExceptionEntry(domain);
 
-      final blockedDomains = (controller.inviteRejectionPolicy as AllowAllInvites).blockedDomains;
-      expect(blockedDomains, isEmpty);
+      expect(
+        controller.inviteRejectionPolicy,
+        isA<AllowAllInvites>().having((p) => p.blockedServers, 'blockedServers', isEmpty),
+      );
     });
 
     test("remove mxid from exceptions -> removes entry from blocked users", () async {
       await controller.addExceptionEntry(mxid);
       await controller.removeExceptionEntry(mxid);
 
-      final blockedUsers = (controller.inviteRejectionPolicy as AllowAllInvites).blockedUsers;
-      expect(blockedUsers, isEmpty);
+      expect(
+        controller.inviteRejectionPolicy,
+        isA<AllowAllInvites>().having((p) => p.blockedUsers, 'blockedUsers', isEmpty),
+      );
     });
 
     test("remove all exceptions -> removes all entries from exceptions", () async {
@@ -100,7 +111,7 @@ void main() {
     test("set default setting to BlockAll -> changes policy to BlockAllInvites", () async {
       await controller.setDefaultSetting(InviteRejectionPolicyType.blockAll);
 
-      expect(controller.inviteRejectionPolicy, (newPolicy) => newPolicy is BlockAllInvites);
+      expect(controller.inviteRejectionPolicy, isA<BlockAllInvites>());
     });
 
     test("set default setting from BlockAll back to AllowAll -> loads old exceptions", () async {
@@ -114,7 +125,7 @@ void main() {
   });
 
   group("BlockAll", () {
-    final policy = BlockAllInvites(allowedDomains: {}, allowedUsers: {});
+    final policy = BlockAllInvites.allowingNone();
 
     // always reinitialize controller for each test
     setUp(() {
@@ -128,32 +139,39 @@ void main() {
 
     test("add homeserver to exceptions -> adds entry to allowed domains", () async {
       await controller.addExceptionEntry(domain);
-
-      final allowedDomains = (controller.inviteRejectionPolicy as BlockAllInvites).allowedDomains;
-      expect(allowedDomains, contains(domain));
+      expect(
+        controller.inviteRejectionPolicy,
+        isA<BlockAllInvites>().having((p) => p.allowedServers, 'allowedServers', contains(domain)),
+      );
     });
 
     test("add mxid to exceptions -> adds entry to allowed users", () async {
       await controller.addExceptionEntry(mxid);
 
-      final allowedUsers = (controller.inviteRejectionPolicy as BlockAllInvites).allowedUsers;
-      expect(allowedUsers, contains(mxid));
+      expect(
+        controller.inviteRejectionPolicy,
+        isA<BlockAllInvites>().having((p) => p.allowedUsers, 'allowedUsers', contains(mxid)),
+      );
     });
 
     test("remove homeserver from exceptions -> removes entry from allowed domains", () async {
       await controller.addExceptionEntry(domain);
       await controller.removeExceptionEntry(domain);
 
-      final allowedDomains = (controller.inviteRejectionPolicy as BlockAllInvites).allowedDomains;
-      expect(allowedDomains, isEmpty);
+      expect(
+        controller.inviteRejectionPolicy,
+        isA<BlockAllInvites>().having((p) => p.allowedServers, 'allowedServers', isEmpty),
+      );
     });
 
     test("remove mxid from exceptions -> removes entry from allowed users", () async {
       await controller.addExceptionEntry(mxid);
       await controller.removeExceptionEntry(mxid);
 
-      final allowedUsers = (controller.inviteRejectionPolicy as BlockAllInvites).allowedUsers;
-      expect(allowedUsers, isEmpty);
+      expect(
+        controller.inviteRejectionPolicy,
+        isA<BlockAllInvites>().having((p) => p.allowedUsers, 'allowedUsers', isEmpty),
+      );
     });
 
     test("remove all exceptions -> removes all entries from exceptions", () async {
@@ -167,7 +185,7 @@ void main() {
     test("set default setting to AllowAll -> changes policy to AllowAllInvites", () async {
       await controller.setDefaultSetting(InviteRejectionPolicyType.allowAll);
 
-      expect(controller.inviteRejectionPolicy, (newPolicy) => newPolicy is AllowAllInvites);
+      expect(controller.inviteRejectionPolicy, isA<AllowAllInvites>());
     });
 
     test("set default setting from AllowAll back to BlockAll -> loads old exceptions", () async {

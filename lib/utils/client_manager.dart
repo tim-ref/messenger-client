@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 25.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -38,8 +38,7 @@ abstract class ClientManager {
     try {
       final rawClientNames = await Store().getItem(clientNamespace);
       if (rawClientNames != null) {
-        final clientNamesList =
-            (jsonDecode(rawClientNames) as List).cast<String>();
+        final clientNamesList = (jsonDecode(rawClientNames) as List).cast<String>();
         clientNames.addAll(clientNamesList);
       }
     } catch (e, s) {
@@ -101,9 +100,8 @@ abstract class ClientManager {
     await Store().setItem(clientNamespace, jsonEncode(clientNamesList));
   }
 
-  static NativeImplementations get nativeImplementations => kIsWeb
-      ? const NativeImplementationsDummy()
-      : NativeImplementationsIsolate(compute);
+  static NativeImplementations get nativeImplementations =>
+      kIsWeb ? const NativeImplementationsDummy() : NativeImplementationsIsolate(compute);
 
   static Client createClient(String clientName) {
     return Client(
@@ -113,8 +111,7 @@ abstract class ClientManager {
           : RawDataDelegatingClient(http.Client(), UserAgentBuilder()),
       verificationMethods: {
         KeyVerificationMethod.numbers,
-        if (kIsWeb || PlatformInfos.isMobile || PlatformInfos.isLinux)
-          KeyVerificationMethod.emoji,
+        if (kIsWeb || PlatformInfos.isMobile || PlatformInfos.isLinux) KeyVerificationMethod.emoji,
       },
       importantStateEvents: <String>{
         // To make room emotes work
@@ -130,6 +127,9 @@ abstract class ClientManager {
       },
       nativeImplementations: nativeImplementations,
       customImageResizer: PlatformInfos.isMobile ? customImageResizer : null,
+      // A_25458 - Use refresh token on soft logout
+      // https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Basis/gemSpec_TI-M_Basis_V1.1.1/#A_25458
+      onSoftLogout: (client) => client.refreshAccessToken(),
     );
   }
 }

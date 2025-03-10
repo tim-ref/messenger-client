@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 26.02.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,6 +9,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
@@ -23,8 +24,7 @@ import 'package:fluffychat/utils/beautify_string_extension.dart';
 class ChatEncryptionSettingsView extends StatelessWidget {
   final ChatEncryptionSettingsController controller;
 
-  const ChatEncryptionSettingsView(this.controller, {Key? key})
-      : super(key: key);
+  const ChatEncryptionSettingsView(this.controller, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,18 +32,17 @@ class ChatEncryptionSettingsView extends StatelessWidget {
     return StreamBuilder<Object>(
       stream: room.client.onSync.stream.where(
         (s) => s.rooms?.join?[room.id] != null || s.deviceLists != null,
-      ),  builder: (context, _) => Scaffold(
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.close_outlined),
-                  onPressed: () => VRouter.of(context)
-                      .toSegments(['rooms', controller.roomId!]),
-                ),
-                title: Text(L10n.of(context)!.endToEndEncryption),
-                actions: [
-                  TextButton(
-                    onPressed: () =>
-                        launchUrlString(AppConfig.encryptionTutorial),
+      ),
+      builder: (context, _) => Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.close_outlined),
+            onPressed: () => VRouter.of(context).toSegments(['rooms', controller.roomId!]),
+          ),
+          title: Text(L10n.of(context)!.endToEndEncryption),
+          actions: [
+            TextButton(
+              onPressed: () => launchUrlString(AppConfig.encryptionTutorial),
               child: Text(L10n.of(context)!.help),
             ),
           ],
@@ -52,8 +51,7 @@ class ChatEncryptionSettingsView extends StatelessWidget {
           children: [
             SwitchListTile(
               secondary: CircleAvatar(
-                foregroundColor:
-                    Theme.of(context).colorScheme.onPrimaryContainer,
+                foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                 child: const Icon(Icons.lock_outlined),
               ),
@@ -62,7 +60,7 @@ class ChatEncryptionSettingsView extends StatelessWidget {
               onChanged: controller.enableEncryption,
             ),
             const Divider(height: 1),
-            if (room.isDirectChat)
+            if (room.isDirectChatWithTwoOrLessParticipants)
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SizedBox(
@@ -108,14 +106,10 @@ class ChatEncryptionSettingsView extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: deviceKeys.length,
-                      itemBuilder: (BuildContext context, int i) =>
-                          SwitchListTile(
+                      itemBuilder: (BuildContext context, int i) => SwitchListTile(
                         value: !deviceKeys[i].blocked,
-                        activeColor: deviceKeys[i].verified
-                            ? Colors.green
-                            : Colors.orange,
-                        onChanged: (_) =>
-                            controller.toggleDeviceKey(deviceKeys[i]),
+                        activeColor: deviceKeys[i].verified ? Colors.green : Colors.orange,
+                        onChanged: (_) => controller.toggleDeviceKey(deviceKeys[i]),
                         title: Row(
                           children: [
                             Icon(
@@ -133,8 +127,7 @@ class ChatEncryptionSettingsView extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              deviceKeys[i].deviceId ??
-                                  L10n.of(context)!.unknownDevice,
+                              deviceKeys[i].deviceId ?? L10n.of(context)!.unknownDevice,
                             ),
                             const SizedBox(width: 4),
                             Flexible(
@@ -145,13 +138,10 @@ class ChatEncryptionSettingsView extends StatelessWidget {
                                     AppConfig.borderRadius,
                                   ),
                                   side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
+                                color: Theme.of(context).colorScheme.primaryContainer,
                                 child: Padding(
                                   padding: const EdgeInsets.all(4.0),
                                   child: Text(
@@ -159,8 +149,7 @@ class ChatEncryptionSettingsView extends StatelessWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(context).colorScheme.primary,
                                       fontSize: 12,
                                       fontStyle: FontStyle.italic,
                                     ),

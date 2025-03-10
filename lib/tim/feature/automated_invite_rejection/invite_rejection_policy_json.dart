@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 – akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -11,44 +11,61 @@
 
 import 'package:fluffychat/tim/feature/automated_invite_rejection/invite_rejection_policy.dart';
 
+const _defaultSetting = 'defaultSetting';
+const _blockAll = 'block all';
+const _allowAll = 'allow all';
+const _userExceptions = 'userExceptions';
+const _serverExceptions = 'serverExceptions';
+const _groupExceptions = 'groupExceptions';
+const _inInsuredPerson = 'isInsuredPerson';
+
+// each domain is an empty object, but for now only the mxid or Matrix server name (represented by key here) are needed.
+Set<String> _parseKeys(dynamic value) =>
+    value == null ? <String>{} : ((value as Map).keys).toSet().cast<String>();
+
+Set<UserGroup> _parseGroups(dynamic json) => {
+      if (json?.contains(_inInsuredPerson) ?? false) UserGroup.isInsuredPerson,
+    };
+
+List<String> _convertGroupsToJson(Iterable<UserGroup> groups) => [
+      if (groups.contains(UserGroup.isInsuredPerson)) _inInsuredPerson,
+    ];
+
 /// Expected schema of json can be found here: see: https://github.com/gematik/api-ti-messenger/commit/9b9f21b87949e778de85dbbc19e25f53495871e2#diff-497ec6e8851cb404e681bc28551f0c288d09a3d496d05ee8a13643699a3f6798
 InviteRejectionPolicy parseRejectionPolicyFromJson(Map<String, dynamic> json) {
-  // each domain is an empty object, but for now only the mxid or Matrix server name (represented by key here) are needed.
-  final domainExceptions = !json.containsKey('domainExceptions')
-      ? <String>{}
-      : ((json['domainExceptions'] as Map).keys).toSet().cast<String>();
-  final userExceptions =
-      !json.containsKey('userExceptions') ? <String>{} : ((json['userExceptions'] as Map).keys).toSet().cast<String>();
-
-  switch (json['defaultSetting']) {
-    case 'block all':
-      return BlockAllInvites(allowedDomains: domainExceptions, allowedUsers: userExceptions);
-    case 'allow all':
-      return AllowAllInvites(blockedDomains: domainExceptions, blockedUsers: userExceptions);
-    default:
-
-      /// should always be one of the above cases, otherwise its a bug.
-      throw Exception('Unexpected Rejection Policy Format');
-  }
-}
-
-Map<String, dynamic> convertInviteRejectionPolicyToJson(InviteRejectionPolicy policy) {
-  final defaultSetting = policy is AllowAllInvites ? 'allow all' : 'block all';
-
-  final (userExceptions, domainExceptions) = switch (policy) {
-    AllowAllInvites(blockedUsers: final blockedUsers, blockedDomains: final blockedDomains) => (
-        blockedUsers,
-        blockedDomains
+  return switch (json) {
+    {_defaultSetting: _blockAll} => BlockAllInvites(
+        allowedServers: _parseKeys(json[_serverExceptions]),
+        allowedUsers: _parseKeys(json[_userExceptions]),
+        allowedUserGroups: _parseGroups(json[_groupExceptions]),
       ),
-    BlockAllInvites(allowedUsers: final allowedUsers, allowedDomains: final allowedDomains) => (
-        allowedUsers,
-        allowedDomains
+    {_defaultSetting: _allowAll} => AllowAllInvites(
+        blockedServers: _parseKeys(json[_serverExceptions]),
+        blockedUsers: _parseKeys(json[_userExceptions]),
+        blockedUserGroups: _parseGroups(json[_groupExceptions]),
       ),
-  };
 
-  return {
-    'defaultSetting': defaultSetting,
-    'domainExceptions': {for (final item in domainExceptions) item: {}},
-    'userExceptions': {for (final item in userExceptions) item: {}},
+    /// should always be one of the above cases, otherwise its a bug.
+    _ => throw Exception('Unexpected Rejection Policy Format')
   };
 }
+
+Map<String, dynamic> convertInviteRejectionPolicyToJson(InviteRejectionPolicy policy) =>
+    switch (policy) {
+      AllowAllInvites(:final blockedUsers, :final blockedServers, :final blockedUserGroups) => {
+          _defaultSetting: _allowAll,
+          if (blockedServers.isNotEmpty)
+            _serverExceptions: {for (final item in blockedServers) item: {}},
+          if (blockedUsers.isNotEmpty) _userExceptions: {for (final item in blockedUsers) item: {}},
+          if (blockedUserGroups.isNotEmpty)
+            _groupExceptions: _convertGroupsToJson(blockedUserGroups),
+        },
+      BlockAllInvites(:final allowedUsers, :final allowedServers, :final allowedUserGroups) => {
+          _defaultSetting: _blockAll,
+          if (allowedServers.isNotEmpty)
+            _serverExceptions: {for (final item in allowedServers) item: {}},
+          if (allowedUsers.isNotEmpty) _userExceptions: {for (final item in allowedUsers) item: {}},
+          if (allowedUserGroups.isNotEmpty)
+            _groupExceptions: _convertGroupsToJson(allowedUserGroups),
+        },
+    };

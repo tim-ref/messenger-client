@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2025 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -51,19 +51,11 @@ class RoomListDebugWidget extends StatelessWidget {
       room.postLoad();
 
       final roomDebugDto = await RoomDebugDto.getDtoFromMatrixRoom(room, Matrix.of(context).client);
-      debugPrint(
-          '######################### current members ${roomDebugDto.members.map((e) => 'member: ${e.mxid} state: ${e.membershipState}')}');
-      debugPrint(
-          '######################### current state ${roomDebugDto.states.where((element) => element.type == 'm.room.members').map((e) => ': ${e.type} state: ${e.content} state key: ${e.stateKey}')}');
-
 
       roomDebugDtos.add(roomDebugDto);
     }
 
     final roomDebugDtoJSON = const JsonEncoder().convert(roomDebugDtos);
-
-    debugPrint(
-        '######################### roomDebugDtoJSONe $roomDebugDtoJSON');
 
     return Text(
       roomDebugDtoJSON,

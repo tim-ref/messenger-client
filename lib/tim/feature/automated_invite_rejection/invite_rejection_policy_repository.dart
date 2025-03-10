@@ -20,14 +20,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../shared/matrix/tim_matrix_client.dart';
 
-const permissionConfigNameSpace = 'de.gematik.tim.account.permissionconfig.v1';
-const inviteRejectionPolicySharedPreferencesKey = 'inviteRejectionPolicy';
+const permissionConfigNameSpace = 'de.gematik.tim.account.permissionconfig.pro.v1';
 
-/// A_25043 - Berechtigungskonfiguration in Accountdaten speichern
-/// A_25044 - Namespace für Berechtigungskonfiguration
-/// A_25258 - Schema der Berechtigungskonfiguration
-///
-/// https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Basis/gemSpec_TI-M_Basis_V1.0.0/#A_25043
+/// [A_25043 - Berechtigungskonfiguration in Accountdaten speichern](https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Basis/gemSpec_TI-M_Basis_V1.0.0/#A_25043)
+/// [A_25044 - Namespace für Berechtigungskonfiguration](https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Basis/gemSpec_TI-M_Basis_V1.0.0/#A_25044)
+/// [A_25258 - Schema der Berechtigungskonfiguration](https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Basis/gemSpec_TI-M_Basis_V1.0.0/#A_25258)
 abstract class InviteRejectionPolicyRepository {
   void listenToNewRejectionPolicy();
 
@@ -39,18 +36,23 @@ abstract class InviteRejectionPolicyRepository {
 class InviteRejectionPolicyRepositoryImpl implements InviteRejectionPolicyRepository {
   InviteRejectionPolicyRepositoryImpl(this._timClient);
 
-  final TimMatrixClient _timClient;
-  InviteRejectionPolicy? _inviteRejectionPolicy;
+  final _targetEventType = permissionConfigNameSpace;
 
-  StreamSubscription<BasicEvent>? onEventStreamSubscription;
+  final TimMatrixClient _timClient;
   final _logger = Logger();
+
+  InviteRejectionPolicy? _inviteRejectionPolicy;
+  StreamSubscription<BasicEvent>? _onEventStreamSubscription;
 
   /// listens to updates concerning the rejection policy through the user´s account data.
   /// Is also triggered when a user logs in.
   @override
   void listenToNewRejectionPolicy() {
-    onEventStreamSubscription ??=
-        _timClient.onAccountDataChange().stream.where((event) => event.type == permissionConfigNameSpace).listen(
+    _onEventStreamSubscription ??= _timClient
+        .onAccountDataChange()
+        .stream
+        .where((event) => event.type == _targetEventType)
+        .listen(
       (event) {
         _inviteRejectionPolicy = parseRejectionPolicyFromJson(event.content);
       },
@@ -66,7 +68,7 @@ class InviteRejectionPolicyRepositoryImpl implements InviteRejectionPolicyReposi
   @override
   Future<void> setNewPolicy(InviteRejectionPolicy policy) {
     final data = convertInviteRejectionPolicyToJson(policy);
-    return _timClient.setAccountData(_timClient.userID, permissionConfigNameSpace, data);
+    return _timClient.setAccountData(_timClient.userID, _targetEventType, data);
   }
 
   /// Retrieves [InviteRejectionPolicy] from the loaded policy. If there is no policy cached, load from
@@ -75,7 +77,7 @@ class InviteRejectionPolicyRepositoryImpl implements InviteRejectionPolicyReposi
   Future<InviteRejectionPolicy> getCurrentPolicy() async {
     if (_inviteRejectionPolicy != null) return _inviteRejectionPolicy!;
 
-    final res = await _timClient.getAccountData(_timClient.userID, permissionConfigNameSpace);
+    final res = await _timClient.getAccountData(_timClient.userID, _targetEventType);
 
     _inviteRejectionPolicy = parseRejectionPolicyFromJson(res);
     return _inviteRejectionPolicy!;
@@ -84,9 +86,17 @@ class InviteRejectionPolicyRepositoryImpl implements InviteRejectionPolicyReposi
 
 class InviteRejectionPolicyRepositoryFakeImpl implements InviteRejectionPolicyRepository {
   InviteRejectionPolicy _inviteRejectionPolicy = AllowAllInvites(
-    blockedDomains: {'homeserverA', 'homeserverB', 'nochEinHomeserver', 'bibup'},
-    blockedUsers: {'@test:homeserver', '@test123:homeserverA', '@grafa:vonhausen', '@nochmal:test'},
+    blockedServers: {'homeserverA', 'homeserverB', 'nochEinHomeserver', 'bibup'},
+    blockedUsers: {
+      '@test:homeserver',
+      '@test123:homeserverA',
+      '@grafa:vonhausen',
+      '@nochmal:test',
+    },
+    blockedUserGroups: {},
   );
+
+  final _preferencesKey = 'inviteRejectionPolicy';
 
   final TimMatrixClient _timClient;
 
@@ -95,7 +105,7 @@ class InviteRejectionPolicyRepositoryFakeImpl implements InviteRejectionPolicyRe
   @override
   Future<InviteRejectionPolicy> getCurrentPolicy() async {
     final sharedPreferences = await SharedPreferences.getInstance();
-    final inviteRejectionPolicyJson = sharedPreferences.getString(inviteRejectionPolicySharedPreferencesKey);
+    final inviteRejectionPolicyJson = sharedPreferences.getString(_preferencesKey);
     if (inviteRejectionPolicyJson != null) {
       _inviteRejectionPolicy = parseRejectionPolicyFromJson(jsonDecode(inviteRejectionPolicyJson));
     }
@@ -114,7 +124,7 @@ class InviteRejectionPolicyRepositoryFakeImpl implements InviteRejectionPolicyRe
     _inviteRejectionPolicy = newPolicy;
     final sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(
-      inviteRejectionPolicySharedPreferencesKey,
+      _preferencesKey,
       jsonEncode(convertInviteRejectionPolicyToJson(newPolicy)),
     );
   }
