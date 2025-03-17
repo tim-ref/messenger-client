@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 05.02.2025
+ * Modified by akquinet GmbH on 14.03.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -22,6 +22,7 @@ import 'package:matrix/matrix.dart';
 
 import '../../config/app_config.dart';
 import '../../utils/platform_infos.dart';
+import '../../utils/set_sync_presence.dart';
 import 'login_view.dart';
 
 class Login extends StatefulWidget {
@@ -98,6 +99,7 @@ class LoginController extends State<Login> {
         refreshToken: true,
       );
 
+      setSyncPresenceAccordingToConfig(loginClient);
       // login successful if no Exception is thrown
       if (matrix.client.userID != null) {
         matrix.client.setPresence(

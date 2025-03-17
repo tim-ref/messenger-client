@@ -14,11 +14,11 @@ import 'dart:convert';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:fluffychat/tim/feature/fhir/dto/create_endpoint.dart';
 import 'package:fluffychat/tim/feature/fhir/dto/resource_type.dart';
+import 'package:fluffychat/tim/feature/fhir/fhir_query_builder.dart';
+import 'package:fluffychat/tim/feature/fhir/fhir_repository.dart';
 import 'package:fluffychat/tim/feature/fhir/json/fhir_json_endpoint.dart';
 import 'package:fluffychat/tim/feature/fhir/json/fhir_json_extensions.dart';
 import 'package:fluffychat/tim/feature/fhir/json/fhir_json_practitioner_role.dart';
-import 'package:fluffychat/tim/feature/fhir/fhir_query_builder.dart';
-import 'package:fluffychat/tim/feature/fhir/fhir_repository.dart';
 import 'package:fluffychat/tim/feature/fhir/json/fhir_searchset_bundle.dart';
 import 'package:fluffychat/tim/feature/fhir/settings/fhir_practitioner_visibility.dart';
 import 'package:fluffychat/tim/shared/tim_auth_repository.dart';
@@ -52,7 +52,7 @@ class FhirAccountService {
 
   /// Does Matrix user with [mxid] have any active TIM Endpoints without the extension 'endpointVisibility: hide-versicherte'?
   /// [AF_10376 - Practitioner - FHIR-VZD Sichtbarkeit für Versicherte setzen](https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Pro/gemSpec_TI-M_Pro_V1.0.1/#AF_10376)
-  Future<PractitionerVisibility> fetchPractitionerVisibility(
+  Future<PractitionerVisibility?> fetchPractitionerVisibility(
     TimAuthToken token,
     String mxid,
   ) async {

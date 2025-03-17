@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 2025-02-04
+ * Modified by akquinet GmbH on 2025-03-14
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -20,6 +20,8 @@ import 'package:flutter/material.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:matrix/matrix.dart';
 import 'package:vrouter/vrouter.dart';
+
+import '../../utils/set_sync_presence.dart';
 
 class HomeserverPicker extends StatefulWidget {
   final bool enableBackButton;
@@ -94,6 +96,14 @@ class HomeserverPickerController extends State<HomeserverPicker> {
         setState(() => isLoading = false);
       }
     }
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      setSyncPresenceAccordingToConfig(Matrix.of(context).client);
+    });
+    super.initState();
   }
 
   @override

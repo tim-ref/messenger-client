@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 26.02.2025
+ * Modified by akquinet GmbH on 14.03.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -436,7 +436,6 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     Logs().v('AppLifecycleState = $state');
     final foreground = state != AppLifecycleState.detached && state != AppLifecycleState.paused;
     client.backgroundSync = foreground;
-    client.syncPresence = foreground ? PresenceType.offline : PresenceType.unavailable;
     client.requestHistoryOnLimitedTimeline = !foreground;
   }
 

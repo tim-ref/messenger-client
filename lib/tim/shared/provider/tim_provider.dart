@@ -29,7 +29,6 @@ import 'package:fluffychat/tim/test_driver/debug_widget.dart';
 import 'package:fluffychat/tim/test_driver/draggable_widget.dart';
 import 'package:fluffychat/tim/test_driver/test_driver_state_helper.dart';
 import 'package:fluffychat/tim/tim_constants.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrix/matrix.dart';
@@ -180,23 +179,12 @@ class TimProviderState extends State<TimProvider> implements TimServices {
       );
 
   FhirConfig _fhirConfig() {
-    final FhirConfig config;
-
-    if (kIsWeb) {
-      config = FhirConfig(
-        host: "${Uri.base.scheme}://${Uri.base.host}:${Uri.base.port}",
-        searchBase: '/vzd/search',
-        authBase: '/vzd/tim-authenticate',
-        ownerBase: '/vzd/owner',
-      );
-    } else {
-      config = FhirConfig(
-        host: 'https://fhir-directory-ref.vzd.ti-dienste.de',
-        searchBase: '/search',
-        authBase: '/tim-authenticate',
-        ownerBase: '/owner',
-      );
-    }
+    final config = FhirConfig(
+      host: 'https://fhir-directory-ref.vzd.ti-dienste.de',
+      searchBase: '/search',
+      authBase: '/tim-authenticate',
+      ownerBase: '/owner',
+    );
 
     Logs().i("Using FhirConfig: $config");
     return config;

@@ -37,6 +37,7 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:vrouter/vrouter.dart';
 
+import '../../utils/set_sync_presence.dart';
 import '../../widgets/fluffy_chat_app.dart';
 import '../../widgets/matrix.dart';
 import '../bootstrap/bootstrap_dialog.dart';
@@ -367,6 +368,7 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
 
   @override
   void initState() {
+    setSyncPresenceAccordingToConfig(Matrix.of(context).client);
     _initReceiveSharingIntent();
     scrollController.addListener(_onScroll);
     _waitForFirstSync();

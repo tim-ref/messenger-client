@@ -9,16 +9,18 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
+
 import 'package:fluffychat/tim/feature/fhir/fhir_endpoint_address_converter.dart';
 import 'package:fluffychat/tim/feature/fhir/settings/fhir_account_service.dart';
 import 'package:fluffychat/tim/feature/fhir/settings/fhir_practitioner_visibility.dart';
-import 'package:fluffychat/tim/feature/fhir/settings/ui/fhir_visibility_form.dart';
 import 'package:fluffychat/tim/feature/fhir/settings/ui/negated_visibility_setting_list_tile.dart';
 import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
 import 'package:fluffychat/tim/shared/tim_auth_token.dart';
-import 'package:fluffychat/tim/tim_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
+
+import 'fhir_visibility_form.dart';
 
 class FhirAccountSettings extends StatefulWidget {
   const FhirAccountSettings({Key? key}) : super(key: key);
@@ -32,11 +34,11 @@ class _FhirAccountSettingsState extends State<FhirAccountSettings> {
   final TextEditingController _urlCtrl = TextEditingController();
   late final FhirAccountService _fhirAccountService;
 
-  late TimAuthToken? _authToken;
+  TimAuthToken? _authToken;
   bool tokenDispenserUrlUpdated = false;
 
-  Future<PractitionerVisibility> _practitionerVisibility =
-      Future.value(PractitionerVisibility.none());
+  Future<PractitionerVisibility?> _practitionerVisibility =
+      Completer<PractitionerVisibility>().future;
 
   @override
   void initState() {
@@ -46,9 +48,12 @@ class _FhirAccountSettingsState extends State<FhirAccountSettings> {
     _mxidController.value = TextEditingValue(
       text: mxid,
     );
-    _practitionerVisibility = _fhirAccountService.hbaAccessToken().then((token) {
+    _fhirAccountService.hbaAccessToken().then((token) async {
       _authToken = token;
-      return _fhirAccountService.fetchPractitionerVisibility(token, mxid);
+      final res = await _fhirAccountService.fetchPractitionerVisibility(token, mxid);
+
+      _practitionerVisibility = Future.value(res);
+      setState(() {});
     });
     _urlCtrl.value = TextEditingValue(text: TimProvider.of(context).tokenDispenserUrl ?? "");
     super.initState();
@@ -73,16 +78,15 @@ class _FhirAccountSettingsState extends State<FhirAccountSettings> {
           },
           child: Column(
             children: [
-              if (const bool.fromEnvironment(enableDebugWidget))
-                Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16),
-                  child: tokenDispenserUrlUpdated
-                      ? const Text(
-                          key: ValueKey("tokenDispenserUrlUpdated"),
-                          "Token updated.",
-                        )
-                      : _tokenDispenserUrlForm(),
-                ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: tokenDispenserUrlUpdated
+                    ? const Text(
+                        key: ValueKey("tokenDispenserUrlUpdated"),
+                        "Token updated.",
+                      )
+                    : _tokenDispenserUrlForm(),
+              ),
               SingleChildScrollView(
                 padding: const EdgeInsets.only(left: 16, right: 16),
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -94,32 +98,37 @@ class _FhirAccountSettingsState extends State<FhirAccountSettings> {
                     _buildMatrixIdLabel(),
                     FutureBuilder(
                       future: _practitionerVisibility,
-                      builder: (context, visibilitySnapshot) =>
-                          switch (visibilitySnapshot.connectionState) {
-                        ConnectionState.waiting => _buildFhirVisibilityLoadingIndicator(),
-                        _ => visibilitySnapshot.hasError
-                            ? _buildFhirVisibilityError(visibilitySnapshot.error)
-                            : Column(
-                                children: [
-                                  FhirVisibilityForm(
-                                    visible: visibilitySnapshot.data?.isGenerallyVisible,
-                                    onChanged:
-                                        visibilitySnapshot.hasData ? _onVisibilityChanged : null,
-                                  ),
-                                  /// [AF_10376 - Practitioner - FHIR-VZD Sichtbarkeit für Versicherte setzen](https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Pro/gemSpec_TI-M_Pro_V1.0.1/#AF_10376)
-                                  NegatedVisibilitySettingListTile(
-                                    visibilityOff:
-                                        visibilitySnapshot.data?.isVisibleExceptFromInsurees ??
-                                            false,
-                                    onChanged: visibilitySnapshot.data?.isGenerallyVisible == true
-                                        ? (isHiddenFromInsurees) => _onVisibilityToInsureesChanged(
-                                              context,
-                                              isHiddenFromInsurees: isHiddenFromInsurees,
-                                            )
-                                        : null,
-                                  ),
-                                ],
-                              ),
+                      builder: (context, visibilitySnapshot) {
+                        return switch (visibilitySnapshot.connectionState) {
+                          ConnectionState.waiting => _buildFhirVisibilityLoadingIndicator(),
+                          _ => visibilitySnapshot.hasError
+                              ? _buildFhirVisibilityError(visibilitySnapshot.error)
+                              : !visibilitySnapshot.hasData
+                                  ? Container()
+                                  : Column(
+                                      children: [
+                                        FhirVisibilityForm(
+                                          visible: visibilitySnapshot.data?.isGenerallyVisible,
+                                          onChanged: _onVisibilityChanged,
+                                        ),
+
+                                        /// [AF_10376 - Practitioner - FHIR-VZD Sichtbarkeit für Versicherte setzen](https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Pro/gemSpec_TI-M_Pro_V1.0.1/#AF_10376)
+                                        NegatedVisibilitySettingListTile(
+                                          visibilityOff: visibilitySnapshot
+                                                  .data?.isVisibleExceptFromInsurees ??
+                                              false,
+                                          onChanged:
+                                              visibilitySnapshot.data?.isGenerallyVisible == true
+                                                  ? (isHiddenFromInsurees) =>
+                                                      _onVisibilityToInsureesChanged(
+                                                        context,
+                                                        isHiddenFromInsurees: isHiddenFromInsurees,
+                                                      )
+                                                  : null,
+                                        ),
+                                      ],
+                                    ),
+                        };
                       },
                     ),
                   ],
@@ -215,6 +224,10 @@ class _FhirAccountSettingsState extends State<FhirAccountSettings> {
   }
 
   Future<void> _onTokenDispenserUrlInputSubmitted() async {
+    setState(() {
+      // puts the future in waiting state to show loading indicator
+      _practitionerVisibility = Completer<PractitionerVisibility>().future;
+    });
     await _fhirAccountService.updateHbaAccessToken(_urlCtrl.text);
     TimProvider.of(context).tokenDispenserUrl = _urlCtrl.text;
     final token = await _fhirAccountService.hbaAccessToken();

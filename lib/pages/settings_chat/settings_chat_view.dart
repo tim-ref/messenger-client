@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 05.12.2024
+ * Modified by akquinet GmbH on 14.03.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -96,6 +96,7 @@ class SettingsChatView extends StatelessWidget {
                   onChanged: (newValue) {
                     AppConfig.sendPresenceUpdates = newValue;
                     if (matrixState.client.userID != null) {
+                      matrixState.client.syncPresence = newValue ? null : PresenceType.offline;
                       matrixState.client.setPresence(
                         matrixState.client.userID!,
                         AppConfig.sendPresenceUpdates ? PresenceType.online : PresenceType.offline,
