@@ -15,6 +15,9 @@
  *   You should have received a copy of the GNU Affero General Public License
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+/*
+ * Modified by akquinet GmbH on 2025-04-02
+ */
 
 import 'dart:async';
 import 'dart:convert';
@@ -1486,7 +1489,8 @@ class Client extends MatrixApi {
     String? filename,
     String? contentType,
   }) async {
-    final mediaConfig = await getConfig();
+    final mediaConfig =
+        (await authenticatedMediaSupported()) ? await getConfigAuthed() : await getConfig();
     final maxMediaSize = mediaConfig.mUploadSize;
     if (maxMediaSize != null && maxMediaSize < file.lengthInBytes) {
       throw FileTooBigMatrixException(file.lengthInBytes, maxMediaSize);

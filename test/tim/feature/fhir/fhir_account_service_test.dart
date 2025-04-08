@@ -12,6 +12,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:fhir/r4.dart' as r4;
 import 'package:fluffychat/tim/feature/fhir/dto/codeable_concept.dart';
 import 'package:fluffychat/tim/feature/fhir/dto/coding.dart';
 import 'package:fluffychat/tim/feature/fhir/dto/create_endpoint.dart';
@@ -325,7 +326,7 @@ void main() {
     });
 
     test(
-        'Should remove Endpoint for PractitionerRole with pre existing endpoints when making user Fhir-invisible',
+        'Should remove Endpoint for PractitionerRole with pre-existing endpoints when making user Fhir-invisible',
         () async {
       // given
       final oldPractitionerRole =
@@ -545,7 +546,10 @@ void main() {
         actualEndpoint,
         contains('https://gematik.de/fhir/directory/StructureDefinition/EndpointVisibility'),
       );
-      expect(actualEndpoint, equals(jsonEncode(activeHiddenTimEndpoint)));
+      expect(
+        r4.FhirEndpoint.fromJsonString(actualEndpoint),
+        equals(r4.FhirEndpoint.fromJson(activeHiddenTimEndpoint)),
+      );
     });
 
     test('Can remove visibility extension from active TIM Endpoint of Practitioner', () async {
@@ -585,7 +589,10 @@ void main() {
           contains('https://gematik.de/fhir/directory/StructureDefinition/EndpointVisibility'),
         ),
       );
-      expect(actualEndpoint, equals(jsonEncode(activeTimEndpoint)));
+      expect(
+        r4.FhirEndpoint.fromJsonString(actualEndpoint),
+        equals(r4.FhirEndpoint.fromJson(activeTimEndpoint)),
+      );
     });
   });
 }

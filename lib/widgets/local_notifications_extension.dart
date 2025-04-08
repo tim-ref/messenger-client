@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 26.02.2025
+ * Modified by akquinet GmbH on 01.04.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -55,18 +55,18 @@ extension LocalNotificationsExtension on MatrixState {
       hideEdit: true,
       removeMarkdown: true,
     );
-    final icon = event.senderFromMemoryOrFallback.avatarUrl?.getThumbnail(
+    final icon = await (event.senderFromMemoryOrFallback.avatarUrl?.getThumbnailUri(
           client,
           width: 64,
           height: 64,
           method: ThumbnailMethod.crop,
         ) ??
-        room.avatar?.getThumbnail(
+        room.avatar?.getThumbnailUri(
           client,
           width: 64,
           height: 64,
           method: ThumbnailMethod.crop,
-        );
+        ));
     if (kIsWeb) {
       html.AudioElement()
         ..src = 'assets/assets/sounds/WoodenBeaver_stereo_message-new-instant.ogg'
@@ -78,7 +78,7 @@ extension LocalNotificationsExtension on MatrixState {
         icon: icon.toString(),
       );
     } else if (Platform.isLinux) {
-      final appIconUrl = room.avatar?.getThumbnail(
+      final appIconUrl = await room.avatar?.getThumbnailUri(
         room.client,
         width: 56,
         height: 56,
@@ -91,7 +91,10 @@ extension LocalNotificationsExtension on MatrixState {
           '${avatarDirectory.path}/${Uri.encodeComponent(appIconUrl.toString())}',
         );
         if (await appIconFile.exists() == false) {
-          final response = await http.get(appIconUrl);
+          final response = await http.get(
+            appIconUrl,
+            headers: {'authorization': 'Bearer ${room.client.accessToken}'},
+          );
           await appIconFile.writeAsBytes(response.bodyBytes);
         }
       }

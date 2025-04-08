@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 26.02.2025
+ * Modified by akquinet GmbH on 2025-04-03
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -265,7 +265,9 @@ extension RoomExtension on Room {
     // Check media config of the server before sending the file. Stop if the
     // Media config is unreachable or the file is bigger than the given maxsize.
     try {
-      final mediaConfig = await client.getConfig();
+      final mediaConfig = (await client.authenticatedMediaSupported())
+          ? await client.getConfigAuthed()
+          : await client.getConfig();
       final maxMediaSize = mediaConfig.mUploadSize;
       if (maxMediaSize != null && maxMediaSize < file.bytes.lengthInBytes) {
         throw FileTooBigMatrixException(file.bytes.lengthInBytes, maxMediaSize);

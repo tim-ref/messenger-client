@@ -12,15 +12,16 @@
 import 'dart:convert';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:fhir/r4.dart';
 import 'package:fluffychat/tim/feature/fhir/dto/create_endpoint.dart';
 import 'package:fluffychat/tim/feature/fhir/dto/resource_type.dart';
 import 'package:fluffychat/tim/feature/fhir/fhir_query_builder.dart';
 import 'package:fluffychat/tim/feature/fhir/fhir_repository.dart';
-import 'package:fluffychat/tim/feature/fhir/json/fhir_json_endpoint.dart';
-import 'package:fluffychat/tim/feature/fhir/json/fhir_json_extensions.dart';
-import 'package:fluffychat/tim/feature/fhir/json/fhir_json_practitioner_role.dart';
-import 'package:fluffychat/tim/feature/fhir/json/fhir_searchset_bundle.dart';
 import 'package:fluffychat/tim/feature/fhir/settings/fhir_practitioner_visibility.dart';
+import 'package:fluffychat/tim/feature/fhir/util/fhir_searchset_bundle.dart';
+import 'package:fluffychat/tim/feature/fhir/util/fhir_util_endpoint.dart';
+import 'package:fluffychat/tim/feature/fhir/util/fhir_util_extensions.dart';
+import 'package:fluffychat/tim/feature/fhir/util/fhir_util_practitioner_role.dart';
 import 'package:fluffychat/tim/shared/tim_auth_repository.dart';
 import 'package:fluffychat/tim/shared/tim_auth_state.dart';
 import 'package:fluffychat/tim/shared/tim_auth_token.dart';
@@ -99,7 +100,7 @@ class FhirAccountService {
     Logs().d("using telematikId $telematikId to search owner for mxId $owningPractitionersMxid");
     final searchResponse = await _fhirRepository.searchPractitionerRoleAsOwner(query, token);
     final bundle = FhirSearchsetBundle.fromJson(owningPractitionersMxid, searchResponse);
-    if (bundle.anyEntryResource(PractitionerRoleJson.isPractitionerRoleResource)) {
+    if (bundle.anyEntryResource((resource) => resource is PractitionerRole)) {
       try {
         if (isVisible) {
           if (bundle.timEndpoint == null) {
@@ -109,7 +110,7 @@ class FhirAccountService {
           }
         } else {
           if (bundle.timEndpoint != null) {
-            final endpointId = bundle.timEndpoint!['id'];
+            final endpointId = bundle.timEndpoint!.fhirId!;
             await _removeEndpoint(bundle, endpointId, token);
           }
         }
@@ -138,11 +139,11 @@ class FhirAccountService {
     Logs().d("using telematikId $telematikId to search owner for mxId $owningPractitionersMxid");
     final searchResponse = await _fhirRepository.searchPractitionerRoleAsOwner(query, token);
     final bundle = FhirSearchsetBundle.fromJson(owningPractitionersMxid, searchResponse);
-    if (bundle.anyEntryResource(PractitionerRoleJson.isPractitionerRoleResource)) {
+    if (bundle.anyEntryResource((resource) => resource is PractitionerRole)) {
       try {
         if (bundle.timEndpoint != null &&
             EndpointJson.isActiveTimEndpointWithAddress(
-              bundle.timEndpoint,
+              bundle.timEndpoint!,
               address: owningPractitionersMxid,
             )) {
           final modifiedEndpoint = shouldBeVisible
@@ -150,7 +151,7 @@ class FhirAccountService {
               : ExtensionsJson.copyAndAddHideEndpointExtension(bundle.timEndpoint!);
           await _fhirRepository.updateResource(
             ResourceType.Endpoint,
-            modifiedEndpoint['id'],
+            modifiedEndpoint.fhirId!,
             token,
             jsonEncode(modifiedEndpoint),
           );
@@ -195,13 +196,13 @@ class FhirAccountService {
   }
 
   /// Activate and save an existing FHIR Endpoint.
-  Future<void> _activateEndpoint(Map<String, dynamic> endpoint, TimAuthToken token) async {
+  Future<void> _activateEndpoint(FhirEndpoint endpoint, TimAuthToken token) async {
     final activeEndpoint = EndpointJson.copyAndActivateEndpoint(endpoint);
     await _fhirRepository.updateResource(
       ResourceType.Endpoint,
-      activeEndpoint['id'],
+      activeEndpoint.fhirId!,
       token,
-      jsonEncode(activeEndpoint),
+      activeEndpoint.toJsonString(),
     );
   }
 
@@ -231,29 +232,29 @@ class FhirAccountService {
   }
 
   Future<void> _revertPractitionerRole(
-    Map<String, dynamic> practitionerRole,
+    PractitionerRole practitionerRole,
     TimAuthToken token,
   ) async {
     Logs().i('Revert PractitionerRole');
     await _fhirRepository.updateResource(
       ResourceType.PractitionerRole,
-      practitionerRole['id'],
+      practitionerRole.fhirId!,
       token,
-      jsonEncode(practitionerRole),
+      practitionerRole.toJsonString(),
     );
   }
 
   /// Saves a FHIR Practitioner Role.
   Future<void> _updatePractitionerRole(
-    Map<String, dynamic> practitionerRole,
+    PractitionerRole practitionerRole,
     TimAuthToken token,
   ) async {
     try {
       await _fhirRepository.updateResource(
         ResourceType.PractitionerRole,
-        practitionerRole['id'],
+        practitionerRole.fhirId!,
         token,
-        jsonEncode(practitionerRole),
+        practitionerRole.toJsonString(),
       );
     } catch (e, s) {
       Logs().e('Error updating PractitionerRole', e, s);

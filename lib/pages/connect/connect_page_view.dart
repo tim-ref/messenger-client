@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 01.04.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -13,7 +13,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
-import 'package:matrix/matrix.dart';
 
 import 'package:fluffychat/pages/connect/connect_page.dart';
 import 'package:fluffychat/widgets/layouts/login_scaffold.dart';
@@ -167,20 +166,10 @@ class ConnectPageView extends StatelessWidget {
                                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                                 foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
                               ),
-                              icon: identityProviders.single.icon == null
-                                  ? const Icon(
-                                      Icons.web_outlined,
-                                      size: 16,
-                                    )
-                                  : Image.network(
-                                      Uri.parse(identityProviders.single.icon!)
-                                          .getDownloadLink(
-                                            Matrix.of(context).getLoginClient(),
-                                          )
-                                          .toString(),
-                                      width: 32,
-                                      height: 32,
-                                    ),
+                              icon: const Icon(
+                                Icons.web_outlined,
+                                size: 16,
+                              ),
                               onPressed: () =>
                                   controller.ssoLoginAction(identityProviders.single.id!),
                               label: Text(

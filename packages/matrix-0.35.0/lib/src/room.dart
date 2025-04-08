@@ -15,6 +15,9 @@
  *   You should have received a copy of the GNU Affero General Public License
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+/*
+ * Modified by akquinet GmbH on 2025-04-02
+ */
 
 import 'dart:async';
 import 'dart:convert';
@@ -760,7 +763,9 @@ class Room {
     // Check media config of the server before sending the file. Stop if the
     // Media config is unreachable or the file is bigger than the given maxsize.
     try {
-      final mediaConfig = await client.getConfig();
+      final mediaConfig = (await client.authenticatedMediaSupported())
+          ? await client.getConfigAuthed()
+          : await client.getConfig();
       final maxMediaSize = mediaConfig.mUploadSize;
       if (maxMediaSize != null && maxMediaSize < file.bytes.lengthInBytes) {
         throw FileTooBigMatrixException(file.bytes.lengthInBytes, maxMediaSize);

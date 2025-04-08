@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 01.04.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -67,9 +67,7 @@ class _MxcImageState extends State<MxcImage> {
   set _imageData(Uint8List? data) {
     if (data == null) return;
     final cacheKey = widget.cacheKey;
-    cacheKey == null
-        ? _imageDataNoCache = data
-        : _imageDataCache[cacheKey] = data;
+    cacheKey == null ? _imageDataNoCache = data : _imageDataCache[cacheKey] = data;
   }
 
   bool? _isCached;
@@ -86,15 +84,15 @@ class _MxcImageState extends State<MxcImage> {
       final height = widget.height;
       final realHeight = height == null ? null : height * devicePixelRatio;
 
-      final httpUri = widget.isThumbnail
-          ? uri.getThumbnail(
+      final httpUri = await (widget.isThumbnail
+          ? uri.getThumbnailUri(
               client,
               width: realWidth,
               height: realHeight,
               animated: widget.animated,
               method: widget.thumbnailMethod,
             )
-          : uri.getDownloadLink(client);
+          : uri.getDownloadUri(client));
 
       final storeKey = widget.isThumbnail ? httpUri : uri;
 
@@ -111,7 +109,10 @@ class _MxcImageState extends State<MxcImage> {
         _isCached = false;
       }
 
-      final response = await http.get(httpUri);
+      final response = await http.get(
+        httpUri,
+        headers: {'authorization': 'Bearer ${client.accessToken}'},
+      );
       if (response.statusCode != 200) {
         if (response.statusCode == 404) {
           return;
@@ -170,8 +171,7 @@ class _MxcImageState extends State<MxcImage> {
 
     return AnimatedCrossFade(
       duration: widget.animationDuration,
-      crossFadeState:
-          data == null ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+      crossFadeState: data == null ? CrossFadeState.showFirst : CrossFadeState.showSecond,
       firstChild: placeholder(context),
       secondChild: data == null || data.isEmpty
           ? const SizedBox.shrink()

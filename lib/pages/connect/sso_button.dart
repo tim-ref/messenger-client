@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 16.10.2023
+ * Modified by akquinet GmbH on 01.04.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -12,10 +12,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
-import 'package:matrix/matrix.dart';
 
 import 'package:fluffychat/pages/connect/connect_page.dart';
-import 'package:fluffychat/widgets/matrix.dart';
 
 class SsoButton extends StatelessWidget {
   final IdentityProvider identityProvider;
@@ -41,26 +39,14 @@ class SsoButton extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
               clipBehavior: Clip.hardEdge,
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: identityProvider.icon == null
-                    ? const Icon(Icons.web_outlined)
-                    : Image.network(
-                        Uri.parse(identityProvider.icon!)
-                            .getDownloadLink(
-                              Matrix.of(context).getLoginClient(),
-                            )
-                            .toString(),
-                        width: 32,
-                        height: 32,
-                      ),
+              child: const Padding(
+                padding: EdgeInsets.all(4.0),
+                child: Icon(Icons.web_outlined),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              identityProvider.name ??
-                  identityProvider.brand ??
-                  L10n.of(context)!.singlesignon,
+              identityProvider.name ?? identityProvider.brand ?? L10n.of(context)!.singlesignon,
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,

@@ -1,7 +1,7 @@
 name: fluffychat
 description: Chat with your friends.
 publish_to: none
-version: 1.28.0+3360
+version: 1.28.1+3360
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -29,6 +29,7 @@ dependencies:
   emoji_picker_flutter: ^1.5.1
   emojis: ^0.9.9
   equatable: ^2.0.5
+  fhir: ^0.12.0
   file_picker: ^5.2.6
   firebase_core: ^2.4.0
   firebase_messaging: ">=14.9.4 <14.10.0"
