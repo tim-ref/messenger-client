@@ -15,7 +15,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 -->
 
-## [Unreleased]
+## [1.28.2] (published on 2025-07-21)
+
+### Fixed
+
+- Fixed a bug, where users of Homeservers only supporting Matrix Version 1.11 could not log in.
 
 ## [1.28.1] (published on 2025-04-09)
 

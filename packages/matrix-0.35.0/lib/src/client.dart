@@ -16,7 +16,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 /*
- * Modified by akquinet GmbH on 2025-04-02
+ * Modified by akquinet GmbH on 2025-07-14
  */
 
 import 'dart:async';
@@ -28,10 +28,6 @@ import 'dart:typed_data';
 import 'package:async/async.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:http/http.dart' as http;
-import 'package:mime/mime.dart';
-import 'package:olm/olm.dart' as olm;
-import 'package:random_string/random_string.dart';
-
 import 'package:matrix/encryption.dart';
 import 'package:matrix/matrix.dart';
 import 'package:matrix/matrix_api_lite/generated/fixed_model.dart';
@@ -47,6 +43,9 @@ import 'package:matrix/src/utils/sync_update_item_count.dart';
 import 'package:matrix/src/utils/try_get_push_rule.dart';
 import 'package:matrix/src/utils/versions_comparator.dart';
 import 'package:matrix/src/voip/utils/async_cache_try_fetch.dart';
+import 'package:mime/mime.dart';
+import 'package:olm/olm.dart' as olm;
+import 'package:random_string/random_string.dart';
 
 typedef RoomSorter = int Function(Room a, Room b);
 
@@ -1607,7 +1606,19 @@ class Client extends MatrixApi {
     return pushrules != null ? TryGetPushRule.tryFromJson(pushrules) : null;
   }
 
-  static const Set<String> supportedVersions = {'v1.1', 'v1.2'};
+  static const Set<String> supportedVersions = {
+    'v1.1',
+    'v1.2',
+    'v1.3',
+    'v1.4',
+    'v1.5',
+    'v1.6',
+    'v1.7',
+    'v1.8',
+    'v1.9',
+    'v1.10',
+    'v1.11',
+  };
   static const List<String> supportedDirectEncryptionAlgorithms = [
     AlgorithmTypes.olmV1Curve25519AesSha2,
   ];
