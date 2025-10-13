@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 25.02.2025
+ * Modified by akquinet GmbH on 29.08.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -130,6 +130,11 @@ abstract class ClientManager {
       // A_25458 - Use refresh token on soft logout
       // https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Basis/gemSpec_TI-M_Basis_V1.1.1/#A_25458
       onSoftLogout: (client) => client.refreshAccessToken(),
+      // A_26574 - Entschlüsseln von Nachrichten nach Wiederanmeldung
+      // https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Basis/gemSpec_TI-M_Basis_V1.1.2/#A_26574
+      // A_26575 - Ablage von Schlüsseln zum Entschlüsseln von Nachrichten nach Wiederanmeldung
+      // https://gemspec.gematik.de/docs/gemSpec/gemSpec_TI-M_Basis/gemSpec_TI-M_Basis_V1.1.2/#A_26575
+      enableDehydratedDevices: true,
     );
   }
 }

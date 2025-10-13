@@ -24,13 +24,13 @@ void main() {
   const roomId = 'roomId';
   const userId = 'userId';
 
-  final matrixClient = MockClient();
-  final timMatrixClient = TimMatrixClientImpl(client: matrixClient);
+  final mockMatrixClient = MockClient();
+  final timMatrixClient = TimMatrixClientImpl(client: mockMatrixClient);
 
   setUp(() {
-    reset(matrixClient);
+    reset(mockMatrixClient);
     when(
-      matrixClient.createRoom(
+      mockMatrixClient.createRoom(
         isDirect: anyNamed('isDirect'),
         preset: anyNamed('preset'),
         name: anyNamed('name'),
@@ -45,297 +45,373 @@ void main() {
         visibility: anyNamed('visibility'),
       ),
     ).thenAnswer((_) async => roomId);
-    when(matrixClient.getDirectChatFromUserId(any)).thenReturn(null);
-    when(matrixClient.encryptionEnabled).thenReturn(true);
-    when(matrixClient.userOwnsEncryptionKeys(any)).thenAnswer((_) async => true);
-    when(matrixClient.getRoomById(roomId)).thenAnswer((realInvocation) => null);
-    when(matrixClient.waitForRoomInSync(roomId, join: true, invite: false, leave: false))
+    when(mockMatrixClient.getDirectChatFromUserId(any)).thenReturn(null);
+    when(mockMatrixClient.encryptionEnabled).thenReturn(true);
+    when(mockMatrixClient.userOwnsEncryptionKeys(any)).thenAnswer((_) async => true);
+    when(mockMatrixClient.getRoomById(roomId)).thenAnswer((realInvocation) => null);
+    when(mockMatrixClient.waitForRoomInSync(roomId, join: true, invite: false, leave: false))
         .thenAnswer((realInvocation) async => SyncUpdate(nextBatch: ''));
-    when(matrixClient.directChats).thenReturn({
+    when(mockMatrixClient.directChats).thenReturn({
       userId: [roomId],
     });
   });
 
-  test('startDirectChat should create room with TIM default room type and default room events',
-      () async {
-    const name = 'roomName';
-    const topic = 'roomTopic';
+  group("startDirectChatWithCustomRoomType", () {
+    test('should create room with TIM default room type and default room events', () async {
+      const name = 'roomName';
+      const topic = 'roomTopic';
 
-    final expectedInitialStates = [
-      StateEvent(
-        content: {},
-        type: TimRoomStateEventType.defaultValue.value,
-      ),
-      StateEvent(
-        content: {
-          'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
-        },
-        type: EventTypes.Encryption,
-      ),
-      StateEvent(
-        content: {
-          'name': name,
-        },
-        type: TimRoomStateEventType.roomName.value,
-      ),
-      StateEvent(
-        content: {
-          'topic': topic,
-        },
-        type: TimRoomStateEventType.roomTopic.value,
-      ),
-      StateEvent(
-        content: {
-          'history_visibility': defaultHistoryVisibility,
-        },
-        type: EventTypes.HistoryVisibility,
-      ),
-    ];
-
-    expect(
-      await timMatrixClient.startDirectChatWithCustomRoomType(
-        userId,
-        name: name,
-        topic: topic,
-      ),
-      roomId,
-    );
-
-    verify(
-      matrixClient.createRoom(
-        isDirect: true,
-        preset: CreateRoomPreset.trustedPrivateChat,
-        name: '',
-        topic: '',
-        creationContent: {'type': TimRoomType.defaultValue.value},
-        initialState: argThat(
-          pairwiseCompare<StateEvent, StateEvent>(
-            expectedInitialStates,
-            compareStateEvents,
-            'compare state events',
-          ),
-          named: 'initialState',
+      final expectedInitialStates = [
+        StateEvent(
+          content: {},
+          type: TimRoomStateEventType.defaultValue.value,
         ),
-        invite: anyNamed('invite'),
-        invite3pid: anyNamed('invite3pid'),
-        powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
-        roomAliasName: anyNamed('roomAliasName'),
-        roomVersion: anyNamed('roomVersion'),
-        visibility: anyNamed('visibility'),
-      ),
-    ).called(1);
-  });
-
-  test(
-      'startDirectChat with casereference should create room with TIM casereference room type and casereference room events',
-      () async {
-    const name = 'roomName';
-    const topic = 'roomTopic';
-
-    final expectedInitialStates = [
-      StateEvent(
-        content: timCaseReferenceContentBlob,
-        type: TimRoomStateEventType.caseReference.value,
-      ),
-      StateEvent(
-        content: {
-          'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
-        },
-        type: EventTypes.Encryption,
-      ),
-      StateEvent(
-        content: {
-          'name': name,
-        },
-        type: TimRoomStateEventType.roomName.value,
-      ),
-      StateEvent(
-        content: {
-          'topic': topic,
-        },
-        type: TimRoomStateEventType.roomTopic.value,
-      ),
-      StateEvent(
+        StateEvent(
+          content: {
+            'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
+          },
+          type: EventTypes.Encryption,
+        ),
+        StateEvent(
+          content: {
+            'name': name,
+          },
+          type: TimRoomStateEventType.roomName.value,
+        ),
+        StateEvent(
+          content: {
+            'topic': topic,
+          },
+          type: TimRoomStateEventType.roomTopic.value,
+        ),
+        StateEvent(
           content: {
             'history_visibility': defaultHistoryVisibility,
           },
           type: EventTypes.HistoryVisibility,
-      ),
-    ];
-
-    expect(
-      await timMatrixClient.startDirectChatWithCustomRoomType(
-        userId,
-        name: name,
-        topic: topic,
-        isCaseReference: true,
-      ),
-      roomId,
-    );
-
-    verify(
-      matrixClient.createRoom(
-        isDirect: true,
-        preset: CreateRoomPreset.trustedPrivateChat,
-        name: '',
-        topic: '',
-        creationContent: {'type': TimRoomType.caseReference.value},
-        initialState: argThat(
-          pairwiseCompare<StateEvent, StateEvent>(
-            expectedInitialStates,
-            compareStateEvents,
-            'compare state events',
-          ),
-          named: 'initialState',
         ),
-        invite: anyNamed('invite'),
-        invite3pid: anyNamed('invite3pid'),
-        powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
-        roomAliasName: anyNamed('roomAliasName'),
-        roomVersion: anyNamed('roomVersion'),
-        visibility: anyNamed('visibility'),
-      ),
-    ).called(1);
+      ];
+
+      expect(
+        await timMatrixClient.startDirectChatWithCustomRoomType(
+          userId,
+          name: name,
+          topic: topic,
+        ),
+        roomId,
+      );
+
+      verify(
+        mockMatrixClient.createRoom(
+          isDirect: true,
+          preset: CreateRoomPreset.trustedPrivateChat,
+          name: name,
+          topic: topic,
+          creationContent: {'type': TimRoomType.defaultValue.value},
+          initialState: argThat(
+            pairwiseCompare<StateEvent, StateEvent>(
+              expectedInitialStates,
+              compareStateEvents,
+              'initialState',
+            ),
+            named: 'initialState',
+          ),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: anyNamed('visibility'),
+        ),
+      ).called(1);
+    });
+
+    test('can create room without name or topic', () async {
+      expect(
+        await timMatrixClient.startDirectChatWithCustomRoomType(userId),
+        roomId,
+      );
+
+      final verificationResult = verify(
+        mockMatrixClient.createRoom(
+          isDirect: true,
+          preset: CreateRoomPreset.trustedPrivateChat,
+          name: null,
+          topic: null,
+          creationContent: {'type': TimRoomType.defaultValue.value},
+          initialState: captureAnyNamed('initialState'),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: anyNamed('visibility'),
+        ),
+      );
+      verificationResult.called(1);
+      expect(
+        verificationResult.captured.single,
+        isNot(
+          contains(
+            anyOf(
+              isA<StateEvent>().having((e) => e.type, 'type', TimRoomStateEventType.roomName.value),
+              isA<StateEvent>()
+                  .having((e) => e.type, 'type', TimRoomStateEventType.roomTopic.value),
+            ),
+          ),
+        ),
+      );
+    });
+
+    test(
+        'with casereference should create room with TIM casereference room type and casereference room events',
+        () async {
+      const name = 'roomName';
+      const topic = 'roomTopic';
+
+      final expectedInitialStates = [
+        StateEvent(
+          content: timCaseReferenceContentBlob,
+          type: TimRoomStateEventType.caseReference.value,
+        ),
+        StateEvent(
+          content: {
+            'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
+          },
+          type: EventTypes.Encryption,
+        ),
+        StateEvent(
+          content: {
+            'name': name,
+          },
+          type: TimRoomStateEventType.roomName.value,
+        ),
+        StateEvent(
+          content: {
+            'topic': topic,
+          },
+          type: TimRoomStateEventType.roomTopic.value,
+        ),
+        StateEvent(
+          content: {
+            'history_visibility': defaultHistoryVisibility,
+          },
+          type: EventTypes.HistoryVisibility,
+        ),
+      ];
+
+      expect(
+        await timMatrixClient.startDirectChatWithCustomRoomType(
+          userId,
+          name: name,
+          topic: topic,
+          isCaseReference: true,
+        ),
+        roomId,
+      );
+
+      verify(
+        mockMatrixClient.createRoom(
+          isDirect: true,
+          preset: CreateRoomPreset.trustedPrivateChat,
+          name: name,
+          topic: topic,
+          creationContent: {'type': TimRoomType.caseReference.value},
+          initialState: argThat(
+            pairwiseCompare<StateEvent, StateEvent>(
+              expectedInitialStates,
+              compareStateEvents,
+              'initialState',
+            ),
+            named: 'initialState',
+          ),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: anyNamed('visibility'),
+        ),
+      ).called(1);
+    });
   });
 
-  test('create group chat should create room with TIM default room type and default room events',
-      () async {
-    const name = 'roomName';
-    const topic = 'roomTopic';
+  group("createGroupChatWithCustomRoomType", () {
+    test('should create room with TIM default room type and default room events', () async {
+      const name = 'roomName';
+      const topic = 'roomTopic';
 
-    final expectedInitialStates = [
-      StateEvent(
-        content: {},
-        type: TimRoomStateEventType.defaultValue.value,
-      ),
-      StateEvent(
-        content: {
-          'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
-        },
-        type: EventTypes.Encryption,
-      ),
-      StateEvent(
-        content: {
-          'name': name,
-        },
-        type: TimRoomStateEventType.roomName.value,
-      ),
-      StateEvent(
-        content: {
-          'topic': topic,
-        },
-        type: TimRoomStateEventType.roomTopic.value,
-      ),
-      StateEvent(
-        content: {
-          'history_visibility': defaultHistoryVisibility,
-        },
-        type: EventTypes.HistoryVisibility,
-      ),
-    ];
-
-    expect(
-      await timMatrixClient.createGroupChatWithCustomRoomType(
-        name: name,
-        topic: topic,
-      ),
-      roomId,
-    );
-
-    verify(
-      matrixClient.createRoom(
-        isDirect: false,
-        preset: CreateRoomPreset.privateChat,
-        name: '',
-        topic: '',
-        creationContent: {'type': TimRoomType.defaultValue.value},
-        initialState: argThat(
-          pairwiseCompare<StateEvent, StateEvent>(
-            expectedInitialStates,
-            compareStateEvents,
-            'compare state events',
-          ),
-          named: 'initialState',
+      final expectedInitialStates = [
+        StateEvent(
+          content: {},
+          type: TimRoomStateEventType.defaultValue.value,
         ),
-        invite: anyNamed('invite'),
-        invite3pid: anyNamed('invite3pid'),
-        powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
-        roomAliasName: anyNamed('roomAliasName'),
-        roomVersion: anyNamed('roomVersion'),
-        visibility: anyNamed('visibility'),
-      ),
-    ).called(1);
-  });
-
-  test(
-      'create group chat with casereference should create room with TIM casereference room type and casereference room events',
-      () async {
-    const name = 'roomName';
-    const topic = 'roomTopic';
-
-    final expectedInitialStates = [
-      StateEvent(
-        content: timCaseReferenceContentBlob,
-        type: TimRoomStateEventType.caseReference.value,
-      ),
-      StateEvent(
-        content: {
-          'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
-        },
-        type: EventTypes.Encryption,
-      ),
-      StateEvent(
-        content: {
-          'name': name,
-        },
-        type: TimRoomStateEventType.roomName.value,
-      ),
-      StateEvent(
-        content: {
-          'topic': topic,
-        },
-        type: TimRoomStateEventType.roomTopic.value,
-      ),
-      StateEvent(
-        content: {
-          'history_visibility': defaultHistoryVisibility,
-        },
-        type: EventTypes.HistoryVisibility,
-      ),
-    ];
-
-    expect(
-      await timMatrixClient.createGroupChatWithCustomRoomType(
-        name: name,
-        topic: topic,
-        isCaseReference: true,
-      ),
-      roomId,
-    );
-
-    verify(
-      matrixClient.createRoom(
-        isDirect: false,
-        preset: CreateRoomPreset.privateChat,
-        name: '',
-        topic: '',
-        creationContent: {'type': TimRoomType.caseReference.value},
-        initialState: argThat(
-          pairwiseCompare<StateEvent, StateEvent>(
-            expectedInitialStates,
-            compareStateEvents,
-            'compare state events',
-          ),
-          named: 'initialState',
+        StateEvent(
+          content: {
+            'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
+          },
+          type: EventTypes.Encryption,
         ),
-        invite: anyNamed('invite'),
-        invite3pid: anyNamed('invite3pid'),
-        powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
-        roomAliasName: anyNamed('roomAliasName'),
-        roomVersion: anyNamed('roomVersion'),
-        visibility: anyNamed('visibility'),
-      ),
-    ).called(1);
+        StateEvent(
+          content: {
+            'name': name,
+          },
+          type: TimRoomStateEventType.roomName.value,
+        ),
+        StateEvent(
+          content: {
+            'topic': topic,
+          },
+          type: TimRoomStateEventType.roomTopic.value,
+        ),
+        StateEvent(
+          content: {
+            'history_visibility': defaultHistoryVisibility,
+          },
+          type: EventTypes.HistoryVisibility,
+        ),
+      ];
+
+      expect(
+        await timMatrixClient.createGroupChatWithCustomRoomType(
+          name: name,
+          topic: topic,
+        ),
+        roomId,
+      );
+
+      verify(
+        mockMatrixClient.createRoom(
+          isDirect: false,
+          preset: CreateRoomPreset.privateChat,
+          name: name,
+          topic: topic,
+          creationContent: {'type': TimRoomType.defaultValue.value},
+          initialState: argThat(
+            pairwiseCompare<StateEvent, StateEvent>(
+              expectedInitialStates,
+              compareStateEvents,
+              'initialState',
+            ),
+            named: 'initialState',
+          ),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: anyNamed('visibility'),
+        ),
+      ).called(1);
+    });
+
+    test('can create room without name or topic', () async {
+      expect(
+        await timMatrixClient.createGroupChatWithCustomRoomType(),
+        roomId,
+      );
+
+      final verificationResult = verify(
+        mockMatrixClient.createRoom(
+          isDirect: false,
+          preset: CreateRoomPreset.privateChat,
+          name: null,
+          topic: null,
+          creationContent: {'type': TimRoomType.defaultValue.value},
+          initialState: captureAnyNamed('initialState'),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: anyNamed('visibility'),
+        ),
+      );
+      verificationResult.called(1);
+      expect(
+        verificationResult.captured.single,
+        isNot(
+          contains(
+            anyOf(
+              isA<StateEvent>().having((e) => e.type, 'type', TimRoomStateEventType.roomName.value),
+              isA<StateEvent>()
+                  .having((e) => e.type, 'type', TimRoomStateEventType.roomTopic.value),
+            ),
+          ),
+        ),
+      );
+    });
+
+    test(
+        'with casereference should create room with TIM casereference room type and casereference room events',
+        () async {
+      const name = 'roomName';
+      const topic = 'roomTopic';
+
+      final expectedInitialStates = [
+        StateEvent(
+          content: timCaseReferenceContentBlob,
+          type: TimRoomStateEventType.caseReference.value,
+        ),
+        StateEvent(
+          content: {
+            'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
+          },
+          type: EventTypes.Encryption,
+        ),
+        StateEvent(
+          content: {
+            'name': name,
+          },
+          type: TimRoomStateEventType.roomName.value,
+        ),
+        StateEvent(
+          content: {
+            'topic': topic,
+          },
+          type: TimRoomStateEventType.roomTopic.value,
+        ),
+        StateEvent(
+          content: {
+            'history_visibility': defaultHistoryVisibility,
+          },
+          type: EventTypes.HistoryVisibility,
+        ),
+      ];
+
+      expect(
+        await timMatrixClient.createGroupChatWithCustomRoomType(
+          name: name,
+          topic: topic,
+          isCaseReference: true,
+        ),
+        roomId,
+      );
+
+      verify(
+        mockMatrixClient.createRoom(
+          isDirect: false,
+          preset: CreateRoomPreset.privateChat,
+          name: name,
+          topic: topic,
+          creationContent: {'type': TimRoomType.caseReference.value},
+          initialState: argThat(
+            pairwiseCompare<StateEvent, StateEvent>(
+              expectedInitialStates,
+              compareStateEvents,
+              'initialState',
+            ),
+            named: 'initialState',
+          ),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: anyNamed('visibility'),
+        ),
+      ).called(1);
+    });
   });
 }
 

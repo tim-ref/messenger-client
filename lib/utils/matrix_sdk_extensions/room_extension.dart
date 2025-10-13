@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 2025-04-03
+ * Modified by akquinet GmbH on 2025-07-29
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -105,20 +105,41 @@ extension RoomExtension on Room {
 
   /// Call the Matrix API to change the name of this room.
   /// Returns the event ID of the new room event.
-  Future<String> setDisplayName(String value) => client.setRoomStateWithKey(
-        id,
-        TimRoomStateEventType.roomName.value,
-        '',
-        {'name': value},
-      );
+  ///
+  /// A_26338-01 - Erzeugung und Verwendung der Custom State Events für Raumnamen und -thema
+  Future<String> setDisplayName(String value) async {
+    await client.setRoomStateWithKey(
+      id,
+      TimRoomStateEventType.roomName.value,
+      '',
+      {'name': value},
+    );
+    return client.setRoomStateWithKey(
+      id,
+      EventTypes.RoomName,
+      '',
+      {'name': value},
+    );
+  }
 
   /// Call the Matrix API to change the topic of this room.
-  Future<String> setDisplayTopic(String value) => client.setRoomStateWithKey(
-        id,
-        TimRoomStateEventType.roomTopic.value,
-        '',
-        {'topic': value},
-      );
+  /// Returns the event ID of the new room event.
+  ///
+  /// A_26338-01 - Erzeugung und Verwendung der Custom State Events für Raumnamen und -thema
+  Future<String> setDisplayTopic(String value) async {
+    await client.setRoomStateWithKey(
+      id,
+      TimRoomStateEventType.roomTopic.value,
+      '',
+      {'topic': value},
+    );
+    return client.setRoomStateWithKey(
+      id,
+      EventTypes.RoomTopic,
+      '',
+      {'topic': value},
+    );
+  }
 
   /// Sends an event to this room with this json as a content. Returns the
   /// event ID generated from the server.

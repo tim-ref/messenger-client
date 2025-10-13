@@ -15,6 +15,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 -->
 
+## [1.29.0] (published on 2025-10-13)
+
+### Added
+
+- Introduce experimental feature MSC3814 - Dehydrated Devices
+- Always show bootstrap dialog for recovery key.
+
+
+### Fixed
+
+- Room name and topic are properly set when creating a room, and omitted if the room has no
+  name/topic.
+
 ## [1.28.2] (published on 2025-07-21)
 
 ### Fixed

@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 26.02.2025
+ * Modified by akquinet GmbH on 24.09.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -582,16 +582,10 @@ class ChatListController extends State<ChatList> with TickerProviderStateMixin, 
     if (client.prevBatch == null) {
       await client.onSync.stream.first;
 
-      // Only display bootstrap if not in testdriver mode
-      if (!const bool.fromEnvironment(enableTestDriver)) {
-        // Display first login bootstrap if enabled
-        if (client.encryption?.keyManager.enabled == true) {
-          if (await client.encryption?.keyManager.isCached() == false ||
-              await client.encryption?.crossSigning.isCached() == false ||
-              client.isUnknownSession && !mounted) {
-            await BootstrapDialog(client: client).show(context);
-          }
-        }
+      if (await client.encryption?.keyManager.isCached() == false ||
+          await client.encryption?.crossSigning.isCached() == false ||
+          client.isUnknownSession && !mounted) {
+        await BootstrapDialog(client: client).show(context);
       }
     }
     if (!mounted) {

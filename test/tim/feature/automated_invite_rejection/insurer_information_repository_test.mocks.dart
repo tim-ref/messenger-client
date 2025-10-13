@@ -357,43 +357,6 @@ class MockTimMatrixClient extends _i1.Mock implements _i8.TimMatrixClient {
       ) as _i7.Future<_i5.GetRoomEventsResponse>);
 
   @override
-  _i7.Future<String> startDirectChat(
-    String? mxid, {
-    bool? enableEncryption,
-    List<_i5.StateEvent>? initialState,
-    bool? waitForSync = true,
-    Map<String, dynamic>? powerLevelContentOverride,
-    _i5.CreateRoomPreset? preset = _i5.CreateRoomPreset.trustedPrivateChat,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #startDirectChat,
-          [mxid],
-          {
-            #enableEncryption: enableEncryption,
-            #initialState: initialState,
-            #waitForSync: waitForSync,
-            #powerLevelContentOverride: powerLevelContentOverride,
-            #preset: preset,
-          },
-        ),
-        returnValue: _i7.Future<String>.value(_i9.dummyValue<String>(
-          this,
-          Invocation.method(
-            #startDirectChat,
-            [mxid],
-            {
-              #enableEncryption: enableEncryption,
-              #initialState: initialState,
-              #waitForSync: waitForSync,
-              #powerLevelContentOverride: powerLevelContentOverride,
-              #preset: preset,
-            },
-          ),
-        )),
-      ) as _i7.Future<String>);
-
-  @override
   _i7.Future<String> startDirectChatWithCustomRoomType(
     String? mxid, {
     bool? isCaseReference = false,

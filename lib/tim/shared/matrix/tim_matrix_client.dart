@@ -196,52 +196,21 @@ class TimMatrixClientImpl implements TimMatrixClient {
     }
 
     enableEncryption ??= _client.encryptionEnabled && await _client.userOwnsEncryptionKeys(mxid);
-    if (enableEncryption) {
-      if (!initialState.any((s) => s.type == EventTypes.Encryption)) {
-        initialState.add(
-          StateEvent(
-            content: {
-              'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
-            },
-            type: EventTypes.Encryption,
-          ),
-        );
-      }
-    }
+    addEncryptionStateEventIfAbsent(enableEncryption, initialState);
 
-    if (name != null &&
-        !initialState.any(
-          (element) => element.type == TimRoomStateEventType.roomName.value,
-        )) {
-      initialState.add(
-        StateEvent(content: {'name': name}, type: TimRoomStateEventType.roomName.value),
-      );
-    }
+    //A_26338-01 - Erzeugung und Verwendung der Custom State Events für Raumnamen und -thema
+    addRoomNameStateEventIfAbsent(name, initialState);
+    addRoomTopicStateEventIfAbsent(topic, initialState);
 
-    if (topic != null &&
-        !initialState.any(
-          (element) => element.type == TimRoomStateEventType.roomTopic.value,
-        )) {
-      initialState.add(
-        StateEvent(content: {'topic': topic}, type: TimRoomStateEventType.roomTopic.value),
-      );
-    }
-
-    // A_25481
-    if (initialState.none(
-          (element) => element.type == EventTypes.HistoryVisibility,
-    )) {
-      initialState.add(
-        StateEvent(content: {'history_visibility': defaultHistoryVisibility}, type: EventTypes.HistoryVisibility ),
-      );
-    }
+    // A_25481 - Raum Historie
+    addHistoryVisibilityStateEventIfAbsent(initialState);
 
     // Start a new direct chat
     final roomId = await _client.createRoom(
       isDirect: true,
       invite: [mxid],
-      name: "",
-      topic: "",
+      name: name,
+      topic: topic,
       creationContent: creationContent,
       initialState: initialState,
       invite3pid: invite3pid,
@@ -260,6 +229,46 @@ class TimMatrixClientImpl implements TimMatrixClient {
     await Room(id: roomId, client: _client).addToDirectChat(mxid);
 
     return roomId;
+  }
+
+  void addEncryptionStateEventIfAbsent(bool enableEncryption, List<StateEvent> stateEvents) {
+    if (enableEncryption && stateEvents.none((e) => e.type == EventTypes.Encryption)) {
+      stateEvents.add(
+        StateEvent(
+          content: {
+            'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
+          },
+          type: EventTypes.Encryption,
+        ),
+      );
+    }
+  }
+
+  void addRoomNameStateEventIfAbsent(String? name, List<StateEvent> stateEvents) {
+    if (name != null && stateEvents.none((e) => e.type == TimRoomStateEventType.roomName.value)) {
+      stateEvents.add(
+        StateEvent(content: {'name': name}, type: TimRoomStateEventType.roomName.value),
+      );
+    }
+  }
+
+  void addRoomTopicStateEventIfAbsent(String? topic, List<StateEvent> stateEvents) {
+    if (topic != null && stateEvents.none((e) => e.type == TimRoomStateEventType.roomTopic.value)) {
+      stateEvents.add(
+        StateEvent(content: {'topic': topic}, type: TimRoomStateEventType.roomTopic.value),
+      );
+    }
+  }
+
+  void addHistoryVisibilityStateEventIfAbsent(List<StateEvent> stateEvents) {
+    if (stateEvents.none((e) => e.type == EventTypes.HistoryVisibility)) {
+      stateEvents.add(
+        StateEvent(
+          content: {'history_visibility': defaultHistoryVisibility},
+          type: EventTypes.HistoryVisibility,
+        ),
+      );
+    }
   }
 
   /// Simplified method to create a new group chat. By default it is a private
@@ -311,16 +320,7 @@ class TimMatrixClientImpl implements TimMatrixClient {
     }
 
     enableEncryption ??= _client.encryptionEnabled && preset != CreateRoomPreset.publicChat;
-    if (enableEncryption && !initialState.any((s) => s.type == EventTypes.Encryption)) {
-      initialState.add(
-        StateEvent(
-          content: {
-            'algorithm': Client.supportedGroupEncryptionAlgorithms.first,
-          },
-          type: EventTypes.Encryption,
-        ),
-      );
-    }
+    addEncryptionStateEventIfAbsent(enableEncryption, initialState);
 
     if (groupCall) {
       powerLevelContentOverride ??= {};
@@ -329,37 +329,17 @@ class TimMatrixClientImpl implements TimMatrixClient {
           powerLevelContentOverride['events_default'] ?? 0;
     }
 
-    if (name != null &&
-        !initialState.any(
-          (element) => element.type == TimRoomStateEventType.roomName.value,
-        )) {
-      initialState.add(
-        StateEvent(content: {'name': name}, type: TimRoomStateEventType.roomName.value),
-      );
-    }
+    //A_26338-01 - Erzeugung und Verwendung der Custom State Events für Raumnamen und -thema
+    addRoomNameStateEventIfAbsent(name, initialState);
+    addRoomTopicStateEventIfAbsent(topic, initialState);
 
-    if (topic != null &&
-        !initialState.any(
-          (element) => element.type == TimRoomStateEventType.roomTopic.value,
-        )) {
-      initialState.add(
-        StateEvent(content: {'topic': topic}, type: TimRoomStateEventType.roomTopic.value),
-      );
-    }
-
-    // A_25481
-    if (!initialState.any(
-          (element) => element.type == EventTypes.HistoryVisibility,
-    )) {
-      initialState.add(
-        StateEvent(content: {'history_visibility': defaultHistoryVisibility}, type: EventTypes.HistoryVisibility ),
-      );
-    }
+    // A_25481 - Raum Historie
+    addHistoryVisibilityStateEventIfAbsent(initialState);
 
     final roomId = await _client.createRoom(
       invite: invite,
       preset: preset,
-      name: "",
+      name: name,
       initialState: initialState,
       visibility: visibility,
       powerLevelContentOverride: powerLevelContentOverride,
@@ -368,7 +348,7 @@ class TimMatrixClientImpl implements TimMatrixClient {
       isDirect: isDirect,
       roomAliasName: roomAliasName,
       roomVersion: roomVersion,
-      topic: "",
+      topic: topic,
     );
 
     if (waitForSync && getRoomById(roomId) == null) {

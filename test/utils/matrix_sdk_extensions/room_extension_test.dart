@@ -9,15 +9,16 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/tim/tim_constants.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:matrix/matrix.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import '../../tim/shared/matrix/tim_matrix_client_test.mocks.dart';
 
 void main() {
   group('extractRawMentionsFromEventBody', () {
-
     test('extracts multiple valid mentions', () {
       const text = "@user4 hello @user3 and @user1";
       final mentions = RoomExtension.extractRawMentionsFromEventBody(text);
@@ -102,6 +103,62 @@ void main() {
               '@user1:79958930-655d-42be-8ab2-37ae737b249e.ru-dev.timref.akquinet.nx2.dev',
             ],
           },
+        ),
+      );
+    });
+  });
+
+  group("test cases using a client", () {
+    late MockClient mockClient;
+    late Room room;
+
+    setUp(() {
+      mockClient = MockClient();
+      when(mockClient.setRoomStateWithKey(any, any, any, any)).thenAnswer((_) async => 'event id');
+
+      room = Room(id: 'room123', client: mockClient);
+    });
+
+    test('setDisplayName', () async {
+      final result = await room.setDisplayName('room name');
+
+      expect(result, 'event id');
+      verify(
+        mockClient.setRoomStateWithKey(
+          any,
+          EventTypes.RoomName,
+          '',
+          {'name': 'room name'},
+        ),
+      );
+      verify(
+        mockClient.setRoomStateWithKey(
+          any,
+          TimRoomStateEventType.roomName.value,
+          '',
+          {'name': 'room name'},
+        ),
+      );
+    });
+
+    test('setDisplayTopic', () async {
+      final result = await room.setDisplayTopic('room topic');
+
+      expect(result, 'event id');
+      verify(
+        mockClient.setRoomStateWithKey(
+          any,
+          EventTypes.RoomTopic,
+          '',
+          {'topic': 'room topic'},
+        ),
+      );
+      verify(
+        mockClient.setRoomStateWithKey(
+          any,
+          TimRoomStateEventType.roomTopic.value,
+          '',
+          {'topic': 'room topic'},
         ),
       );
     });

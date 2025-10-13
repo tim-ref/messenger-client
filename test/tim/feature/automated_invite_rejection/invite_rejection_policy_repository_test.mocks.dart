@@ -193,58 +193,6 @@ class MockTimMatrixClient extends _i1.Mock implements _i4.TimMatrixClient {
       ) as _i6.Future<_i3.GetRoomEventsResponse>);
 
   @override
-  _i6.Future<String> startDirectChat(
-    String? mxid, {
-    bool? enableEncryption,
-    List<_i3.StateEvent>? initialState,
-    bool? waitForSync = true,
-    Map<String, dynamic>? powerLevelContentOverride,
-    _i3.CreateRoomPreset? preset = _i3.CreateRoomPreset.trustedPrivateChat,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #startDirectChat,
-          [mxid],
-          {
-            #enableEncryption: enableEncryption,
-            #initialState: initialState,
-            #waitForSync: waitForSync,
-            #powerLevelContentOverride: powerLevelContentOverride,
-            #preset: preset,
-          },
-        ),
-        returnValue: _i6.Future<String>.value(_i5.dummyValue<String>(
-          this,
-          Invocation.method(
-            #startDirectChat,
-            [mxid],
-            {
-              #enableEncryption: enableEncryption,
-              #initialState: initialState,
-              #waitForSync: waitForSync,
-              #powerLevelContentOverride: powerLevelContentOverride,
-              #preset: preset,
-            },
-          ),
-        )),
-        returnValueForMissingStub:
-            _i6.Future<String>.value(_i5.dummyValue<String>(
-          this,
-          Invocation.method(
-            #startDirectChat,
-            [mxid],
-            {
-              #enableEncryption: enableEncryption,
-              #initialState: initialState,
-              #waitForSync: waitForSync,
-              #powerLevelContentOverride: powerLevelContentOverride,
-              #preset: preset,
-            },
-          ),
-        )),
-      ) as _i6.Future<String>);
-
-  @override
   _i6.Future<String> startDirectChatWithCustomRoomType(
     String? mxid, {
     bool? isCaseReference = false,
