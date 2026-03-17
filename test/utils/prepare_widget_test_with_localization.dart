@@ -17,6 +17,8 @@ import 'package:vrouter/vrouter.dart';
 Future<void> prepareAppTestWithLocalization({
   required Widget child,
   required WidgetTester tester,
+  String path = '/',
+  String? initialUrl,
 }) async {
   await tester.pumpWidget(
     VRouter(
@@ -24,8 +26,9 @@ Future<void> prepareAppTestWithLocalization({
       key: GlobalKey<VRouterState>(),
       supportedLocales: L10n.supportedLocales,
       routes: [
-        VWidget(path: '/', widget: child),
+        VWidget(path: path, widget: child),
       ],
+      initialUrl: initialUrl ?? path,
     ),
   );
 

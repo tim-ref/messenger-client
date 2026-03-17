@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2026 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -24,7 +24,9 @@ abstract class TestFactory {
 
   static Room room({String? id, String? name, Client? client}) {
     final result = Room(
-        id: id ?? "roomId${_num++}", client: client ?? TestFactory.client(),);
+      id: id ?? "roomId${_num++}",
+      client: client ?? TestFactory.client(),
+    );
     // A room name is derived from a room name event, which we add here.
     result.states[EventTypes.RoomName] = {
       "": Event.fromMatrixEvent(matrixEventRoomName(name: name), result),
@@ -32,11 +34,12 @@ abstract class TestFactory {
     return result;
   }
 
-  static MatrixEvent matrixEventTextMessage(
-          {String? body,
-          String? senderId,
-          String? eventId,
-          DateTime? originServerTs,}) =>
+  static MatrixEvent matrixEventTextMessage({
+    String? body,
+    String? senderId,
+    String? eventId,
+    DateTime? originServerTs,
+  }) =>
       matrixEvent(
         type: EventTypes.Message,
         content: {
@@ -48,12 +51,13 @@ abstract class TestFactory {
         originServerTs: originServerTs,
       );
 
-  static MatrixEvent matrixEventMessageWithAttachment(
-          {required String url,
-          String? body,
-          String? senderId,
-          String? eventId,
-          DateTime? originServerTs,}) =>
+  static MatrixEvent matrixEventMessageWithAttachment({
+    required String url,
+    String? body,
+    String? senderId,
+    String? eventId,
+    DateTime? originServerTs,
+  }) =>
       matrixEvent(
         type: EventTypes.Message,
         content: {
@@ -66,11 +70,12 @@ abstract class TestFactory {
         originServerTs: originServerTs,
       );
 
-  static MatrixEvent matrixEventRoomName(
-          {String? name,
-          String? senderId,
-          String? eventId,
-          DateTime? originServerTs,}) =>
+  static MatrixEvent matrixEventRoomName({
+    String? name,
+    String? senderId,
+    String? eventId,
+    DateTime? originServerTs,
+  }) =>
       matrixEvent(
         type: EventTypes.RoomName,
         content: {"name": name ?? "roomName${_num++}"},
@@ -104,14 +109,18 @@ abstract class TestFactory {
   }) =>
       Event.fromMatrixEvent(
         matrixEvent(
-            type: type,
-            content: content,
-            senderId: senderId,
-            eventId: eventId,
-            originServerTs: originServerTs,),
+          type: type,
+          content: content,
+          senderId: senderId,
+          eventId: eventId,
+          originServerTs: originServerTs,
+        ),
         room ?? TestFactory.room(),
       );
 
   static MatrixFile matrixFile({Uint8List? bytes, String? name}) =>
       MatrixFile(bytes: bytes ?? Uint8List(0), name: "matrixFileName${_num++}");
+
+  static GetRelatingEventsWithRelTypeResponse relatedEvents({required List<MatrixEvent> chunk}) =>
+      GetRelatingEventsWithRelTypeResponse(chunk: chunk);
 }

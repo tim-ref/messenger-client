@@ -294,6 +294,10 @@ class TimMatrixClientImpl implements TimMatrixClient {
     String? topic,
   }) async {
     creationContent ??= {};
+    // A_25325-01 - Erzeugung öffentlicher Räume
+    if (visibility == Visibility.public || preset == CreateRoomPreset.publicChat) {
+      creationContent['m.federate'] = false;
+    }
     initialState ??= [];
 
     if (!creationContent.containsKey('type')) {

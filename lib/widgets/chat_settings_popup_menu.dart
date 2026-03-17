@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 27.11.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -10,18 +10,18 @@
  */
 
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:fluffychat/tim/feature/archive/share_room_archive.dart';
+import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:keyboard_shortcuts/keyboard_shortcuts.dart';
 import 'package:matrix/matrix.dart';
 import 'package:vrouter/vrouter.dart';
 
-import 'package:fluffychat/tim/shared/provider/tim_provider.dart';
-import 'package:fluffychat/tim/feature/archive/share_room_archive.dart';
 import 'matrix.dart';
 
 class ChatSettingsPopupMenu extends StatefulWidget {
@@ -47,9 +47,9 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
   Widget build(BuildContext context) {
     notificationChangeSub ??= Matrix.of(context)
         .client
-        .onAccountData
+        .onSync
         .stream
-        .where((u) => u.type == 'm.push_rules')
+        .where((u) => u.accountData?.any((u) => u.type == 'm.push_rules') ?? false)
         .listen(
           (u) => setState(() {}),
         );
@@ -96,6 +96,19 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
           ],
         ),
       ),
+      PopupMenuItem<String>(
+        value: 'leave_and_forget',
+        key: const ValueKey("leaveChatButton"),
+        child: Row(
+          children: [
+            const Icon(Icons.delete_outlined),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Text(L10n.of(context)!.leaveAndForget),
+            ),
+          ],
+        ),
+      ),
     ];
     if (widget.displayChatDetails) {
       items.insert(
@@ -129,6 +142,9 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
           onSelected: (String choice) async {
             switch (choice) {
               case 'leave':
+                // Get VRouter reference before async operations to avoid context becoming invalid
+                // when the page rebuilds after Matrix sync processes the leave event
+                final vrouter = VRouter.of(context);
                 final confirmed = await showOkCancelAlertDialog(
                   useRootNavigator: false,
                   context: context,
@@ -142,7 +158,31 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                     future: () => widget.room.leave(),
                   );
                   if (success.error == null) {
-                    VRouter.of(context).to('/rooms');
+                    vrouter.to('/rooms');
+                  }
+                }
+                break;
+              case 'leave_and_forget':
+                // Get VRouter reference before async operations to avoid context becoming invalid
+                // when the page rebuilds after Matrix sync processes the leave and forget event
+                final vrouter = VRouter.of(context);
+                final confirmed = await showOkCancelAlertDialog(
+                  useRootNavigator: false,
+                  context: context,
+                  title: L10n.of(context)!.areYouSure,
+                  okLabel: L10n.of(context)!.ok,
+                  cancelLabel: L10n.of(context)!.cancel,
+                );
+                if (confirmed == OkCancelResult.ok) {
+                  final success = await showFutureLoadingDialog(
+                    context: context,
+                    future: () async {
+                      await widget.room.leave();
+                      await widget.room.forget();
+                    },
+                  );
+                  if (success.error == null) {
+                    vrouter.to('/rooms');
                   }
                 }
                 break;
@@ -174,7 +214,11 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                 );
                 if (result.error != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(L10n.of(context)!.chatSettingsArchiveDownloadError)),
+                    SnackBar(
+                      content: Text(
+                        L10n.of(context)!.chatSettingsArchiveDownloadError,
+                      ),
+                    ),
                   );
                 }
                 break;

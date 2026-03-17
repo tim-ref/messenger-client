@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 10.04.2024
+ * Modified by akquinet GmbH on 2025-12-05
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,18 +9,17 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import 'package:animations/animations.dart';
-import 'package:flutter_gen/gen_l10n/l10n.dart';
-import 'package:keyboard_shortcuts/keyboard_shortcuts.dart';
-import 'package:matrix/matrix.dart';
-
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:keyboard_shortcuts/keyboard_shortcuts.dart';
+import 'package:matrix/matrix.dart';
+
 import '../../config/themes.dart';
 import 'chat.dart';
 import 'input_bar.dart';
@@ -279,7 +278,7 @@ class ChatInputRow extends StatelessWidget {
                     onPressed: controller.voiceMessageAction,
                   ),
                 ),
-              if (!PlatformInfos.isMobile || controller.inputText.isNotEmpty)
+              if (!PlatformInfos.isMobile || controller.inputText.isNotEmpty || controller.isEditEvent)
                 Container(
                   height: 56,
                   alignment: Alignment.center,

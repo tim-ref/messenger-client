@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 05.12.2024
+ * Modified by akquinet GmbH on 27.11.2025
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -12,7 +12,7 @@
 import 'dart:ui';
 
 abstract class AppConfig {
-  static const String _applicationName = 'FluffyChat';
+  static const String _applicationName = 'TI-Messenger Referenz';
 
   static String get applicationName => _applicationName;
   static String? _applicationWelcomeMessage;

@@ -234,6 +234,70 @@ void main() {
         ),
       ).called(1);
     });
+
+    test('should not set m.federate to false when creating direct chat room with visbility: public', () async {
+      const name = 'publicRoom';
+
+      expect(
+        await timMatrixClient.startDirectChatWithCustomRoomType(
+          userId,
+          name: name,
+          visibility: Visibility.public,
+        ),
+        roomId,
+      );
+
+      verify(
+        mockMatrixClient.createRoom(
+          isDirect: true,
+          preset: CreateRoomPreset.trustedPrivateChat,
+          name: name,
+          topic: null,
+          creationContent: {
+            'type': TimRoomType.defaultValue.value,
+          },
+          initialState: anyNamed('initialState'),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: Visibility.public,
+        ),
+      ).called(1);
+    });
+
+    test('should not set m.federate to false when creating direct chat with public Chat preset', () async {
+      const name = 'publicRoom';
+
+      expect(
+        await timMatrixClient.startDirectChatWithCustomRoomType(
+          userId,
+          name: name,
+          preset: CreateRoomPreset.publicChat,
+        ),
+        roomId,
+      );
+
+      verify(
+        mockMatrixClient.createRoom(
+          isDirect: true,
+          preset: CreateRoomPreset.publicChat,
+          name: name,
+          topic: null,
+          creationContent: {
+            'type': TimRoomType.defaultValue.value
+          },
+          initialState: anyNamed('initialState'),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: anyNamed('visibility'),
+        ),
+      ).called(1);
+    });
   });
 
   group("createGroupChatWithCustomRoomType", () {
@@ -403,6 +467,70 @@ void main() {
             ),
             named: 'initialState',
           ),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: anyNamed('visibility'),
+        ),
+      ).called(1);
+    });
+
+    test('should set m.federate to false when creating room with visbility: public', () async {
+      const name = 'publicRoom';
+
+      expect(
+        await timMatrixClient.createGroupChatWithCustomRoomType(
+          name: name,
+          visibility: Visibility.public,
+        ),
+        roomId,
+      );
+
+      verify(
+        mockMatrixClient.createRoom(
+          isDirect: false,
+          preset: CreateRoomPreset.privateChat,
+          name: name,
+          topic: null,
+          creationContent: {
+            'type': TimRoomType.defaultValue.value,
+            'm.federate': false,
+          },
+          initialState: anyNamed('initialState'),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: Visibility.public,
+        ),
+      ).called(1);
+    });
+
+    test('should set m.federate to false when using public chat preset', () async {
+      const name = 'publicRoom';
+
+      expect(
+        await timMatrixClient.createGroupChatWithCustomRoomType(
+          name: name,
+          preset: CreateRoomPreset.publicChat,
+        ),
+        roomId,
+      );
+
+      verify(
+        mockMatrixClient.createRoom(
+          isDirect: false,
+          preset: CreateRoomPreset.publicChat,
+          name: name,
+          topic: null,
+          creationContent: {
+            'type': TimRoomType.defaultValue.value,
+            'm.federate': false,
+          },
+          initialState: anyNamed('initialState'),
           invite: anyNamed('invite'),
           invite3pid: anyNamed('invite3pid'),
           powerLevelContentOverride: anyNamed('powerLevelContentOverride'),

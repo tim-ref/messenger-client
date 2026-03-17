@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024-2026 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -65,9 +65,9 @@ class _TimVersionSwitcherState extends State<TimVersionSwitcher> {
           onChanged: setVersion,
         ),
         RadioListTile<TimVersion>(
-          title: Text(L10n.of(context)!.timVersionEpa),
-          key: const Key("radio button: TI-M version ePA"),
-          value: TimVersion.ePA,
+          title: Text(L10n.of(context)!.timVersionPro),
+          key: const Key("radio button: TI-M version pro"),
+          value: TimVersion.pro,
           groupValue: _selectedVersion,
           onChanged: setVersion,
         ),

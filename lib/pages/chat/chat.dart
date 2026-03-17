@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 27.02.2025
+ * Modified by akquinet GmbH on 2026-02-26
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -45,6 +45,7 @@ import '../../config/app_config.dart';
 import '../../tim/feature/chat/message_edit_history_dialog.dart';
 import '../../tim/shared/provider/tim_provider.dart';
 import '../../utils/account_bundles.dart';
+import '../../utils/data_preperation_helper.dart';
 import '../../utils/localized_exception_extension.dart';
 import '../../utils/matrix_sdk_extensions/matrix_file_extension.dart';
 import '../../utils/set_user_presence.dart';
@@ -196,7 +197,10 @@ class ChatController extends State<ChatPageWithRoom> {
             client.onSync.stream.firstWhere((s) => s.rooms?.leave?.containsKey(room.id) ?? false);
         await room.leave();
         await waitForSync;
-        return await TimProvider.of(context).matrix().client().startDirectChatWithCustomRoomType(userId);
+        return await TimProvider.of(context)
+            .matrix()
+            .client()
+            .startDirectChatWithCustomRoomType(userId);
       },
     );
     final roomId = success.result;
@@ -409,17 +413,16 @@ class ChatController extends State<ChatPageWithRoom> {
       });
 
   Future<void> send() async {
-    if (sendController.text.trim().isEmpty) return;
+    if (!isEditEvent && sendController.text.trim().isEmpty) return;
     _storeInputTimeoutTimer?.cancel();
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('draft_$roomId');
-    const parseCommands = false;
     // ignore: unawaited_futures
     room.sendTextEventWithMentions(
       sendController.text,
       inReplyTo: replyEvent,
       editEventId: editEvent?.eventId,
-      parseCommands: parseCommands,
+      parseCommands: false,
     );
     setUserPresence(room.client);
     sendController.value = TextEditingValue(
@@ -728,7 +731,7 @@ class ChatController extends State<ChatPageWithRoom> {
         future: () async {
           if (event.status.isSent) {
             if (event.canRedact) {
-              await event.redactEvent();
+              await fetchAndRedactMessage(room, event);
             } else {
               final client = currentRoomBundle.firstWhere(
                 (cl) => selectedEvents.first.senderId == cl!.userID,
@@ -738,7 +741,7 @@ class ChatController extends State<ChatPageWithRoom> {
                 return;
               }
               final room = client.getRoomById(roomId)!;
-              await Event.fromJson(event.toJson(), room).redactEvent();
+              await fetchAndRedactMessage(room, event);
             }
           } else {
             await event.cancelSend();
@@ -752,6 +755,25 @@ class ChatController extends State<ChatPageWithRoom> {
     });
   }
 
+  Future<void> fetchAndRedactMessage(Room room, Event event) async {
+    final fetchedEvents = await fetchRelatedEvents(
+      Matrix.of(context).client,
+      TimProvider.of(context).matrix().crypto(),
+      room,
+      event.eventId,
+      RelationshipType.edit,
+      includeParentEvent: true,
+    );
+
+    if (fetchedEvents.isNotEmpty) {
+      for (final e in fetchedEvents) {
+        await e.redactEvent();
+      }
+    } else {
+      await event.redactEvent();
+    }
+  }
+
   List<Client?> get currentRoomBundle {
     final clients = Matrix.of(context).currentBundle!;
     clients.removeWhere((c) => c!.getRoomById(roomId) == null);
@@ -759,14 +781,39 @@ class ChatController extends State<ChatPageWithRoom> {
   }
 
   bool get canRedactSelectedEvents {
+    return ChatController.canRedactEvents(
+      selectedEvents: selectedEvents,
+      isArchived: isArchived,
+      currentBundle: Matrix.of(context).currentBundle,
+    );
+  }
+
+  static bool canRedactEvents({
+    required List<Event> selectedEvents,
+    required bool isArchived,
+    required List<Client?>? currentBundle,
+  }) {
     if (isArchived) return false;
-    final clients = Matrix.of(context).currentBundle;
+    final clients = currentBundle;
     for (final event in selectedEvents) {
-      if (event.canRedact == false && !(clients!.any((cl) => event.senderId == cl!.userID))) {
+      if (event.canRedact == false && _isNotOwnEvent(event, clients)) {
+        return false;
+      }
+      if (!ChatController._isWithinLast24Hours(event.originServerTs)) {
         return false;
       }
     }
     return true;
+  }
+
+  static bool _isNotOwnEvent(Event event, List<Client?>? clients) {
+    return !(clients!.any((cl) => event.senderId == cl!.userID));
+  }
+
+  static bool _isWithinLast24Hours(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+    return difference.inHours < 24 && !dateTime.isAfter(now);
   }
 
   void forwardEventsAction() async {
@@ -1171,6 +1218,8 @@ class ChatController extends State<ChatPageWithRoom> {
   void cancelEditEventAction() => setState(() {
         editEvent = null;
       });
+
+  bool get isEditEvent => editEvent != null;
 
   @override
   Widget build(BuildContext context) => ChatView(this);

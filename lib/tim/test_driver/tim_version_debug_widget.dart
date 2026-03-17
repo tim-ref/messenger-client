@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024-2026 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -44,7 +44,7 @@ class _TimVersionDebugWidgetState extends State<TimVersionDebugWidget> {
             if (snapshot.hasData) {
               text = switch (snapshot.data!) {
                 TimVersion.classic => "classic",
-                TimVersion.ePA => "ePA",
+                TimVersion.pro => "pro",
               };
             } else if (snapshot.hasError) {
               text = "error: ${snapshot.error}";

@@ -1,7 +1,7 @@
-// Openapi Generator last run: : 2025-07-21T15:49:38.826143
+// Openapi Generator last run: : 2026-01-19T19:10:41.038040
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - 2025 akquinet GmbH
+ * Copyright (C) 2024 - 2026 akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *

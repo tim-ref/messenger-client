@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024 - 2026 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -13,6 +13,7 @@ import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 import 'package:flutter_gen/gen_l10n/l10n.dart';
+import '../../../utils/data_preperation_helper.dart';
 import '../../../widgets/matrix.dart';
 import '../../shared/provider/tim_provider.dart';
 
@@ -31,48 +32,20 @@ class MessageEditHistoryDialog extends StatefulWidget {
 }
 
 class MessageEditHistoryDialogState extends State<MessageEditHistoryDialog> {
-  Future<List<Event>>? future;
+  Future<List<Event>>? messageEventsFuture;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
-        future = fetchRelatedEvents(context);
+        final client = Matrix.of(context).client;
+        final timCrypto = TimProvider.of(context).matrix().crypto();
+        messageEventsFuture = fetchRelatedEvents(
+            client, timCrypto, widget.room, widget.event.eventId, RelationshipType.edit,
+            includeParentEvent: true);
       });
     });
-  }
-
-  Future<List<Event>> fetchRelatedEvents(BuildContext context) async {
-    final relatingEvents = await Matrix.of(context)
-        .client
-        .getRelatingEventsWithRelType(widget.room.id, widget.event.eventId, RelationshipTypes.edit);
-
-    final List<Event> decryptedEvents = [];
-
-    for (int i = 0; i < relatingEvents.chunk.length; i++) {
-      final event = Event.fromMatrixEvent(relatingEvents.chunk[i], widget.room);
-      final decryptedEvent = await TimProvider.of(context).matrix().crypto().decryptRoomEvent(
-            widget.room.id,
-            event,
-          );
-      decryptedEvents.add(decryptedEvent);
-    }
-
-    final initialEventId =
-        decryptedEvents.firstOrNull?.content.tryGetMap("m.relates_to")?["event_id"] as String?;
-    if (initialEventId != null) {
-      final initialEvent =
-          await Matrix.of(context).client.getOneRoomEvent(widget.room.id, initialEventId);
-      final initialDecryptedEvent =
-          await TimProvider.of(context).matrix().crypto().decryptRoomEvent(
-                widget.room.id,
-                Event.fromMatrixEvent(initialEvent, widget.room),
-              );
-
-      decryptedEvents.add(initialDecryptedEvent);
-    }
-    return decryptedEvents;
   }
 
   @override
@@ -81,12 +54,12 @@ class MessageEditHistoryDialogState extends State<MessageEditHistoryDialog> {
       title: Text(L10n.of(context)!.messageEditHistory),
       content: SizedBox(
         height: 300,
-        child: future == null
+        child: messageEventsFuture == null
             ? const Center(
                 child: CircularProgressIndicator(),
               )
             : FutureBuilder(
-                future: future,
+                future: messageEventsFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

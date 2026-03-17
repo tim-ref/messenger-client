@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 26.02.2025
+ * Modified by akquinet GmbH on 02.02.2026
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,17 +9,15 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:fluffychat/config/app_config.dart';
+import 'package:fluffychat/pages/chat_encryption_settings/chat_encryption_settings.dart';
+import 'package:fluffychat/utils/beautify_string_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/room_extension.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:matrix/matrix.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:vrouter/vrouter.dart';
-
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/pages/chat_encryption_settings/chat_encryption_settings.dart';
-import 'package:fluffychat/utils/beautify_string_extension.dart';
 
 class ChatEncryptionSettingsView extends StatelessWidget {
   final ChatEncryptionSettingsController controller;

@@ -119,7 +119,7 @@ void main() {
       room = Room(id: 'room123', client: mockClient);
     });
 
-    test('setDisplayName', () async {
+    test('setDisplayName for v1 room sets both TIM and standard events', () async {
       final result = await room.setDisplayName('room name');
 
       expect(result, 'event id');
@@ -141,7 +141,7 @@ void main() {
       );
     });
 
-    test('setDisplayTopic', () async {
+    test('setDisplayTopic for v1 room sets both TIM and standard events', () async {
       final result = await room.setDisplayTopic('room topic');
 
       expect(result, 'event id');
@@ -159,6 +159,174 @@ void main() {
           TimRoomStateEventType.roomTopic.value,
           '',
           {'topic': 'room topic'},
+        ),
+      );
+    });
+  });
+
+  group('A_28595 - v2 room type support', () {
+    late MockClient mockClient;
+
+    setUp(() {
+      mockClient = MockClient();
+      when(mockClient.setRoomStateWithKey(any, any, any, any)).thenAnswer((_) async => 'event id');
+    });
+
+    Room createRoomWithType(String roomType) {
+      final room = Room(id: 'room123', client: mockClient);
+      room.states = {
+        EventTypes.RoomCreate: {
+          '': StrippedStateEvent(
+            type: EventTypes.RoomCreate,
+            content: {'type': roomType},
+            senderId: '@creator:example.com',
+            stateKey: '',
+          ),
+        },
+      };
+      return room;
+    }
+
+    test('isDefaultV2Room returns true for v2 room type', () {
+      final room = createRoomWithType(TimRoomType.defaultV2.value);
+      expect(room.isDefaultV2Room, isTrue);
+    });
+
+    test('isDefaultV2Room returns false for v1 room type', () {
+      final room = createRoomWithType(TimRoomType.defaultValue.value);
+      expect(room.isDefaultV2Room, isFalse);
+    });
+
+    test('displayName for v2 room reads only standard Matrix event', () {
+      final room = createRoomWithType(TimRoomType.defaultV2.value);
+      room.states[TimRoomStateEventType.roomName.value] = {
+        '': StrippedStateEvent(
+          type: TimRoomStateEventType.roomName.value,
+          content: {'name': 'TIM Name (should be ignored)'},
+          senderId: '@creator:example.com',
+          stateKey: '',
+        ),
+      };
+      room.states[EventTypes.RoomName] = {
+        '': StrippedStateEvent(
+          type: EventTypes.RoomName,
+          content: {'name': 'Standard Name'},
+          senderId: '@creator:example.com',
+          stateKey: '',
+        ),
+      };
+
+      expect(room.displayName, equals('Standard Name'));
+    });
+
+    test('displayName for v1 room reads TIM event first', () {
+      final room = createRoomWithType(TimRoomType.defaultValue.value);
+      room.states[TimRoomStateEventType.roomName.value] = {
+        '': StrippedStateEvent(
+          type: TimRoomStateEventType.roomName.value,
+          content: {'name': 'TIM Name'},
+          senderId: '@creator:example.com',
+          stateKey: '',
+        ),
+      };
+      room.states[EventTypes.RoomName] = {
+        '': StrippedStateEvent(
+          type: EventTypes.RoomName,
+          content: {'name': 'Standard Name (should be ignored)'},
+          senderId: '@creator:example.com',
+          stateKey: '',
+        ),
+      };
+
+      expect(room.displayName, equals('TIM Name'));
+    });
+
+    test('displayTopic for v2 room reads only standard Matrix event', () {
+      final room = createRoomWithType(TimRoomType.defaultV2.value);
+      room.states[TimRoomStateEventType.roomTopic.value] = {
+        '': StrippedStateEvent(
+          type: TimRoomStateEventType.roomTopic.value,
+          content: {'topic': 'TIM Topic (should be ignored)'},
+          senderId: '@creator:example.com',
+          stateKey: '',
+        ),
+      };
+      room.states[EventTypes.RoomTopic] = {
+        '': StrippedStateEvent(
+          type: EventTypes.RoomTopic,
+          content: {'topic': 'Standard Topic'},
+          senderId: '@creator:example.com',
+          stateKey: '',
+        ),
+      };
+
+      expect(room.displayTopic, equals('Standard Topic'));
+    });
+
+    test('displayTopic for v1 room reads TIM event first', () {
+      final room = createRoomWithType(TimRoomType.defaultValue.value);
+      room.states[TimRoomStateEventType.roomTopic.value] = {
+        '': StrippedStateEvent(
+          type: TimRoomStateEventType.roomTopic.value,
+          content: {'topic': 'TIM Topic'},
+          senderId: '@creator:example.com',
+          stateKey: '',
+        ),
+      };
+      room.states[EventTypes.RoomTopic] = {
+        '': StrippedStateEvent(
+          type: EventTypes.RoomTopic,
+          content: {'topic': 'Standard Topic (should be ignored)'},
+          senderId: '@creator:example.com',
+          stateKey: '',
+        ),
+      };
+
+      expect(room.displayTopic, equals('TIM Topic'));
+    });
+
+    test('setDisplayName for v2 room sets only standard Matrix event', () async {
+      final room = createRoomWithType(TimRoomType.defaultV2.value);
+
+      await room.setDisplayName('new name');
+
+      verify(
+        mockClient.setRoomStateWithKey(
+          any,
+          EventTypes.RoomName,
+          '',
+          {'name': 'new name'},
+        ),
+      ).called(1);
+      verifyNever(
+        mockClient.setRoomStateWithKey(
+          any,
+          TimRoomStateEventType.roomName.value,
+          '',
+          any,
+        ),
+      );
+    });
+
+    test('setDisplayTopic for v2 room sets only standard Matrix event', () async {
+      final room = createRoomWithType(TimRoomType.defaultV2.value);
+
+      await room.setDisplayTopic('new topic');
+
+      verify(
+        mockClient.setRoomStateWithKey(
+          any,
+          EventTypes.RoomTopic,
+          '',
+          {'topic': 'new topic'},
+        ),
+      ).called(1);
+      verifyNever(
+        mockClient.setRoomStateWithKey(
+          any,
+          TimRoomStateEventType.roomTopic.value,
+          '',
+          any,
         ),
       );
     });

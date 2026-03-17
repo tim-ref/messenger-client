@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024-2026 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -24,20 +24,20 @@ void main() {
 
   test('can save and load TI-M classic version', () async {
     await repo.set(TimVersion.classic);
-    final resultWithDefault = await repo.getOrDefault(TimVersion.ePA);
+    final resultWithDefault = await repo.getOrDefault(TimVersion.pro);
     final resultWithoutDefault = await repo.get();
 
     expect(resultWithDefault, equals(TimVersion.classic));
     expect(resultWithoutDefault, equals(TimVersion.classic));
   });
 
-  test('can save and load TI-M ePA version', () async {
-    await repo.set(TimVersion.ePA);
+  test('can save and load TI-M pro version', () async {
+    await repo.set(TimVersion.pro);
     final resultWithDefault = await repo.getOrDefault(TimVersion.classic);
     final resultWithoutDefault = await repo.get();
 
-    expect(resultWithDefault, equals(TimVersion.ePA));
-    expect(resultWithoutDefault, equals(TimVersion.ePA));
+    expect(resultWithDefault, equals(TimVersion.pro));
+    expect(resultWithoutDefault, equals(TimVersion.pro));
   });
 
   test('can default to TI-M classic version', () async {
@@ -46,9 +46,9 @@ void main() {
     expect(result, equals(TimVersion.classic));
   });
 
-  test('can default to TI-M ePA version', () async {
-    final result = await repo.getOrDefault(TimVersion.ePA);
+  test('can default to TI-M pro version', () async {
+    final result = await repo.getOrDefault(TimVersion.pro);
 
-    expect(result, equals(TimVersion.ePA));
+    expect(result, equals(TimVersion.pro));
   });
 }

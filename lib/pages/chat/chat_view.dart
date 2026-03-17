@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 26.02.2025
+ * Modified by akquinet GmbH on 2025-11-18
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -48,115 +48,129 @@ class ChatView extends StatelessWidget {
 
   List<Widget> _appBarActions(BuildContext context) {
     if (controller.selectMode) {
-      return [
-        IconButton(
-          icon: const Icon(Icons.copy_outlined),
-          tooltip: L10n.of(context)!.copy,
-          onPressed: controller.copyEventsAction,
-        ),
-        if (controller.canSaveSelectedEvent)
-          // Use builder context to correctly position the share dialog on iPad
-          Builder(
-            builder: (context) => IconButton(
-              icon: Icon(Icons.adaptive.share),
-              tooltip: L10n.of(context)!.share,
-              onPressed: () => controller.saveSelectedEvent(context),
-            ),
-          ),
-        if (controller.canRedactSelectedEvents)
-          IconButton(
-            icon: const Icon(Icons.delete_outlined),
-            tooltip: L10n.of(context)!.redactMessage,
-            onPressed: controller.redactEventsAction,
-            key: const ValueKey("redactEventButton"),
-          ),
-        IconButton(
-          icon: const Icon(Icons.push_pin_outlined),
-          onPressed: controller.pinEvent,
-          tooltip: L10n.of(context)!.pinMessage,
-        ),
-        // can only edit own messages and 1 at a time
-        if (controller.selectedEvents.length == 1 &&
-            controller.selectedEvents.first.senderId == controller.matrixClient.userID)
-          IconButton(onPressed: controller.editAction, icon: const Icon(Icons.edit)),
-        if (controller.selectedEvents.length == 1)
-          PopupMenuButton<_EventContextAction>(
-            onSelected: (action) {
-              switch (action) {
-                case _EventContextAction.info:
-                  controller.showEventInfo();
-                  controller.clearSelectedEvents();
-                  break;
-                case _EventContextAction.report:
-                  controller.reportEventAction();
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: _EventContextAction.info,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.info_outlined),
-                    const SizedBox(width: 12),
-                    Text(L10n.of(context)!.messageInfo),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _EventContextAction.report,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.shield_outlined,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(L10n.of(context)!.reportMessage),
-                  ],
-                ),
-              ),
-            ],
-          ),
-      ];
+      return _selectionBarActions(context);
     } else if (controller.isArchived) {
-      return [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextButton.icon(
-            onPressed: controller.forgetRoom,
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-            icon: const Icon(Icons.delete_forever_outlined),
-            label: Text(L10n.of(context)!.delete),
-          ),
-        ),
-      ];
+      return _archivedRoomBarActions(context);
     } else {
-      return [
-        if (Matrix.of(context).voipPlugin != null &&
-            controller.room.isDirectChatWithTwoOrLessParticipants)
-          IconButton(
-            onPressed: controller.onPhoneButtonTap,
-            icon: const Icon(Icons.call_outlined),
-            tooltip: L10n.of(context)!.placeCall,
+      return _defaultBarActions(context);
+    }
+  }
+
+  List<Widget> _defaultBarActions(BuildContext context) {
+    return [
+      if (controller.room.isPublic)
+        const Icon(Icons.public),
+      if (Matrix.of(context).voipPlugin != null &&
+          controller.room.isDirectChatWithTwoOrLessParticipants)
+        IconButton(
+          onPressed: controller.onPhoneButtonTap,
+          icon: const Icon(Icons.call_outlined),
+          tooltip: L10n.of(context)!.placeCall,
+        ),
+      EncryptionButton(controller.room),
+      if (controller.timCaseReferenceContent.isNotEmpty)
+        CaseReferencePopupWidget(caseReference: controller.timCaseReferenceContent),
+      Semantics(
+        label: "roomPopupMenu",
+        container: true,
+        child: ChatSettingsPopupMenu(
+          controller.room,
+          true,
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _archivedRoomBarActions(BuildContext context) {
+    return [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextButton.icon(
+          onPressed: controller.forgetRoom,
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.error,
           ),
-        EncryptionButton(controller.room),
-        if (controller.timCaseReferenceContent.isNotEmpty)
-          CaseReferencePopupWidget(caseReference: controller.timCaseReferenceContent),
-        Semantics(
-          label: "roomPopupMenu",
-          container: true,
-          child: ChatSettingsPopupMenu(
-            controller.room,
-            true,
+          icon: const Icon(Icons.delete_forever_outlined),
+          label: Text(L10n.of(context)!.delete),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _selectionBarActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.copy_outlined),
+        tooltip: L10n.of(context)!.copy,
+        onPressed: controller.copyEventsAction,
+      ),
+      if (controller.canSaveSelectedEvent)
+        // Use builder context to correctly position the share dialog on iPad
+        Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.adaptive.share),
+            tooltip: L10n.of(context)!.share,
+            onPressed: () => controller.saveSelectedEvent(context),
           ),
         ),
-      ];
-    }
+      if (controller.canRedactSelectedEvents)
+        IconButton(
+          icon: const Icon(Icons.delete_outlined),
+          tooltip: L10n.of(context)!.redactMessage,
+          onPressed: controller.redactEventsAction,
+          key: const ValueKey("redactEventButton"),
+        ),
+      IconButton(
+        icon: const Icon(Icons.push_pin_outlined),
+        onPressed: controller.pinEvent,
+        tooltip: L10n.of(context)!.pinMessage,
+      ),
+      // can only edit own messages and 1 at a time
+      if (controller.selectedEvents.length == 1 &&
+          controller.selectedEvents.first.senderId == controller.matrixClient.userID)
+        IconButton(onPressed: controller.editAction, icon: const Icon(Icons.edit)),
+      if (controller.selectedEvents.length == 1)
+        PopupMenuButton<_EventContextAction>(
+          onSelected: (action) {
+            switch (action) {
+              case _EventContextAction.info:
+                controller.showEventInfo();
+                controller.clearSelectedEvents();
+                break;
+              case _EventContextAction.report:
+                controller.reportEventAction();
+                break;
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: _EventContextAction.info,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.info_outlined),
+                  const SizedBox(width: 12),
+                  Text(L10n.of(context)!.messageInfo),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: _EventContextAction.report,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.shield_outlined,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(L10n.of(context)!.reportMessage),
+                ],
+              ),
+            ),
+          ],
+        ),
+    ];
   }
 
   @override

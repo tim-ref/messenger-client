@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 08.04.2024
+ * Modified by akquinet GmbH on 02.02.2026
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -9,12 +9,10 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter/material.dart';
-
-import 'package:flutter_gen/gen_l10n/l10n.dart';
-
 import 'package:fluffychat/pages/new_group/new_group.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
 
 class NewGroupView extends StatelessWidget {
   final NewGroupController controller;
@@ -64,8 +62,8 @@ class NewGroupView extends StatelessWidget {
             SwitchListTile.adaptive(
               secondary: const Icon(Icons.lock_outlined),
               title: Text(L10n.of(context)!.enableEncryption),
-              value: !controller.publicGroup,
-              onChanged: null,
+              value: controller.publicGroup ? controller.enableEncryption : true,
+              onChanged: controller.publicGroup ? controller.setEnableEncryption : null,
             ),
             Semantics(
               label: "groupTimCaseReferenceRoomTypeToggle",

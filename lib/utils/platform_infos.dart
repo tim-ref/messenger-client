@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 04.03.2025
+ * Modified by akquinet GmbH on 2025-12-11
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -22,15 +22,15 @@ import '../config/app_config.dart';
 abstract class PlatformInfos {
   static bool get isWeb => kIsWeb;
 
-  static bool get isLinux => !kIsWeb && Platform.isLinux;
+  static bool get isLinux => !kIsWeb && defaultTargetPlatform == TargetPlatform.linux;
 
-  static bool get isWindows => !kIsWeb && Platform.isWindows;
+  static bool get isWindows => !kIsWeb && defaultTargetPlatform == TargetPlatform.windows;
 
-  static bool get isMacOS => !kIsWeb && Platform.isMacOS;
+  static bool get isMacOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
 
-  static bool get isIOS => !kIsWeb && Platform.isIOS;
+  static bool get isIOS => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
-  static bool get isAndroid => !kIsWeb && Platform.isAndroid;
+  static bool get isAndroid => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
 
   static bool get isCupertinoStyle => isIOS || isMacOS;
 

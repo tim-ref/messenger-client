@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024-2026 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -9,10 +9,10 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// The active TI-M version (classic or ePA)
-enum TimVersion { classic, ePA }
+/// The active TI-M version (classic or pro)
+enum TimVersion { classic, pro }
 
 bool featuresClientSideInviteRejection(TimVersion version) => switch (version) {
       TimVersion.classic => false,
-      TimVersion.ePA => true,
+      TimVersion.pro => true,
     };

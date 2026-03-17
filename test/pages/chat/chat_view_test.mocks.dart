@@ -538,6 +538,13 @@ class MockChatController extends _i1.Mock implements _i5.ChatController {
       ) as bool);
 
   @override
+  bool get isEditEvent => (super.noSuchMethod(
+        Invocation.getter(#isEditEvent),
+        returnValue: false,
+        returnValueForMissingStub: false,
+      ) as bool);
+
+  @override
   _i5.ChatPageWithRoom get widget => (super.noSuchMethod(
         Invocation.getter(#widget),
         returnValue: _FakeChatPageWithRoom_5(
@@ -814,6 +821,23 @@ class MockChatController extends _i1.Mock implements _i5.ChatController {
         ),
         returnValueForMissingStub: null,
       );
+
+  @override
+  _i8.Future<void> fetchAndRedactMessage(
+    _i2.Room? room,
+    _i2.Event? event,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #fetchAndRedactMessage,
+          [
+            room,
+            event,
+          ],
+        ),
+        returnValue: _i8.Future<void>.value(),
+        returnValueForMissingStub: _i8.Future<void>.value(),
+      ) as _i8.Future<void>);
 
   @override
   void forwardEventsAction() => super.noSuchMethod(

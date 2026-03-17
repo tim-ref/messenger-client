@@ -9,21 +9,27 @@
  * You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
 import 'package:vrouter/vrouter.dart';
-import 'package:flutter_gen/gen_l10n/l10n.dart';
 
 import '../pages/settings_chat_test.dart';
+import 'firebase_mock.dart';
 
 Future<void> prepareAppTestWithMatrixClient({
   required Widget child,
   required WidgetTester tester,
   required Client client,
+  List<VRouteElement>? additionalRoutes,
 }) async {
+  final firebaseMock = MockFirebasePlatform();
+  Firebase.delegatePackingProperty = firebaseMock;
+
   await tester.pumpWidget(
     VRouter(
       localizationsDelegates: L10n.localizationsDelegates,
@@ -40,12 +46,15 @@ Future<void> prepareAppTestWithMatrixClient({
                   router: null,
                   context: context,
                   clients: [client],
-                  child: child,
+                  child: Scaffold(
+                    body: child,
+                  ),
                 ),
               );
             },
           ),
         ),
+        ...?additionalRoutes,
       ],
     ),
   );

@@ -16,6 +16,17 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*
+ * Modified by akquinet GmbH on 2025-12-16
+ * Originally forked from https://pub.dev/api/archives/matrix-0.35.0.tar.gz
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -285,9 +296,13 @@ class Event extends MatrixEvent {
   /// Returns the formatted boy of this event if it has a formatted body.
   String get formattedText => content.tryGet<String>('formatted_body') ?? '';
 
+  // PATCH: TIMREF-2418 -> A_25577-01 (Absatz 2)
+  bool get emptyMessage => type==EventTypes.Message && text=='';
+
   /// Use this to get the body.
   String get body {
     if (redacted) return 'Redacted';
+    if (emptyMessage) return ''; // PATCH: TIMREF-2418 -> A_25577-01 (Absatz 2)
     if (text != '') return text;
     return type;
   }

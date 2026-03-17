@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 2025-07-29
+ * Modified by akquinet GmbH on 2025-12-10
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -20,15 +20,27 @@ import 'package:matrix/src/utils/markdown.dart';
 /// To get the correct values use these functions over Matrix SDK Room class
 extension RoomExtension on Room {
   /// The name of the room if set by a participant.
+  /// For v2 rooms (A_28595) only standard Matrix events are used.
   String get displayName {
-    final state = getState(TimRoomStateEventType.roomName.value) ?? getState(EventTypes.RoomName);
+    final StrippedStateEvent? state;
+    if (isDefaultV2Room) {
+      state = getState(EventTypes.RoomName);
+    } else {
+      state = getState(TimRoomStateEventType.roomName.value) ?? getState(EventTypes.RoomName);
+    }
     final contentName = state?.content['name'];
     return (contentName is String) ? contentName : '';
   }
 
   /// The topic of the room if set by a participant.
+  /// For v2 rooms (A_28595) only standard Matrix events are used.
   String get displayTopic {
-    final state = getState(TimRoomStateEventType.roomTopic.value) ?? getState(EventTypes.RoomName);
+    final StrippedStateEvent? state;
+    if (isDefaultV2Room) {
+      state = getState(EventTypes.RoomTopic);
+    } else {
+      state = getState(TimRoomStateEventType.roomTopic.value) ?? getState(EventTypes.RoomTopic);
+    }
     final contentTopic = state?.content['topic'];
     return contentTopic is String ? contentTopic : '';
   }
@@ -42,6 +54,9 @@ extension RoomExtension on Room {
   /// Check if room type is casereference
   bool get isCaseReferenceRoom => roomType == TimRoomType.caseReference.value;
 
+  /// A_28595 - Check if room type is default v2 (uses standard Matrix events)
+  bool get isDefaultV2Room => roomType == TimRoomType.defaultV2.value;
+
   /// Content of CustomRoom Type Initial State Events
   Map<String, dynamic> get caseReferenceContent {
     final state = getState(TimRoomStateEventType.caseReference.value) ??
@@ -53,6 +68,12 @@ extension RoomExtension on Room {
   /// returns false if room is not a direct chat
   bool get isDirectChatWithTwoOrLessParticipants =>
       isDirectChat && (summary.mHeroes == null || summary.mHeroes!.length < 2);
+
+  /// Returns information on the publicity of a room which is defined in A_25562-01
+  bool get isPublic =>
+      historyVisibility == HistoryVisibility.worldReadable ||
+      encrypted == false ||
+      joinRules == JoinRules.public;
 
   /// Returns a localized displayname for this server. If the room is a groupchat
   /// without a name, then it will return the localized version of 'Group with Alice' instead
@@ -107,13 +128,16 @@ extension RoomExtension on Room {
   /// Returns the event ID of the new room event.
   ///
   /// A_26338-01 - Erzeugung und Verwendung der Custom State Events für Raumnamen und -thema
+  /// A_28595 - For v2 rooms only standard Matrix events are used
   Future<String> setDisplayName(String value) async {
-    await client.setRoomStateWithKey(
-      id,
-      TimRoomStateEventType.roomName.value,
-      '',
-      {'name': value},
-    );
+    if (!isDefaultV2Room) {
+      await client.setRoomStateWithKey(
+        id,
+        TimRoomStateEventType.roomName.value,
+        '',
+        {'name': value},
+      );
+    }
     return client.setRoomStateWithKey(
       id,
       EventTypes.RoomName,
@@ -126,13 +150,16 @@ extension RoomExtension on Room {
   /// Returns the event ID of the new room event.
   ///
   /// A_26338-01 - Erzeugung und Verwendung der Custom State Events für Raumnamen und -thema
+  /// A_28595 - For v2 rooms only standard Matrix events are used
   Future<String> setDisplayTopic(String value) async {
-    await client.setRoomStateWithKey(
-      id,
-      TimRoomStateEventType.roomTopic.value,
-      '',
-      {'topic': value},
-    );
+    if (!isDefaultV2Room) {
+      await client.setRoomStateWithKey(
+        id,
+        TimRoomStateEventType.roomTopic.value,
+        '',
+        {'topic': value},
+      );
+    }
     return client.setRoomStateWithKey(
       id,
       EventTypes.RoomTopic,

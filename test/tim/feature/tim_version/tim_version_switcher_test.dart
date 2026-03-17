@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - akquinet GmbH
+ * Copyright (C) 2024-2026 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -25,7 +25,7 @@ import 'mock_tim_version_service_provider.dart';
 import 'tim_version_switcher_test.mocks.dart';
 
 const _classicKey = Key("radio button: TI-M version classic");
-const _ePAKey = Key("radio button: TI-M version ePA");
+const _proKey = Key("radio button: TI-M version pro");
 
 main() {
   late MockTimVersionService serviceMock;
@@ -39,23 +39,23 @@ main() {
     ));
   });
 
-  testWidgets('can set TI-M version ePA', (tester) async {
+  testWidgets('can set TI-M version pro', (tester) async {
     await tester.pumpWidget(wrappedWidget);
 
-    final ePaRadioFinder = find.byKey(_ePAKey);
+    final ePaRadioFinder = find.byKey(_proKey);
 
     expect(ePaRadioFinder, findsOneWidget);
 
     await tester.tap(ePaRadioFinder);
     await tester.pump();
 
-    verify(serviceMock.set(TimVersion.ePA));
+    verify(serviceMock.set(TimVersion.pro));
   });
 
   testWidgets('can set TI-M version classic', (tester) async {
     await tester.pumpWidget(wrappedWidget);
 
-    final ePaRadioFinder = find.byKey(_ePAKey);
+    final ePaRadioFinder = find.byKey(_proKey);
     await tester.tap(ePaRadioFinder);
     await tester.pump();
 

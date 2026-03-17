@@ -21,12 +21,15 @@ const String tokenDispenserPassword = 'TOKEN_DISPENSER_PASSWORD';
 const String fhirAuthTokenStorageKey = 'fhirAuthToken';
 const String defaultTokenDispenserUrl = 'TOKEN_DISPENSER_URL';
 
-const String defaultHistoryVisibility =  'invited';
+const String defaultHistoryVisibility = 'invited';
 
 /// Types of room within TIM specification
 enum TimRoomType {
   /// default room type if no case reference is needed
   defaultValue(value: 'de.gematik.tim.roomtype.default.v1'),
+
+  /// A_28595 - default v2 room type using standard Matrix events for name/topic
+  defaultV2(value: 'de.gematik.tim.roomtype.default.v2'),
 
   /// special case reference for rooms, will be replaced by FHIR search API in the future
   caseReference(value: 'de.gematik.tim.roomtype.casereference.v1');
