@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2025 - akquinet GmbH
+ * Copyright (C) 2025-2026 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -235,7 +235,8 @@ void main() {
       ).called(1);
     });
 
-    test('should not set m.federate to false when creating direct chat room with visbility: public', () async {
+    test('should not set m.federate to false when creating direct chat room with visbility: public',
+        () async {
       const name = 'publicRoom';
 
       expect(
@@ -267,7 +268,8 @@ void main() {
       ).called(1);
     });
 
-    test('should not set m.federate to false when creating direct chat with public Chat preset', () async {
+    test('should not set m.federate to false when creating direct chat with public Chat preset',
+        () async {
       const name = 'publicRoom';
 
       expect(
@@ -285,9 +287,7 @@ void main() {
           preset: CreateRoomPreset.publicChat,
           name: name,
           topic: null,
-          creationContent: {
-            'type': TimRoomType.defaultValue.value
-          },
+          creationContent: {'type': TimRoomType.defaultValue.value},
           initialState: anyNamed('initialState'),
           invite: anyNamed('invite'),
           invite3pid: anyNamed('invite3pid'),
@@ -306,6 +306,12 @@ void main() {
       const topic = 'roomTopic';
 
       final expectedInitialStates = [
+        StateEvent(
+          content: {
+            'history_visibility': defaultHistoryVisibility,
+          },
+          type: EventTypes.HistoryVisibility,
+        ),
         StateEvent(
           content: {},
           type: TimRoomStateEventType.defaultValue.value,
@@ -327,12 +333,6 @@ void main() {
             'topic': topic,
           },
           type: TimRoomStateEventType.roomTopic.value,
-        ),
-        StateEvent(
-          content: {
-            'history_visibility': defaultHistoryVisibility,
-          },
-          type: EventTypes.HistoryVisibility,
         ),
       ];
 
@@ -414,6 +414,12 @@ void main() {
 
       final expectedInitialStates = [
         StateEvent(
+          content: {
+            'history_visibility': defaultHistoryVisibility,
+          },
+          type: EventTypes.HistoryVisibility,
+        ),
+        StateEvent(
           content: timCaseReferenceContentBlob,
           type: TimRoomStateEventType.caseReference.value,
         ),
@@ -434,12 +440,6 @@ void main() {
             'topic': topic,
           },
           type: TimRoomStateEventType.roomTopic.value,
-        ),
-        StateEvent(
-          content: {
-            'history_visibility': defaultHistoryVisibility,
-          },
-          type: EventTypes.HistoryVisibility,
         ),
       ];
 
@@ -539,6 +539,158 @@ void main() {
           visibility: anyNamed('visibility'),
         ),
       ).called(1);
+    });
+  });
+
+  group('history_visibility initial state – A_25324-02 / A_25481', () {
+    group('enforceHistoryVisibilityStateEventForPublicRooms', () {
+      test('adds world_readable when no history_visibility event present', () {
+        final events = <StateEvent>[];
+        timMatrixClient.enforceHistoryVisibilityStateEventForPublicRooms(events);
+        expect(events, hasLength(1));
+        expect(events.single.type, EventTypes.HistoryVisibility);
+        expect(events.single.content['history_visibility'], 'world_readable');
+      });
+
+      test('leaves world_readable unchanged', () {
+        final events = [
+          StateEvent(
+              content: {'history_visibility': 'world_readable'},
+              type: EventTypes.HistoryVisibility),
+        ];
+        timMatrixClient.enforceHistoryVisibilityStateEventForPublicRooms(events);
+        expect(events, hasLength(1));
+        expect(events.single.content['history_visibility'], 'world_readable');
+      });
+
+      test('leaves shared unchanged', () {
+        final events = [
+          StateEvent(content: {'history_visibility': 'shared'}, type: EventTypes.HistoryVisibility),
+        ];
+        timMatrixClient.enforceHistoryVisibilityStateEventForPublicRooms(events);
+        expect(events, hasLength(1));
+        expect(events.single.content['history_visibility'], 'shared');
+      });
+
+      test('overrides invited to world_readable', () {
+        final events = [
+          StateEvent(
+              content: {'history_visibility': 'invited'}, type: EventTypes.HistoryVisibility),
+        ];
+        timMatrixClient.enforceHistoryVisibilityStateEventForPublicRooms(events);
+        expect(events, hasLength(1));
+        expect(events.single.content['history_visibility'], 'world_readable');
+      });
+
+      test('overrides joined to world_readable', () {
+        final events = [
+          StateEvent(content: {'history_visibility': 'joined'}, type: EventTypes.HistoryVisibility),
+        ];
+        timMatrixClient.enforceHistoryVisibilityStateEventForPublicRooms(events);
+        expect(events, hasLength(1));
+        expect(events.single.content['history_visibility'], 'world_readable');
+      });
+    });
+
+    group('addHistoryVisibilityStateEventIfAbsent', () {
+      test('adds defaultHistoryVisibility when no event present', () {
+        final events = <StateEvent>[];
+        timMatrixClient.addHistoryVisibilityStateEventIfAbsent(events);
+        expect(events, hasLength(1));
+        expect(events.single.type, EventTypes.HistoryVisibility);
+        expect(events.single.content['history_visibility'], defaultHistoryVisibility);
+      });
+
+      test('does not change existing history_visibility event', () {
+        final events = [
+          StateEvent(
+              content: {'history_visibility': 'world_readable'},
+              type: EventTypes.HistoryVisibility),
+        ];
+        timMatrixClient.addHistoryVisibilityStateEventIfAbsent(events);
+        expect(events, hasLength(1));
+        expect(events.single.content['history_visibility'], 'world_readable');
+      });
+    });
+
+    List<StateEvent> captureInitialState() {
+      final result = verify(
+        mockMatrixClient.createRoom(
+          isDirect: anyNamed('isDirect'),
+          preset: anyNamed('preset'),
+          name: anyNamed('name'),
+          topic: anyNamed('topic'),
+          creationContent: anyNamed('creationContent'),
+          initialState: captureAnyNamed('initialState'),
+          invite: anyNamed('invite'),
+          invite3pid: anyNamed('invite3pid'),
+          powerLevelContentOverride: anyNamed('powerLevelContentOverride'),
+          roomAliasName: anyNamed('roomAliasName'),
+          roomVersion: anyNamed('roomVersion'),
+          visibility: anyNamed('visibility'),
+        ),
+      );
+      result.called(1);
+      return result.captured.single as List<StateEvent>;
+    }
+
+    String? historyVisibility(List<StateEvent> events) => events
+        .firstWhere((e) => e.type == EventTypes.HistoryVisibility)
+        .content['history_visibility'] as String?;
+
+    test('public group (visibility: public) sets world_readable', () async {
+      await timMatrixClient.createGroupChatWithCustomRoomType(
+        visibility: Visibility.public,
+        preset: CreateRoomPreset.publicChat,
+      );
+      expect(historyVisibility(captureInitialState()), 'world_readable');
+    });
+
+    test('public group (preset: publicChat) sets world_readable', () async {
+      await timMatrixClient.createGroupChatWithCustomRoomType(
+        preset: CreateRoomPreset.publicChat,
+      );
+      expect(historyVisibility(captureInitialState()), 'world_readable');
+    });
+
+    test('public group preserves shared history_visibility', () async {
+      await timMatrixClient.createGroupChatWithCustomRoomType(
+        visibility: Visibility.public,
+        preset: CreateRoomPreset.publicChat,
+        initialState: [
+          StateEvent(content: {'history_visibility': 'shared'}, type: EventTypes.HistoryVisibility),
+        ],
+      );
+      expect(historyVisibility(captureInitialState()), 'shared');
+    });
+
+    test('public group overrides invited to world_readable', () async {
+      await timMatrixClient.createGroupChatWithCustomRoomType(
+        visibility: Visibility.public,
+        preset: CreateRoomPreset.publicChat,
+        initialState: [
+          StateEvent(
+              content: {'history_visibility': 'invited'}, type: EventTypes.HistoryVisibility),
+        ],
+      );
+      expect(historyVisibility(captureInitialState()), 'world_readable');
+    });
+
+    test('private group sets defaultHistoryVisibility (invited)', () async {
+      await timMatrixClient.createGroupChatWithCustomRoomType(
+        preset: CreateRoomPreset.privateChat,
+      );
+      expect(historyVisibility(captureInitialState()), defaultHistoryVisibility);
+    });
+
+    test('private group does not add history_visibility if already present', () async {
+      await timMatrixClient.createGroupChatWithCustomRoomType(
+        preset: CreateRoomPreset.privateChat,
+        initialState: [
+          StateEvent(content: {'history_visibility': 'joined'}, type: EventTypes.HistoryVisibility),
+        ],
+      );
+      expect(historyVisibility(captureInitialState()), 'joined');
     });
   });
 }

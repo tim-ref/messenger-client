@@ -1,6 +1,6 @@
 /*
  * TIM-Referenzumgebung
- * Copyright (C) 2024 - 2025 - akquinet GmbH
+ * Copyright (C) 2024-2026 - akquinet GmbH
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
  *
@@ -271,6 +271,29 @@ class TimMatrixClientImpl implements TimMatrixClient {
     }
   }
 
+  void enforceHistoryVisibilityStateEventForPublicRooms(List<StateEvent> stateEvents) {
+    if (stateEvents.none((e) => e.type == EventTypes.HistoryVisibility)) {
+      stateEvents.add(
+        StateEvent(
+          content: {'history_visibility': 'world_readable'},
+          type: EventTypes.HistoryVisibility,
+        ),
+      );
+    } else {
+      final historyVisibility = stateEvents
+          .firstWhere((e) => e.type == EventTypes.HistoryVisibility)
+          .content
+          .tryGet('history_visibility')
+          ?.toString();
+      if (!['world_readable', 'shared'].contains(historyVisibility)) {
+        stateEvents
+            .firstWhere((e) => e.type == EventTypes.HistoryVisibility)
+            .content
+            .update('history_visibility', (_) => 'world_readable');
+      }
+    }
+  }
+
   /// Simplified method to create a new group chat. By default it is a private
   /// chat. The encryption is enabled if this client supports encryption and
   /// the preset is not a public chat.
@@ -293,12 +316,19 @@ class TimMatrixClientImpl implements TimMatrixClient {
     String? roomVersion,
     String? topic,
   }) async {
+    final isPublic = visibility == Visibility.public || preset == CreateRoomPreset.publicChat;
+
     creationContent ??= {};
-    // A_25325-01 - Erzeugung öffentlicher Räume
-    if (visibility == Visibility.public || preset == CreateRoomPreset.publicChat) {
-      creationContent['m.federate'] = false;
-    }
     initialState ??= [];
+    // A_25325-01 - Erzeugung öffentlicher Räume
+    if (isPublic) {
+      creationContent['m.federate'] = false;
+      // A_25325-02 - Deaktivierung der Verschlüsselung beim Anlegen von Räumen
+      enforceHistoryVisibilityStateEventForPublicRooms(initialState);
+    } else {
+      // A_25481 - Raum Historie
+      addHistoryVisibilityStateEventIfAbsent(initialState);
+    }
 
     if (!creationContent.containsKey('type')) {
       creationContent['type'] =
@@ -336,9 +366,6 @@ class TimMatrixClientImpl implements TimMatrixClient {
     //A_26338-01 - Erzeugung und Verwendung der Custom State Events für Raumnamen und -thema
     addRoomNameStateEventIfAbsent(name, initialState);
     addRoomTopicStateEventIfAbsent(topic, initialState);
-
-    // A_25481 - Raum Historie
-    addHistoryVisibilityStateEventIfAbsent(initialState);
 
     final roomId = await _client.createRoom(
       invite: invite,

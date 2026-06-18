@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 05.02.2025
+ * Modified by akquinet GmbH on 2026-05-12
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -20,7 +20,6 @@ import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:matrix/matrix.dart';
 
-import '../../config/app_config.dart';
 import '../../utils/set_user_presence.dart';
 
 class SendLocationDialog extends StatefulWidget {

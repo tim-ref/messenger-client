@@ -1,5 +1,5 @@
 /*
- * Modified by akquinet GmbH on 21.11.2024
+ * Modified by akquinet GmbH on 2026-05-13
  * Originally forked from https://github.com/krille-chan/fluffychat
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License.
@@ -25,35 +25,48 @@ extension EventInfoDialogExtension on Event {
         context: context,
         builder: (context) => EventInfoDialog(l10n: L10n.of(context)!, event: this),
       );
+
+  DateTime? get redactedAt {
+    final ts = unsigned?.tryGetMap('redacted_because')?['origin_server_ts'];
+    if (ts is! int || ts <= 0) return null;
+    return DateTime.fromMillisecondsSinceEpoch(ts);
+  }
+
+  String get humanreadableType {
+    if (type == EventTypes.Message) {
+      return messageType.split('m.').last;
+    }
+    if (type.startsWith('m.room.')) {
+      return type.split('m.room.').last;
+    }
+    if (type.startsWith('m.')) {
+      return type.split('m.').last;
+    }
+    return type;
+  }
 }
+
+const JsonDecoder decoder = JsonDecoder();
+const JsonEncoder encoder = JsonEncoder.withIndent('    ');
 
 class EventInfoDialog extends StatelessWidget {
   final Event event;
   final L10n l10n;
 
-  EventInfoDialog({
+  const EventInfoDialog({
     required this.event,
     required this.l10n,
     Key? key,
   }) : super(key: key);
 
   String get prettyJson {
-    const JsonDecoder decoder = JsonDecoder();
-    const JsonEncoder encoder = JsonEncoder.withIndent('    ');
     final object = decoder.convert(jsonEncode(event.toJson()));
     return encoder.convert(object);
   }
 
   @override
   Widget build(BuildContext context) {
-    String? redactedEventTime;
-    try {
-      redactedEventTime = DateTime.fromMillisecondsSinceEpoch(
-        (event.unsigned?.tryGetMap('redacted_because')?['origin_server_ts']),
-      ).localizedDateTime(context);
-    } catch (e) {
-      redactedEventTime = null;
-    }
+    final redactedEventTime = event.redactedAt?.localizedDateTime(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(L10n.of(context)!.messageInfo),
@@ -101,20 +114,5 @@ class EventInfoDialog extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-extension on Event {
-  String get humanreadableType {
-    if (type == EventTypes.Message) {
-      return messageType.split('m.').last;
-    }
-    if (type.startsWith('m.room.')) {
-      return type.split('m.room.').last;
-    }
-    if (type.startsWith('m.')) {
-      return type.split('m.').last;
-    }
-    return type;
   }
 }

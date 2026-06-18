@@ -73,7 +73,7 @@ class MessageEditHistoryDialogState extends State<MessageEditHistoryDialog> {
                           final content = e.content.tryGetMap("m.new_content")?["body"] ?? e.body;
 
                           return Text(
-                            '$content - ${e.originServerTs.localizedTimeShort(context)}',
+                            '$content - ${e.originServerTs.localizedDateTime(context)}',
                           );
                         }).toList(),
                       ),

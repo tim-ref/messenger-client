@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2026-01-19T19:10:34.728588
+// Openapi Generator last run: : 2026-05-12T15:51:29.168414
 /*
  * TIM-Referenzumgebung
  * Copyright (C) 2024 - 2026 akquinet GmbH

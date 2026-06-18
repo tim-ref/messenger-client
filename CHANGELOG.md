@@ -16,6 +16,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 -->
 
 
+## [1.30.1]
+
+### Added
+
+- Public rooms are created with `history_visibility` set to `world_readable` by default; pre-existing values of `world_readable` or `shared` are preserved, any other value is overridden (A_25324-02).
+
+### Changed
+
+- Localized timestamp for message edits.
+
+### Fixed
+
+- `EventInfoDialog` no longer shows a bogus "Redacted at" timestamp when `origin_server_ts` is missing, `null`, or `0` in the `redacted_because` field (TIMREF-2491).
+
 ## [1.30.0]
 
 ### Added
